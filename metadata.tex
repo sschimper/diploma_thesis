@@ -14,16 +14,16 @@
 \def\UKFaculty{Faculty of Mathematics and Physics}
 
 % Thesis type names, as used in several places in the title
-\def\ThesisTypeTitle{\ifEN BACHELOR THESIS \else BAKALÁŘSKÁ PRÁCE \fi}
-%\def\ThesisTypeTitle{\ifEN MASTER THESIS \else DIPLOMOVÁ PRÁCE \fi}
+%\def\ThesisTypeTitle{\ifEN BACHELOR THESIS \else BAKALÁŘSKÁ PRÁCE \fi}
+\def\ThesisTypeTitle{\ifEN MASTER THESIS \else DIPLOMOVÁ PRÁCE \fi}
 %\def\ThesisTypeTitle{\ifEN RIGOROUS THESIS \else RIGORÓZNÍ PRÁCE \fi}
 %\def\ThesisTypeTitle{\ifEN DOCTORAL THESIS \else DISERTAČNÍ PRÁCE \fi}
-\def\ThesisGenitive{\ifEN bachelor \else bakalářské \fi}
-%\def\ThesisGenitive{\ifEN master \else diplomové \fi}
+%\def\ThesisGenitive{\ifEN bachelor \else bakalářské \fi}
+\def\ThesisGenitive{\ifEN master \else diplomové \fi}
 %\def\ThesisGenitive{\ifEN rigorous \else rigorózní \fi}
 %\def\ThesisGenitive{\ifEN doctoral \else disertační \fi}
-\def\ThesisAccusative{\ifEN bachelor \else bakalářskou \fi}
-%\def\ThesisAccusative{\ifEN master \else diplomovou \fi}
+%\def\ThesisAccusative{\ifEN bachelor \else bakalářskou \fi}
+\def\ThesisAccusative{\ifEN master \else diplomovou \fi}
 %\def\ThesisAccusative{\ifEN rigorous \else rigorózní \fi}
 %\def\ThesisAccusative{\ifEN doctoral \else disertační \fi}
 
@@ -32,24 +32,25 @@
 %%% Fill in your details %%%
 
 % (Note: \xxx is a "ToDo label" which makes the unfilled visible. Remove it.)
-\def\ThesisTitle{\xxx{Thesis title}}
-\def\ThesisAuthor{\xxx{Your Name Surname}}
-\def\YearSubmitted{\xxx{YEAR}}
+\def\ThesisTitle{Integration of Intel\textregistered's ray tracing framework Embree into the ART rendering system}
+\def\ThesisAuthor{Bc. Sebastian Schimper}
+\def\YearSubmitted{2021}
 
 % department assigned to the thesis
-\def\Department{\xxx{Name of the department}}
+\def\Department{Department of Software and Computer Science Education}
 % Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{\xxx{Department}}
+\def\DeptType{Department}
 
-\def\Supervisor{\xxx{Supername Supersurname}}
-\def\SupervisorsDepartment{\xxx{department}}
+\def\Supervisor{doc. Alexander Wilkie, Dr.}
+\def\SupervisorsDepartment{Department of Software and Computer
+	Science Education}
 
 % Study programme and specialization
-\def\StudyProgramme{\xxx{study programme}}
-\def\StudyBranch{\xxx{study branch}}
+\def\StudyProgramme{Computer Science}
+\def\StudyBranch{Computer Graphics and Game Development}
 
 \def\Dedication{%
-Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book authors and food providers.}
+I owe a significant depth of gratitude to my supervisor, doc. Alexander Wilkie Dr., for the possibility to contribute to the development of a groundbreaking rendering system, and for his help and support. I would also like to express sincere thankfulness towards Alban Fichet, whose help and feedback were of crucial value to my work, as well as towards various members of the Computer Graphics Group in Prague for numerous reviews and discussions. Finally, I would like to thank my family and Monika for their love and support during difficult times.
 }
 
 \def\AbstractEN{%
@@ -64,7 +65,7 @@ Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book 
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\Keywords{%
-\xxx{{key} {words}}
+\xxx{{ray-tracing} {Embree} {acceleration} {}}
 }
 
 % If your abstracts are long and do not fit in the infopage, you can make the

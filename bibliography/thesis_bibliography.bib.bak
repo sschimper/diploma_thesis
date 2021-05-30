@@ -1,0 +1,155 @@
+% Encoding: UTF-8
+
+@Article{wald2014embree,
+  author    = {Wald, Ingo and Woop, Sven and Benthin, Carsten and Johnson, Gregory S and Ernst, Manfred},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {Embree: a kernel framework for efficient CPU ray tracing},
+  year      = {2014},
+  number    = {4},
+  pages     = {1--8},
+  volume    = {33},
+  groups    = {Embree},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Inproceedings{wilkie2013predicting,
+  author    = {Wilkie, Alexander and Ho{\v{s}}ek, Lukas},
+  title     = {Predicting sky dome appearance on earth-like extrasolar worlds},
+  booktitle = {Proceedings of the 29th Spring Conference on Computer Graphics},
+  year      = {2013},
+  pages     = {145--152},
+  groups    = {ART},
+}
+
+@InProceedings{mojzik2018handling,
+  author       = {Mojz{\'\i}k, Michal and Fichet, Alban and Wilkie, Alexander},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Handling Fluorescence in a Uni-directional Spectral Path Tracer},
+  year         = {2018},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {77--94},
+  volume       = {37},
+  groups       = {ART},
+}
+
+@InProceedings{wilkie2014hero,
+  author       = {Wilkie, Alexander and Nawaz, Sehera and Droske, Marc and Weidlich, Andrea and Hanika, Johannes},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Hero wavelength spectral sampling},
+  year         = {2014},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {123--131},
+  volume       = {33},
+  groups       = {ART},
+}
+
+@InProceedings{wilkie2011physically,
+  author       = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle    = {Computer Graphics Forum},
+  title        = {A physically plausible model for light emission from glowing solid objects},
+  year         = {2011},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {1269--1276},
+  volume       = {30},
+  groups       = {ART},
+}
+
+@Article{hosek2012analytic,
+  author    = {Hosek, Lukas and Wilkie, Alexander},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {An analytic model for full spectral sky-dome radiance},
+  year      = {2012},
+  number    = {4},
+  pages     = {1--9},
+  volume    = {31},
+  groups    = {ART},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Book{glassner1989introduction,
+  author    = {Glassner, Andrew S},
+  publisher = {Morgan Kaufmann},
+  title     = {An introduction to ray tracing},
+  year      = {1989},
+  groups    = {Introduction},
+}
+
+@Book{arthandbook,
+  author = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
+  title  = {The ART Handbook},
+  year   = {n.d.},
+  groups = {ART},
+}
+
+@Book{artreferencemanual,
+  title  = {The ARM File Reference Manual},
+  year   = {n.d.},
+  groups = {ART},
+}
+
+@InProceedings{kajiya1986rendering,
+  author    = {Kajiya, James T},
+  booktitle = {Proceedings of the 13th annual conference on Computer graphics and interactive techniques},
+  title     = {The rendering equation},
+  year      = {1986},
+  pages     = {143--150},
+  groups    = {Introduction},
+}
+
+@Article{,
+  author    = {Benthin, Carsten},
+  title     = {Embree Ray Tracing Kernels 3.X: Overview and Features},
+  year      = {2018},
+  groups    = {Embree},
+  timestamp = {Intel},
+}
+
+@InCollection{whitted2005improved,
+  author    = {Whitted, Turner},
+  booktitle = {ACM Siggraph 2005 Courses},
+  title     = {An improved illumination model for shaded display},
+  year      = {2005},
+  pages     = {4--es},
+  groups    = {Introduction},
+}
+
+@Book{HughesDamEtAl13,
+  author    = {Hughes, John F. and van Dam, Andries and McGuire, Morgan and Sklar, David F. and Foley, James D. and Feiner, Steven and Akeley, Kurt},
+  publisher = {Addison-Wesley},
+  title     = {Computer Graphics: Principles and Practice},
+  year      = {2013},
+  address   = {Upper Saddle River, NJ},
+  edition   = {3},
+  isbn      = {978-0-321-39952-6},
+  abstract  = {The third edition remains the most authoritative introduction to the field. The first edition, the original 'Foley and van Dam', helped to define computer graphics and how it could be taught. The second edition became an even more comprehensive resource for practitioners and students alike. This third edition has been completely rewritten to provide detailed and up-to-date coverage of key concepts, algorithms, technologies, and applications. The authors explain the principles, as well as the mathematics, underlying computer graphics-knowledge that is essential for successful work both now and in the future. Early chapters show how to create 2D and 3D pictures right away, supporting experimentation. Later chapters, covering a broad range of topics, demonstrate more sophisticated approaches. Sections on current computer graphics practice show how to apply given principles in common situations, such as how to approximate an ideal solution on available hardware, or how to represent a data structure more efficiently. Topics are reinforced by exercises, programming problems, and hands-on projects.},
+  added-at  = {2017-06-18T09:18:32.000+0200},
+  biburl    = {https://www.bibsonomy.org/bibtex/2782c8b454e7bfe36ae74024906f999fd/flint63},
+  file      = {eBook:2013/HughesDamEtAl13.pdf:PDF;InformIT Product page:http\://www.informit.com/store/computer-graphics-principles-and-practice-9780321399526:URL;Amazon Search inside:http\://www.amazon.de/gp/reader/0321399528/:URL},
+  groups    = {public, General Computer Graphics},
+  interhash = {eb128bd82b9b475b4a69a002ae18beb8},
+  intrahash = {782c8b454e7bfe36ae74024906f999fd},
+  keywords  = {01821 103 book computer graphics},
+  timestamp = {2018-04-16T11:55:50.000+0200},
+  username  = {flint63},
+}
+
+@Book{pharr2016physically,
+  author    = {Pharr, Matt and Jakob, Wenzel and Humphreys, Greg},
+  publisher = {Morgan Kaufmann},
+  title     = {Physically based rendering: From theory to implementation},
+  year      = {2016},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
+
+@Comment{jabref-meta: grouping:
+0 AllEntriesGroup:;
+1 StaticGroup:Embree\;0\;0\;0x0000ffff\;\;\;;
+1 StaticGroup:ART\;0\;1\;0x008000ff\;\;\;;
+1 StaticGroup:Introduction\;0\;0\;0x804d80ff\;\;\;;
+1 StaticGroup:Existing Ray Accelerator Structures\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:General Computer Graphics\;0\;1\;0x8a8a8aff\;\;\;;
+}

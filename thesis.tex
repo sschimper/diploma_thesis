@@ -47,14 +47,15 @@
 \usepackage{floatrow}
 
 % load bibliography tools
-\usepackage[backend=bibtex,natbib,style=numeric,sorting=none]{biblatex}
+% \usepackage[backend=bibtex,natbib,style=numeric,sorting=none]{biblatex}
+
 % alternative with alphanumeric citations (more informative than numbers):
-%\usepackage[backend=bibtex,natbib,style=alphabetic]{biblatex}
+\usepackage[backend=bibtex,natbib,style=alphabetic]{biblatex}
 %
 % alternatives that conform to iso690
 % (iso690 is not formally required on MFF, but may help elsewhere):
 %\usepackage[backend=bibtex,natbib,style=iso-numeric,sorting=none]{biblatex}
-%\usepackage[backend=bibtex,natbib,style=iso-alphabetic]{biblatex}
+ %\usepackage[backend=bibtex,natbib,style=iso-alphabetic]{biblatex}
 %
 % additional option choices:
 %  - add `giveninits=true` to typeset "E. A. Poe" instead of full Edgar Allan
@@ -80,7 +81,7 @@
 %\DeclareNameAlias{default}{family-given}
 
 % load the file with bibliography entries
-\addbibresource{refs}
+\addbibresource{bibliography/thesis_bibliography}
 
 % remove this if you won't use fancy verbatim environments
 \usepackage{fancyvrb}
