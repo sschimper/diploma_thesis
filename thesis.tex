@@ -55,7 +55,13 @@
 % alternative with alphanumeric citations (more informative than numbers):
 %\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear]{biblatex}
 
-\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear]{biblatex}
+%\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear]{biblatex}
+
+
+\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear-icomp, maxcitenames=1]{biblatex}
+
+\let\oldcite\cite
+\renewcommand*\cite[1]{[\oldcite{#1}]}
 
 %
 % alternatives that conform to iso690
