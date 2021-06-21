@@ -8,7 +8,7 @@
   number    = {4},
   pages     = {1--8},
   volume    = {33},
-  groups    = {Embree},
+  groups    = {Embree, Introduction},
   publisher = {ACM New York, NY, USA},
 }
 
@@ -74,20 +74,25 @@
   publisher = {Morgan Kaufmann},
   title     = {An introduction to ray tracing},
   year      = {1989},
-  groups    = {Introduction},
+  groups    = {Ray Tracing Technques},
 }
 
-@Book{arthandbook,
-  author = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
-  title  = {The ART Handbook},
-  year   = {n.d.},
-  groups = {ART},
+@Online{arthandbook,
+  author  = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
+  groups  = {ART},
+  title   = {The ART Handbook},
+  url     = {https://cgg.mff.cuni.cz/ART/assets/ART_Handbook.pdf},
+  urldate = {2021-05-30},
+  year    = {n.d.},
 }
 
-@Book{artreferencemanual,
-  title  = {The ARM File Reference Manual},
-  year   = {n.d.},
-  groups = {ART},
+@Online{artreferencemanual,
+  author  = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
+  groups  = {ART},
+  title   = {The ARM File Reference Manual},
+  url     = {https://cgg.mff.cuni.cz/ART/assets/ARM_Interface.pdf},
+  urldate = {2021-05-30},
+  year    = {n.d.},
 }
 
 @InProceedings{kajiya1986rendering,
@@ -96,10 +101,10 @@
   title     = {The rendering equation},
   year      = {1986},
   pages     = {143--150},
-  groups    = {Introduction},
+  groups    = {Ray Tracing Technques},
 }
 
-@Article{,
+@Misc{embreeSlides,
   author    = {Benthin, Carsten},
   title     = {Embree Ray Tracing Kernels 3.X: Overview and Features},
   year      = {2018},
@@ -107,13 +112,13 @@
   timestamp = {Intel},
 }
 
-@InCollection{whitted2005improved,
+@InProceedings{whitted1979improved,
   author    = {Whitted, Turner},
-  booktitle = {ACM Siggraph 2005 Courses},
+  booktitle = {Proceedings of the 6th annual conference on Computer graphics and interactive techniques},
   title     = {An improved illumination model for shaded display},
-  year      = {2005},
-  pages     = {4--es},
-  groups    = {Introduction},
+  year      = {1979},
+  pages     = {14},
+  groups    = {Introduction, Ray Tracing Technques},
 }
 
 @Book{HughesDamEtAl13,
@@ -128,7 +133,7 @@
   added-at  = {2017-06-18T09:18:32.000+0200},
   biburl    = {https://www.bibsonomy.org/bibtex/2782c8b454e7bfe36ae74024906f999fd/flint63},
   file      = {eBook:2013/HughesDamEtAl13.pdf:PDF;InformIT Product page:http\://www.informit.com/store/computer-graphics-principles-and-practice-9780321399526:URL;Amazon Search inside:http\://www.amazon.de/gp/reader/0321399528/:URL},
-  groups    = {public, General Computer Graphics},
+  groups    = {public},
   interhash = {eb128bd82b9b475b4a69a002ae18beb8},
   intrahash = {782c8b454e7bfe36ae74024906f999fd},
   keywords  = {01821 103 book computer graphics},
@@ -141,6 +146,201 @@
   publisher = {Morgan Kaufmann},
   title     = {Physically based rendering: From theory to implementation},
   year      = {2016},
+  groups    = {Existing Renderers},
+}
+
+@Article{roth1982ray,
+  author    = {Roth, Scott D},
+  journal   = {Computer graphics and image processing},
+  title     = {Ray casting for modeling solids},
+  year      = {1982},
+  number    = {2},
+  pages     = {109--144},
+  volume    = {18},
+  groups    = {CSG},
+  publisher = {Elsevier},
+}
+
+@Article{embreecsg,
+  author  = {Karaffová, Markéta},
+  journal = {Master Thesis},
+  title   = {Efficient Ray Tracing of CSG Models},
+  year    = {2016},
+  groups  = {CSG},
+}
+
+@Online{embreeAward,
+  author  = {Intel Newsroom},
+  groups  = {Embree},
+  title   = {{Intel Embree Wins Academy Scientific and Technical Award}},
+  url     = {https://newsroom.intel.de/news/intel-embree-wins-academy-scientific-and-technical-award/#gs.2q50qi},
+  urldate = {2021-05-30},
+  year    = {2021},
+}
+
+@Online{artSoftware,
+  author  = {Computer Graphics Group, Charles University},
+  groups  = {ART},
+  title   = {{Advanced Rendering Toolkit}},
+  url     = {https://cgg.mff.cuni.cz/ART/},
+  urldate = {2021-05-30},
+  year    = {n.d.},
+}
+
+@Article{nimier2019mitsuba,
+  author    = {Nimier-David, Merlin and Vicini, Delio and Zeltner, Tizian and Jakob, Wenzel},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {Mitsuba 2: A retargetable forward and inverse renderer},
+  year      = {2019},
+  number    = {6},
+  pages     = {1--17},
+  volume    = {38},
+  groups    = {Existing Renderers},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{schmittler2002saarcor,
+  author    = {Schmittler, J{\"o}rg and Wald, Ingo and Slusallek, Philipp},
+  booktitle = {Proceedings of the ACM SIGGRAPH/EUROGRAPHICS conference on Graphics hardware},
+  title     = {Saarcor: a hardware architecture for ray tracing},
+  year      = {2002},
+  pages     = {27--36},
+  groups    = {Hardware},
+}
+
+@InProceedings{wald2001interactive,
+  author       = {Wald, Ingo and Slusallek, Philipp and Benthin, Carsten and Wagner, Markus},
+  booktitle    = {Computer graphics forum},
+  title        = {Interactive rendering with coherent ray tracing},
+  year         = {2001},
+  number       = {3},
+  organization = {Wiley Online Library},
+  pages        = {153--165},
+  volume       = {20},
+  groups       = {Hardware},
+}
+
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
+}
+
+@Online{raytracingvideo,
+  author  = {NVIDIA},
+  groups  = {Other},
+  title   = {{The Compleat Angler – First demonstration of recursive ray tracing in computer graphics animation} YouTube video},
+  url     = {https://www.youtube.com/watch?v=0KrCh5qD9Ho},
+  urldate = {2021-05-30},
+  year    = {2018},
+}
+
+@InProceedings{appel1968some,
+  author    = {Appel, Arthur},
+  booktitle = {Proceedings of the April 30--May 2, 1968, spring joint computer conference},
+  title     = {Some techniques for shading machine renderings of solids},
+  year      = {1968},
+  pages     = {37--45},
+  groups    = {Introduction},
+}
+
+@Article{phong1975illumination,
+  author    = {Phong, Bui Tuong},
+  journal   = {Communications of the ACM},
+  title     = {Illumination for computer generated pictures},
+  year      = {1975},
+  number    = {6},
+  pages     = {311--317},
+  volume    = {18},
+  groups    = {Introduction},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Article{plunkett1985vectorization,
+  author    = {Plunkett, David and Bailey, Michael},
+  journal   = {IEEE Computer Graphics and Applications},
+  title     = {The vectorization of a ray-tracing algorithm for improved execution speed},
+  year      = {1985},
+  number    = {08},
+  pages     = {52--60},
+  volume    = {5},
+  groups    = {Hardware},
+  publisher = {IEEE Computer Society},
+}
+
+@InProceedings{amanatides1987fast,
+  author    = {Amanatides, John and Woo, Andrew and others},
+  booktitle = {Eurographics},
+  title     = {A fast voxel traversal algorithm for ray tracing},
+  year      = {1987},
+  number    = {3},
+  pages     = {3--10},
+  volume    = {87},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Article{goldsmith1987automatic,
+  author    = {Goldsmith, Jeffrey and Salmon, John},
+  journal   = {IEEE Computer Graphics and Applications},
+  title     = {Automatic creation of object hierarchies for ray tracing},
+  year      = {1987},
+  number    = {5},
+  pages     = {14--20},
+  volume    = {7},
+  groups    = {Existing Ray Accelerator Structures},
+  publisher = {IEEE},
+}
+
+@InProceedings{fuchs1980visible,
+  author    = {Fuchs, Henry and Kedem, Zvi M and Naylor, Bruce F},
+  booktitle = {Proceedings of the 7th annual conference on Computer graphics and interactive techniques},
+  title     = {On visible surface generation by a priori tree structures},
+  year      = {1980},
+  pages     = {124--133},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@InCollection{sung1992ray,
+  author    = {Sung, Kelvin and Shirley, Peter},
+  booktitle = {Graphics Gems III (IBM Version)},
+  publisher = {Elsevier},
+  title     = {Ray tracing with the BSP tree},
+  year      = {1992},
+  pages     = {271--274},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Article{bentley1975multidimensional,
+  author    = {Bentley, Jon Louis},
+  journal   = {Communications of the ACM},
+  title     = {Multidimensional binary search trees used for associative searching},
+  year      = {1975},
+  number    = {9},
+  pages     = {509--517},
+  volume    = {18},
+  groups    = {Existing Ray Accelerator Structures},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Online{embree2021Doc,
+  author  = {Intel},
+  groups  = {Embree},
+  title   = {Intel Embree High Performance Ray Tracing Kernels - User Documentation},
+  url     = {https://github.com/embree/embree/blob/master/readme.pdf},
+  urldate = {2021-05-30},
+  year    = {2021},
+}
+
+@Online{windowsSubsystem,
+  author  = {Tom Fenton},
+  groups  = {Appendix},
+  title   = {Running Graphical Programs on Windows Subsystem on Linux},
+  url     = {https://virtualizationreview.com/articles/2017/02/08/graphical-programs-on-windows-subsystem-on-linux.aspx},
+  urldate = {2021-06-13},
+  year    = {2017},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
@@ -149,7 +349,13 @@
 0 AllEntriesGroup:;
 1 StaticGroup:Embree\;0\;0\;0x0000ffff\;\;\;;
 1 StaticGroup:ART\;0\;1\;0x008000ff\;\;\;;
-1 StaticGroup:Introduction\;0\;0\;0x804d80ff\;\;\;;
-1 StaticGroup:Existing Ray Accelerator Structures\;0\;1\;0x8a8a8aff\;\;\;;
-1 StaticGroup:General Computer Graphics\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Introduction\;0\;1\;0x804d80ff\;\;\;;
+2 StaticGroup:Hardware\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Existing Renderers\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Fundamentals\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Ray Tracing Technques\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Existing Ray Accelerator Structures\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:CSG\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Other\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Appendix\;0\;0\;0x8a8a8aff\;\;\;;
 }
