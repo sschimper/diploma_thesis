@@ -15,7 +15,7 @@ An advantage of these ray tracing algorithms is that the core procedure is strai
 
 The following chapter is dedicated to providing background information on ray tracing, shape representation in rendering systems, and ray acceleration data structures. Furthermore, the Embree framework is introduced. \todo{maybe rephrase}
 
-\section{Overview of Ray Tracing Algorithms}
+\section{Ray Tracing Algorithms}
 
 
 \subsection{Origins of Ray Tracing}
@@ -48,10 +48,10 @@ The idea of casting rays later became a key utilization for a shading model that
 
 \cite{whitted1979improved} introduced a shading model that would truthfully simulate reflection, shadows and refraction as well as the effects of other conventional shading models at that time.  
 
-The model builds upon an empirical reflection model devised by \cite{phong1975illumination}, which assumes that light is reflected from a surface is composed by three types of reflection: ambient reflection, diffuse reflection and specular reflection. It is given by the following equation:
+The model is partially derived from an empirical reflection model developed by \cite{phong1975illumination}, which assumes that light, which is reflected from a surface, is composed by three types of reflection: ambient reflection, diffuse reflection and specular reflection. The following equation describes this model:
 
 \begin{equation} \label{eq:phong}
-I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}\sum_{j}(n*L_{j}\prime)^{gl}
+I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}\sum_{j}(n*L_{j}\prime)^{\alpha}
 \end{equation}
 
 \noindent where
@@ -64,23 +64,22 @@ I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}\sum_{j}(n*L_{j}\prime)^{gl}
 	\item  [$n$] is the unit surface normal at an intersection point
 	\item  [$L_{j}$] is a vector in the direction of the $j$th light source
 	\item  [$L_{j}\prime$] is a half vector between the eye point and the $j$th light source, and
-	\item  [$gl$] is the glossiness coefficient.
+	\item  [$\alpha$] is the glossiness coefficient.
 \end{description}
 
-One limitation of this model is the assumption that the light sources are located at an infinite distance from the scene geometry, and thus, the model does not account for objects within the scene acting as light sources. It was observed in \cite{newell1977progression}, that this can critiacaly affect the specular reflection component of Equation \ref{eq:phong}.
-
-As opposed the the Phong shading model, Whitted's model assumes that the light intensity $I$ arriving at the eye point from the intersection point $x$ is conglomerated by the specular reflection $S$ and transmission, $T$ as shown in Figure \ref{fig:whitted_model}.
+This model even nowadays finds popularity among real time graphics due to its low computational cost and convincing (although not physically plausible) results. \todo{maybe reformulate}
+The model assumes furthermore that light sources are located at an infinite distance from the scene geometry, and thus, it does not account for objects within the scene acting as light sources. It was observed in \cite{newell1977progression}, \todo{verify this} that this can critically affect the specular reflection component of Equation \ref{eq:phong}.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\linewidth]{img/1 fundamentals/whitted.png}
-	\caption{The light intensity $I$ arriving at the $Eye Point$ from a point $x$ on the surface is assumed to be composed of a specular component $S$ and a transmissive component $T$.}
+	\caption{Light intensity propagated towards an observer being composed of a specular reflection component $S$ and a transmissive reflection component $T$.}
 	\label{fig:whitted_model}
 \end{figure}
 
-
+As opposed to the Phong shading model, Whitted's model assumes that the light intensity $I$ arriving at the $Eye Point$ from the intersection point $x$ along the outgoing direction $\omega_{o}$ is conglomerated by a specular reflection component $S$, being propagated along direction $\omega_{s}$ and a transmission component $T$, being propagated along direction $\omega_{t}$. This is shown in Figure \ref{fig:whitted_model}.
 The model is given by the equation:
-\begin{equation}
+\begin{equation} \label{eq:whitted}
 I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}S + k_{t}T
 \end{equation}
 
@@ -88,33 +87,58 @@ I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}S + k_{t}T
 \begin{description}
 	\setlength\itemsep{0.05em}
 	\item  $S$ is the light intensity of the specular reflection
-	\item  $T$ is the light intensity of the transmissive reflection, and
-	\item  $k_{s}$ is the transmission coefficien
+	\item  $T$ is the light intensity of the transmission, and
+	\item  $k_{s}$ is the transmission coefficient
 \end{description}
-
 The ambient and diffuse term are maintained from Equation \ref{eq:phong}. 
-This model approximates the 
 
-\begin{figure}
+The model is capable of generating images with a high degree of realism, preconditioned that the coefficients of equation \ref{eq:whitted} are reasonably chosen. Whitted noted in his paper that "for the best
+accuracy they [the coefficients] should be functions that incorporate an
+approximation of the Fresnel reflection". 
+Generally, Equation \ref{eq:whitted} approximates the reflection of light towards an observer (or camera, or "Eye Point") from a single surface. However, in nature, light that is propagated towards a viewer from a surface most certainly has interacted with other surfaces before. If true realism of computer generated images is desired, this fact has to be taken into consideration, even for virtual scenes with moderately complex geometry. An example of such an event can be seen in Figure \ref{fig:whitted_rays}.
+
+\begin{figure}[h]
 	\centering
-	\subfloat[Light is reflected from other surfaces before reaching the Eye Point.]{\includegraphics[width=.5\textwidth]{img/1 fundamentals/whitted_rays.png}\label{fig:whitted_rays}}
+	\subfloat[Light is reflected from other surfaces before reaching the Eye Point.]{\includegraphics[width=.6\textwidth]{img/1 fundamentals/whitted_rays.png}\label{fig:whitted_rays}}
 	\hfill
-	\subfloat[Tree structure storing the individual reflection and transmission rays.]{\includegraphics[width=.25\textwidth]{img/1 fundamentals/whitted_tree.png}\label{fig:whitted_tree}}
+	\subfloat[Tree structure storing the individual reflection and transmission rays.]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/whitted_tree.png}\label{fig:whitted_tree}}
 	\caption{Figures from the paper \citetitle{whitted1979improved} \cite{whitted1979improved}}
 \end{figure}
 
+This natural behavior is implemented in the following way. From the Eye Point, a ray is cast towards the virtual scene and a possible intersection point $x$ with the scene geometry is calculated. 
+
+
+The transmission and specular component rays at that intersection point are then recursively calculated by Equation \ref{eq:whitted} and stored in a tree structure which is shown in Figure \ref{fig:whitted_tree}.  \todo{check check check}
+
+
+Each node in this tree represents an intersection point and is furthermore associated with rays pointing towards \todo{rephrase} each light source in the scene, correlating to the $L_{j}$ terms in Equation \ref{eq:whitted}. If one of these light rays $L_{j}$ intersect scene geometry before it reaches light source $j$, the intersection point corresponding to the tree node in question is not illuminated by that particular light source and consequentially the contribution it to the reflection is not taken into consideration. To prevent a branch of the tree from growing infinitely large, it is truncated as soon as an attempt is made to access more storage than was made available for it. After such a tree is created, it is traversed recursively in order to calculate the light intensity at each node with Equation \ref{eq:whitted}, finally resulting in the calculation of the total light intensity that is reflected towards the $Eye Point$. Between two nodes, the intensity is attenuated according to a distance function between the intersection points associated with the node and the node's parent node. 
+Such trees are created and traversed for every pixel of the image plane. This procedure allows for the convincing display of a variety of optical effects with the help of a single model.
 
 
 \begin{figure}
 	\centering
-	\subfloat[Light is reflected from other surfaces before reaching the Eye Point.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/radiance.png}\label{fig:radiance}}
+	\subfloat[Radiance is defined as the radiant flux emitted, received or reflected per solid angle $\partial\omega_{o}$ per unit projected area $\partial A$.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/radiance.png}\label{fig:radiance}}
 	\hfill
-	\subfloat[Tree structure storing the individual reflection and transmission rays.]{\includegraphics[width=.5\textwidth]{img/1 fundamentals/brdf.png}\label{fig:brdf}}
-	\caption{Figures from the paper \citetitle{whitted1979improved} \cite{whitted1979improved}}
+	\subfloat[The BRDF is a function defining how much light from the incoming direction$\omega_{i}$ is reflected towards the viewer along the outgoing direction $\omega_{o}$.]{\includegraphics[width=.5\textwidth]{img/1 fundamentals/brdf.png}\label{fig:brdf}}
+	\caption{Diagrams visualizing radiance (Figure \ref{fig:radiance}) and the BRDF (Figure \ref{fig:brdf}).}
 \end{figure}
 
-\subsection{Path Tracing}
+\todo{reformulate caption of radiance and brdf}
 
+\subsection{The Rendering Equation}
+
+In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the light transport
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{img/1 fundamentals/path_tracing.png}
+	\caption{Tracing a path for calculating global illumination.}
+	\label{fig:pathtracing}
+\end{figure}
+
+\subsubsection{Derivation from the Definition of Radiance}
+
+We define \emph{radiance} of a source, or informally "brightness", as the power per unit area $\partial A$ perpendicular to the ray in the direction $\omega_{o}$ and per unit solid angle that is propagated along it (see Figure \ref{fig:radiance}). This is described by the following equation:
 
 \begin{equation}
 L(\omega_{o}) = \frac{\partial^2\phi}{\partial\omega_{o}\partial A\cos\theta}
@@ -125,8 +149,10 @@ L(\omega_{o}) = \frac{\partial^2\phi}{\partial\omega_{o}\partial A\cos\theta}
 	\setlength\itemsep{0.05em}
 	\item  $\omega_{o}$ is the outgoing direction
 	\item  $\phi$ is flux or radiance per unit time
-	\item  $A$ is the surface area
+	\item  $A$ is the surface area, and
+	\item  $\cos\theta$ a term for compensating Lambert's cosine law
 \end{description}
+
 
 
 \begin{equation}
@@ -136,7 +162,7 @@ BRDF(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{i
 \noindent where
 \begin{description}
 	\setlength\itemsep{0.05em}
-	\item  $L_r(\omega_{o})$ is the reflected radiance
+	\item  $L_r(\omega_{o})$ is the reflected radiance, and
 	\item  $L_i(\omega_{i})$ is the incident radiance
 \end{description}
 
@@ -160,21 +186,64 @@ L(\omega_{o}) = L_{e}(\omega_{o}) \int_{H(x)} L(ray(\omega_{i}, -\omega_{i})BRDF
 	\item  $ray(\omega_{i}, -\omega_{i})$ is the recursive ray tracing function
 \end{description}
 
+
 \begin{figure}
 	\centering
-	\includegraphics[width=.75\linewidth]{img/1 fundamentals/rendering_eq_figure.png}
-	\caption{Figure from \cite{kajiya1986rendering} displaying a scene rendered with his approach.}
-	\label{fig:rendering_eq}
+	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_direct.png}\label{fig:cb_local}}
+	\hfill
+	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_global.png}\label{fig:cb_global}}
+	\caption{The Cornell Box scene with local illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}).}
 \end{figure}
 
+\subsubsection{Monte Calo methods}
+lalala
 
-\subsection{Notable Ray Tracing Algorithms}
 
-\section{Solid Representation}
+\section{Solid Representations in 3D Space}
 
-\subsection{Analytical (WT)}
+A large part of the work of ray tracing algorithms is the calculation of intersection points between rays with scene geometry.
+The way solid objects can be represented in the Euclidean space varies, thus does the testing for intersections with rays. The following section illustrates three types of solid representations in image synthesis environments, such as ART: Quadric surfaces, polygon meshes and constructive solid geometry.
+
+\subsection{Quadric Surfaces}
+\label{sec:quadrics}
+Quadric surfaces are two dimensional surfaces in three dimensional Euclidean space, defined by quadric equations. Examples of these surfaces are spheres, cones, cylinders and paraboloids. The equations describing these shapes can be in implicit form, which have the pleasant property, that testing whether a point $p$ is located at the boundary of such a surface is easy. Generally speaking, implicit equations are relations of the form  $f(x_{0}, x_{1}, ..., x_{n}) = 0$ where $f$ is a function of multiple variables. Consider such a variable as a point $p$ in three dimensional space and evaluated by function $f$. An evaluation of $f$ will result in two possible outcomes: either $f(p) = 0$, which means $p$ is located on the surface of the shape, or  $f(p) \ne 0$, which means the opposite.
+Due to this evaluation, quadrics are well suited for intersection testing during ray tracing. These quadratic function can furthermore be expressed in explicit form (sometimes referred to as parametric equation). An explicit equation is \todo{explain explicit function}.
+In the following we will provide an example of an intersection calculation between a given unit sphere $S$ with radius $1$ and a given ray $R$. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.5\linewidth]{img/1 fundamentals/sphere_isect.png}
+	\caption{Intersection between a sphere $S$ with its center point $c$ and radius $r$, and a ray with origin $P$ and direction $\omega$. We attempt to solve a quadradic equation in oder to obtain points $t_{0}$ and $t_{1}$. For reasons of simplicity, visualized in two dimensional space.} 
+	\label{fig:sphere_isect}
+\end{figure}
+
+The sphere $S$ is implicitly defined by: 
+\begin{equation} \label{eq:sphere}
+S(x,y,z) = x^{2}+y^{2}+z^{2}-1 = 0
+\end{equation}
+The ray $R$ in its parametric form is defined by:
+\begin{equation}\label{eq:ray}
+R(t) = P + t\omega
+\end{equation}
+
+\noindent where
+\begin{description}
+	\setlength\itemsep{0.05em}
+	\item  $P$ is the origin of ray $R$, a point in Euclidean space,
+	\item  $t$ a scalar, and
+	\item  $\omega$ the direction vector of $R$.
+\end{description}
+
+To obtain the two intersection points, the parametric equation defining $R$ is substituted into the implicit equation defining $S$
+\begin{equation}\label{eq:substitution}
+(P_{x}+t\omega_{x})^{2}+(P_{y}+t\omega_{y})^{2}+(P_{z}+t\omega_{z})^{2}-1 = 0
+\end{equation}
+and then, since all variables with the exception of $t$ are known, solved for $t$.
+Once the two resulting values $t_{0}$ and $t_{1}$ are obtained, the two intersection points $I_{0}$ and $I_{1}$ can be expressed as $I_{0} = P + t_{0}\omega$, and respectively $I_{1} = P + t_{1}\omega$.
 
 \subsection{Polygon Meshes}
+
+Polygon meshes represent shapes as a composition of multiple, smaller polygons that are connected with each other. The higher the number of such polygons the mesh exhibits, the higher the accuracy of the approximation of the represented shape \todo{weird sentence.} The most common types of polygons used are triangles and quadrangles. An example of a representation of a shape with a triangle mesh can be seen in Figure \ref{fig:poly_mesh}. 
 
 \begin{figure}
 	\centering
@@ -185,16 +254,20 @@ L(\omega_{o}) = L_{e}(\omega_{o}) \int_{H(x)} L(ray(\omega_{i}, -\omega_{i})BRDF
 
 \subsection{Constructive Solid Geometry (CSG)}
 
-\begin{figure}
+The idea behind constructive solid geometry (CSG) modeling is the application of the boolean set operations to geometry primitive in order to create more complex geometries. The boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted sometimes as \texttt{SUB}-operator). 
+Primitives are usually quadric surfaces such as spheres, cones and cylinders. Figure \ref{fig:csg} shows the application of each boolean operator to two sphere primitives. Multiple of such set operations can be hierarchically ordered with the help of a binary tree structure, called the CSG-tree.   
+
+\begin{figure} \label{csg}
 	\centering
-	\subfloat[\texttt{OR} operator.]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/or.png}\label{fig:csg_or}}
+	\subfloat[Union of two spheres (\texttt{OR} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/or.png}\label{fig:csg_or}}
 	\hfill
-	\subfloat[\texttt{AND} operator.]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/and.png}\label{fig:csg_and}}
+	\subfloat[Intersection of two spheres (\texttt{AND} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/and.png}\label{fig:csg_and}}
 	\hfill
-	\subfloat[\texttt{SUB} operator.]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/sub.png}\label{fig:csg_sub}}
+	\subfloat[Left sphere with the right sphere "subtracted" from it (\texttt{SUB} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/sub.png}\label{fig:csg_sub}}
 	\caption{Boolean operators Union (\ref{fig:csg_or}), Intersection (\ref{fig:csg_and}) and Difference (\ref{fig:csg_sub}) applied to two sphere objects.}
 \end{figure}
 
+One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leafs are associated with the geometry primitives, the nodes with the set operations. Due to the possibility that two primitives can face being translated, rotated or scaled before a boolean operator is applied to them, edges of the tree is associated with transformation information (this is denoted in the figure with the matrix icon). The transformation corresponding to an edge between a node and a node's parent can be "empty", meaning that it has no effect on the primitive represented by that node.  
 
 \begin{figure}
 	\centering
@@ -204,11 +277,12 @@ L(\omega_{o}) = L_{e}(\omega_{o}) \int_{H(x)} L(ray(\omega_{i}, -\omega_{i})BRDF
 	\label{fig:csg_tree}
 \end{figure}
 
+The intersection calculation for a given ray during the ray tracing process is straightforward: 
+All the primitives associated to the leafs of the CSG tree are tested for intersection. If an intersection test has a positive result, usually two intersection points are calculated: one  with one primitive is found, one point when the ray enters the primitive and one point when it exits it (there is the edge case that there exists infinitely many intersection points between a ray and a primitive when the ray is tangent to the primitive, however, this is seldom the case and can be safely ignored). Then the CSG tree is traversed bottom up and each time an interior node representing a boolean set operator is encountered, the intersection points of the ray with the primitives associated with the child nodes are evaluated and re-arranged. For example, when considering the \texttt{OR} operator in Figure \ref{fig:csg_or}, and imagining a single ray would intersect both spheres, there would be four intersection points: One entering the first sphere, followed by one entering the second sphere, then one exiting the first sphere, and finally one intersection point exiting the second sphere. The \text{OR} operator would treat the two spheres as one single object and therefore discard the inner intersection points. Similarly, the \text{AND} operator in Figure \ref{fig:csg_and} would discard the intersection of a sphere that is not in the interior of the other sphere. And finally, the \text{SUB} operator in Figure \ref{fig:csg_sub} discards every intersection point on the sphere on the right, which is "subtracted" from the sphere on the left.
 
-\section{Limitations}
+The representation of CSG offers one significant advantage: Complex geometry can be expressed via the composition of a manageable amount of primitive shapes, as opposed to large numbers of polygons in a polygon mesh. Because testing whether a point lies inside or outside a primitive is easy, as noted in Section \ref{sec:quadrics}, and since compared to polygon meshes only a small amount of primitives exist, the number of intersection tests in each render pass is comparatively low.
 
-
-
+Although the CSG modeling technique is several years old (being introduced by \cite{roth1982ray}), it is still used in practice today, e.g. for computer-aided design.
 
 % new section
 \section{Common ray acceleration data structures}
