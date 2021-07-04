@@ -12,13 +12,13 @@
   publisher = {ACM New York, NY, USA},
 }
 
-@Inproceedings{wilkie2013predicting,
+@InProceedings{wilkie2013predicting,
   author    = {Wilkie, Alexander and Ho{\v{s}}ek, Lukas},
-  title     = {Predicting sky dome appearance on earth-like extrasolar worlds},
   booktitle = {Proceedings of the 29th Spring Conference on Computer Graphics},
+  title     = {Predicting sky dome appearance on earth-like extrasolar worlds},
   year      = {2013},
   pages     = {145--152},
-  groups    = {ART},
+  groups    = {ART, Skydome appearance model},
 }
 
 @InProceedings{mojzik2018handling,
@@ -57,18 +57,6 @@
   groups       = {ART},
 }
 
-@Article{hosek2012analytic,
-  author    = {Hosek, Lukas and Wilkie, Alexander},
-  journal   = {ACM Transactions on Graphics (TOG)},
-  title     = {An analytic model for full spectral sky-dome radiance},
-  year      = {2012},
-  number    = {4},
-  pages     = {1--9},
-  volume    = {31},
-  groups    = {ART},
-  publisher = {ACM New York, NY, USA},
-}
-
 @Book{glassner1989introduction,
   author    = {Glassner, Andrew S},
   publisher = {Morgan Kaufmann},
@@ -95,13 +83,13 @@
   year    = {n.d.},
 }
 
-@InProceedings{kajiya1986rendering,
-  author    = {Kajiya, James T},
-  booktitle = {Proceedings of the 13th annual conference on Computer graphics and interactive techniques},
-  title     = {The rendering equation},
-  year      = {1986},
-  pages     = {143--150},
-  groups    = {Ray Tracing Technques},
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
 }
 
 @Misc{embreeSlides,
@@ -161,14 +149,6 @@
   publisher = {Elsevier},
 }
 
-@Article{embreecsg,
-  author  = {Karaffová, Markéta},
-  journal = {Master Thesis},
-  title   = {Efficient Ray Tracing of CSG Models},
-  year    = {2016},
-  groups  = {CSG},
-}
-
 @Online{embreeAward,
   author  = {{Intel Newsroom}},
   groups  = {Embree},
@@ -220,15 +200,6 @@
   groups       = {Hardware},
 }
 
-@Book{peddie2019ray,
-  author    = {Peddie, Jon},
-  publisher = {Springer},
-  title     = {Ray Tracing: A tool for all},
-  year      = {2019},
-  volume    = {5},
-  groups    = {Introduction},
-}
-
 @Online{raytracingvideo,
   author  = {NVIDIA},
   groups  = {Other},
@@ -271,38 +242,6 @@
   publisher = {IEEE Computer Society},
 }
 
-@InProceedings{amanatides1987fast,
-  author    = {Amanatides, John and Woo, Andrew and others},
-  booktitle = {Eurographics},
-  title     = {A fast voxel traversal algorithm for ray tracing},
-  year      = {1987},
-  number    = {3},
-  pages     = {3--10},
-  volume    = {87},
-  groups    = {Existing Ray Accelerator Structures},
-}
-
-@Article{goldsmith1987automatic,
-  author    = {Goldsmith, Jeffrey and Salmon, John},
-  journal   = {IEEE Computer Graphics and Applications},
-  title     = {Automatic creation of object hierarchies for ray tracing},
-  year      = {1987},
-  number    = {5},
-  pages     = {14--20},
-  volume    = {7},
-  groups    = {Existing Ray Accelerator Structures},
-  publisher = {IEEE},
-}
-
-@InProceedings{fuchs1980visible,
-  author    = {Fuchs, Henry and Kedem, Zvi M and Naylor, Bruce F},
-  booktitle = {Proceedings of the 7th annual conference on Computer graphics and interactive techniques},
-  title     = {On visible surface generation by a priori tree structures},
-  year      = {1980},
-  pages     = {124--133},
-  groups    = {Existing Ray Accelerator Structures},
-}
-
 @InCollection{sung1992ray,
   author    = {Sung, Kelvin and Shirley, Peter},
   booktitle = {Graphics Gems III (IBM Version)},
@@ -311,18 +250,6 @@
   year      = {1992},
   pages     = {271--274},
   groups    = {Existing Ray Accelerator Structures},
-}
-
-@Article{bentley1975multidimensional,
-  author    = {Bentley, Jon Louis},
-  journal   = {Communications of the ACM},
-  title     = {Multidimensional binary search trees used for associative searching},
-  year      = {1975},
-  number    = {9},
-  pages     = {509--517},
-  volume    = {18},
-  groups    = {Existing Ray Accelerator Structures},
-  publisher = {ACM New York, NY, USA},
 }
 
 @Online{embree2021Doc,
@@ -364,10 +291,200 @@
 
 @Online{csgtree,
   author  = {Zottie},
+  comment = {Distributed on Wikimedia Commons.},
   title   = {Illustration of CSG tree. Created and rendered in POV-Ray.},
   url     = {https://commons.wikimedia.org/wiki/File:Csg_tree.png},
   urldate = {2021-06-22},
   year    = {2021},
+}
+
+@Online{cg3,
+  author  = {Jaroslav Křivánek},
+  groups  = {Rendering Equation},
+  title   = {Computer Graphics III - Physically based rendering (NPGR010)},
+  url     = {https://cgg.mff.cuni.cz/~jaroslav/teaching/2019-npgr010/index.html},
+  urldate = {2021-06-24},
+  year    = {2019},
+}
+
+@Article{moller1997fast,
+  author    = {M{\"o}ller, Tomas and Trumbore, Ben},
+  journal   = {Journal of graphics tools},
+  title     = {Fast, minimum storage ray-triangle intersection},
+  year      = {1997},
+  number    = {1},
+  pages     = {21--28},
+  volume    = {2},
+  groups    = {solid representations},
+  publisher = {Taylor \& Francis},
+}
+
+@Article{goral1984modeling,
+  author    = {Goral, Cindy M and Torrance, Kenneth E and Greenberg, Donald P and Battaile, Bennett},
+  journal   = {ACM SIGGRAPH computer graphics},
+  title     = {Modeling the interaction of light between diffuse surfaces},
+  year      = {1984},
+  number    = {3},
+  pages     = {213--222},
+  volume    = {18},
+  groups    = {Rendering Equation},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{cook1984distributed,
+  author    = {Cook, Robert L and Porter, Thomas and Carpenter, Loren},
+  booktitle = {Proceedings of the 11th annual conference on Computer graphics and interactive techniques},
+  title     = {Distributed ray tracing},
+  year      = {1984},
+  pages     = {137--145},
+  groups    = {Rendering Equation},
+}
+
+@InProceedings{rubin19803,
+  author    = {Rubin, Steven M and Whitted, Turner},
+  booktitle = {Proceedings of the 7th annual conference on Computer graphics and interactive techniques},
+  title     = {A 3-dimensional representation for fast rendering of complex scenes},
+  year      = {1980},
+  pages     = {110--116},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Article{bentley1975multidimensional,
+  author    = {Bentley, Jon Louis},
+  journal   = {Communications of the ACM},
+  title     = {Multidimensional binary search trees used for associative searching},
+  year      = {1975},
+  number    = {9},
+  pages     = {509--517},
+  volume    = {18},
+  groups    = {Existing Ray Accelerator Structures},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{hapala2011kd,
+  author       = {Hapala, Michal and Havran, Vlastimil},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Kd-tree traversal algorithms for ray tracing},
+  year         = {2011},
+  number       = {1},
+  organization = {Wiley Online Library},
+  pages        = {199--213},
+  volume       = {30},
+  groups       = {Existing Ray Accelerator Structures},
+}
+
+@InProceedings{wald2006building,
+  author       = {Wald, Ingo and Havran, Vlastimil},
+  booktitle    = {2006 IEEE Symposium on Interactive Ray Tracing},
+  title        = {On building fast kd-trees for ray tracing, and on doing that in O (N log N)},
+  year         = {2006},
+  organization = {IEEE},
+  pages        = {61--69},
+  groups       = {Existing Ray Accelerator Structures},
+}
+
+@InProceedings{wilkie2010standardised,
+  author    = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle = {Proceedings of the 26th Spring Conference on Computer Graphics},
+  title     = {A standardised polarisation visualisation for images},
+  year      = {2010},
+  pages     = {43--50},
+  groups    = {ART},
+}
+
+@InProceedings{wilkie2011physically,
+  author       = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle    = {Computer Graphics Forum},
+  title        = {A physically plausible model for light emission from glowing solid objects},
+  year         = {2011},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {1269--1276},
+  volume       = {30},
+  groups       = {ART},
+}
+
+@Thesis{todova2021,
+  author = {Lucia Tódová},
+  groups = {ART},
+  title  = {Constrained Spectral Uplifting},
+  year   = {2021},
+}
+
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
+}
+
+@InCollection{wilkie2009predictive,
+  author    = {Wilkie, Alexander and Weidlich, Andrea and Magnor, Marcus and Chalmers, Alan},
+  booktitle = {ACM SIGGRAPH ASIA 2009 Courses},
+  title     = {Predictive rendering},
+  year      = {2009},
+  pages     = {1--428},
+  groups    = {ART},
+}
+
+@Article{hovsek2013adding,
+  author    = {Ho{\v{s}}ek, Luk{\'a}{\v{s}} and Wilkie, Alexander},
+  journal   = {IEEE computer graphics and applications},
+  title     = {Adding a solar-radiance function to the Ho{\v{s}}ek-Wilkie skylight model},
+  year      = {2013},
+  number    = {3},
+  pages     = {44--52},
+  volume    = {33},
+  groups    = {Introduction, Skydome appearance model},
+  publisher = {IEEE},
+}
+
+@Article{hosek2012analytic,
+  author    = {Ho{\v{s}}ek, Luk{\'a}{\v{s}} and Wilkie, Alexander},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {An analytic model for full spectral sky-dome radiance},
+  year      = {2012},
+  number    = {4},
+  pages     = {1--9},
+  volume    = {31},
+  groups    = {Skydome appearance model},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Online{moana2021,
+  author  = {{Walt Disney Animation Studios}},
+  groups  = {Other},
+  title   = {{Moana Island Scene}},
+  url     = {https://www.disneyanimation.com/resources/moana-island-scene/},
+  urldate = {2021-07-01},
+  year    = {2021},
+}
+
+@Misc{peddie2019ray,
+  author       = {Peddie, Jon},
+  howpublished = {\url{http://gts.sourceforge.net/}},
+  title        = {{GTS}: {GNU} {Triangulated} {Surface} library},
+  year         = {2000--2004},
+  groups       = {Introduction},
+  publisher    = {Springer},
+  volume       = {5},
+}
+
+@Article{fichet2021openexr,
+  author  = {Fichet, Alban and Pacanowski, Romain and Wilkie, Alexander},
+  journal = {Journal of Computer Graphics Techniques},
+  title   = {An OpenEXR Layout for Spectral Images},
+  year    = {2021},
+  groups  = {ART},
+}
+
+@Misc{rply2016,
+  author       = {Lars Kiesow and Nigel Stewart},
+  howpublished = {\url{https://github.com/lkiesow/librply}},
+  title        = {RPly},
+  year         = {2016},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
@@ -376,13 +493,16 @@
 0 AllEntriesGroup:;
 1 StaticGroup:Embree\;0\;0\;0x0000ffff\;\;\;;
 1 StaticGroup:ART\;0\;1\;0x008000ff\;\;\;;
+2 StaticGroup:Skydome appearance model\;0\;1\;0x8a8a8aff\;\;\;;
 1 StaticGroup:Introduction\;0\;1\;0x804d80ff\;\;\;;
 2 StaticGroup:Hardware\;0\;1\;0x8a8a8aff\;\;\;;
 2 StaticGroup:Existing Renderers\;0\;0\;0x8a8a8aff\;\;\;;
 1 StaticGroup:Fundamentals\;0\;1\;0x8a8a8aff\;\;\;;
 2 StaticGroup:Ray Tracing Technques\;0\;1\;0x8a8a8aff\;\;\;;
-2 StaticGroup:Existing Ray Accelerator Structures\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Existing Ray Accelerator Structures\;0\;0\;0x8a8a8aff\;\;\;;
 2 StaticGroup:CSG\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Rendering Equation\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:solid representations\;0\;1\;0x8a8a8aff\;\;\;;
 1 StaticGroup:Other\;0\;0\;0x8a8a8aff\;\;\;;
 1 StaticGroup:Appendix\;0\;0\;0x8a8a8aff\;\;\;;
 }

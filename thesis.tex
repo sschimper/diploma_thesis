@@ -111,7 +111,7 @@
 \usepackage{algorithm}
 
 % remove this if you won't list any source code
-\usepackage{listings}
+\usepackage{listings, lstautogobble}
 
 % for clickable links in appendix
 \usepackage{hyperref}
@@ -128,6 +128,12 @@
 
 \input{macros} % use this file for various custom definitions
 
+% for comment blocks
+\newcommand{\comment}[1]{}
+
+% listing options
+\lstset{language=[Objective]C, breakindent=40pt, breaklines}
+
 
 \begin{document}
 
@@ -142,8 +148,13 @@
 \include{ch4}
 \include{conclusion}
 \include{bibliography}
+
+\addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
+
+\addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
+\lstlistoflistings
 
 \appendix
 \include{howto}

@@ -1,5 +1,5 @@
 \chapter{Fundamentals}
-\label{chap:refs}
+\label{chap:fundamentals}
 
 Under the term \emph{ray tracing} we understand the utilization of algorithms that involve the casting of virtual light rays for generating images. The purpose of these light rays is to archive high visual realism by approximating real-life behavior \todo{is that right?}. The reason we are able to perceive nearby objects or persons is due to the fact that light, which is being emitted from light sources, either natural or artificial, is interacting with these objects or persons, it is being reflected off by their surfaces towards our vision sensory organs after possibly being reflected a multiple times before from other surfaces. \todo{what?}
 The purpose of ray tracing algorithms is to imitate this behavior, usually by tracing these light rays in reverse order from the sensory organs (or a virtual camera or an "eye point") back to the emitting light source.
@@ -114,29 +114,32 @@ The transmission and specular component rays at that intersection point are then
 Each node in this tree represents an intersection point and is furthermore associated with rays pointing towards \todo{rephrase} each light source in the scene, correlating to the $L_{j}$ terms in Equation \ref{eq:whitted}. If one of these light rays $L_{j}$ intersect scene geometry before it reaches light source $j$, the intersection point corresponding to the tree node in question is not illuminated by that particular light source and consequentially the contribution it to the reflection is not taken into consideration. To prevent a branch of the tree from growing infinitely large, it is truncated as soon as an attempt is made to access more storage than was made available for it. After such a tree is created, it is traversed recursively in order to calculate the light intensity at each node with Equation \ref{eq:whitted}, finally resulting in the calculation of the total light intensity that is reflected towards the $Eye Point$. Between two nodes, the intensity is attenuated according to a distance function between the intersection points associated with the node and the node's parent node. 
 Such trees are created and traversed for every pixel of the image plane. This procedure allows for the convincing display of a variety of optical effects with the help of a single model.
 
-
-\begin{figure}
-	\centering
-	\subfloat[Radiance is defined as the radiant flux emitted, received or reflected per solid angle $\partial\omega_{o}$ per unit projected area $\partial A$.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/radiance.png}\label{fig:radiance}}
-	\hfill
-	\subfloat[The BRDF is a function defining how much light from the incoming direction$\omega_{i}$ is reflected towards the viewer along the outgoing direction $\omega_{o}$.]{\includegraphics[width=.5\textwidth]{img/1 fundamentals/brdf.png}\label{fig:brdf}}
-	\caption{Diagrams visualizing radiance (Figure \ref{fig:radiance}) and the BRDF (Figure \ref{fig:brdf}).}
-\end{figure}
-
 \todo{reformulate caption of radiance and brdf}
 
 \subsection{The Rendering Equation}
 
-In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the light transport
+In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the total reflected radiance towards an observer as the "sum" (or integral) of all light contributions over a hemisphere at a point on the surface. This mathematical model acheives high realism by taking direct illumination (light from light sources) and indirect illumination (light being reflected off other surfaces in the scene) into account.
+The \emph{rendering equation} is given by
 
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{img/1 fundamentals/path_tracing.png}
-	\caption{Tracing a path for calculating global illumination.}
-	\label{fig:pathtracing}
-\end{figure}
+\begin{equation}\label{eq:renderingeq}
+L(x, \omega_{o}) = L_{e}(x, \omega_{o}) \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
+\end{equation}
 
-\subsubsection{Derivation from the Definition of Radiance}
+\noindent where
+\begin{description}
+	\setlength\itemsep{0.05em}
+	\item  $L(x, \omega_{o})$ is the total reflected light intensity from a surface point $x$ towards the observer along the outgoing direction $\omega_{o}$,
+	\item  $L_{e}(\omega_{o})$ is the radiance emitted at the surface point $x$ and propagated along $\omega_{o}$,
+	\item  $H(x)$ is the hemisphere over surface point $x$,
+	\item 	$L(x, \omega_{i})$ is the light intensity incident to $x$ along direction$\omega_{i}$, 
+	\item  $f_{r}(\omega_{i} \rightarrow \omega_{o})$ is the bidirectional reflectance distribution function, and 
+	\item  $\cos\theta$ is a term, compensating for Lambert's cosine law.
+\end{description}
+
+For a better understanding of the individual terms of the rendering equation, a definition of radiance and a brief explanation of the bidirectional reflectance distribution function and the local reflection equation is provided in the following subsections.
+The following subsections are based on the lecture notes of the course \citetitle{cg3} held at Charles University in Prague, Czech Republic \cite{cg3}.
+
+\subsubsection{Definition of Radiance}
 
 We define \emph{radiance} of a source, or informally "brightness", as the power per unit area $\partial A$ perpendicular to the ray in the direction $\omega_{o}$ and per unit solid angle that is propagated along it (see Figure \ref{fig:radiance}). This is described by the following equation:
 
@@ -153,38 +156,55 @@ L(\omega_{o}) = \frac{\partial^2\phi}{\partial\omega_{o}\partial A\cos\theta}
 	\item  $\cos\theta$ a term for compensating Lambert's cosine law
 \end{description}
 
+\begin{figure}[h]
+	\centering
+	\subfloat[Radiance is defined as the radiant flux emitted, received or reflected per solid angle $\partial\omega_{o}$ per unit projected area $\partial A$.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/radiance.png}\label{fig:radiance}}
+	\hfill
+	\subfloat[The BRDF is a function defining how much light from the incoming direction$\omega_{i}$ is reflected towards the viewer along the outgoing direction $\omega_{o}$.]{\includegraphics[width=.5\textwidth]{img/1 fundamentals/brdf.png}\label{fig:brdf}}
+	\caption{Diagrams visualizing radiance (Figure \ref{fig:radiance}) and the BRDF (Figure \ref{fig:brdf}).}
+\end{figure}
 
+From this definition we can derive the \emph{bidirectional reflectance distribution function}.
 
-\begin{equation}
-BRDF(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{i}(\omega_{i})\partial A\cos\theta}
+\subsubsection{Bidirectional reflectance distrubution function (BRDF)}
+The bidirectional reflectance distribution function (BRDF) is a mathematical model of reflection properties of a given surface. To be precise, it describes the probability of light energy, arriving at a point $x$ on a surface from direction $\omega_{i}$, being reflected along the reflection $\omega_{o}$. 
+The BRDF model is defined by:
+
+\begin{equation} \label{eq:brdf}
+f_{r}(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{i}(\omega_{i})\cos\theta\partial\omega_{i}}
 \end{equation}
 
 \noindent where
 \begin{description}
 	\setlength\itemsep{0.05em}
-	\item  $L_r(\omega_{o})$ is the reflected radiance, and
-	\item  $L_i(\omega_{i})$ is the incident radiance
+	\item  $L_{r}(\omega_{o})$ is the reflected light energy, and
+	\item  $L_{i}(\omega_{i})$ is the incident light energy
 \end{description}
 
-\begin{equation}
-L_{r}(\omega_{o}) = \int_{H(x)} L_{i}(\omega_{i})  BRDF(\omega_{i} \rightarrow \omega_{o}) \cos\theta\partial\omega_{i}
+Properties of BRDFs are the conservation of energy and the Helmholtz reciprocity, stating that the incident light and reflected light can be switched in Equation \ref{eq:brdf} without affecting the result. There exist different types of BRDFs: they can be empirical, physically based or an approximation of measured data.
+BRDFs are a cruical componenet when calculating direct illumination with the \emph{local reflection equation}.
+
+\subsubsection{Local reflection equation}
+
+The local reflection equation describes how much total light is reflected towards a given direction $\omega_{o}$. It is given by:
+
+\begin{equation}\label{eq:local}
+L_{r}(x, \omega_{o}) = \int_{H(x)} L_{i}(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
 \end{equation}
 
 \noindent where
 \begin{description}
 	\setlength\itemsep{0.05em}
-	\item  $H(x)$ is a hemisphere over the interaction point $x$
+	\item  $H(x)$ is a hemisphere over the interaction point $x$.
 \end{description}
 
-\begin{equation}
-L(\omega_{o}) = L_{e}(\omega_{o}) \int_{H(x)} L(ray(\omega_{i}, -\omega_{i})BRDF(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
-\end{equation}
+The total amount of reflected energy is calculated by the integration of all contributions of incident radiance over the hemisphere $H(x)$. The BRDF serves as a weight in this equation because only the energy reflected along $\omega_{o}$ is considered.
+Figure \ref{fig:cb_local} shows the Cornell Box, where for each pixel Equation \ref{eq:local} was evaluated. The appearance of the scene is the result of shooting a ray into the scene, calculating a possible intersection point and then generating a second ray in the direction of the light source. However, the appearance of the Cornell Box is not physically realistic because the ceiling is not illuminated. This is due to the fact that with this approach no light rays that interact with surface points on the ceiling can directly reach the missive area of the light source. And this is where the rendering equation comes into play. \todo{definetely rephrase}
+ 
+\subsubsection{The rendering equation revisited}
+The rendering equation shown in \ref{eq:renderingeq} is an extension of the local reflection equation which additionally takes global illumination information into account. Essentially, it describes the total reflection of energy towards direction $\omega_{o}$ from a surface point $x$ as the "sum" or integral of all the light intensity, incident to all directions over a hemisphere over the point $x$, together with the intensity emitted from point $x$, if $x$ is located on an emissive material.
 
-\noindent where
-\begin{description}
-	\setlength\itemsep{0.05em}
-	\item  $ray(\omega_{i}, -\omega_{i})$ is the recursive ray tracing function
-\end{description}
+This function is a higher order integral which is difficult to calculate. The most common approach on solving this equation is the approximation via Monte Carlo methods. Most of today's image synthesis algorithms are dedicated to this task.
 
 
 \begin{figure}
@@ -195,16 +215,41 @@ L(\omega_{o}) = L_{e}(\omega_{o}) \int_{H(x)} L(ray(\omega_{i}, -\omega_{i})BRDF
 	\caption{The Cornell Box scene with local illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}).}
 \end{figure}
 
-\subsubsection{Monte Calo methods}
-lalala
 
+
+\subsubsection{Path Tracing}
+
+Multiple approaches for solving the rendering equation exists, for example the \emph{radiosity} method, aiming at solving it via the application of the finite element method (compare \cite{goral1984modeling}), or \emph{distributed ray tracing}, a technique for achieving effects such soft shadows by distributing cast rays "according to the analytic function they sample" \cite{cook1984distributed}. \todo{weird sentence} However, the most commonly used methods for solving the rendering equation are Monte Carlo methods. \todo{why??} One particular Monte Carlo method is \emph{path tracing}, which is the subject of this section.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{img/1 fundamentals/path_tracing.png}
+	\caption{Tracing a path for calculating global illumination.}
+	\label{fig:pathtracing}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.7\linewidth]{img/1 fundamentals/rendering_eq_figure.png}
+	\caption{Figure from the paper \citetitle{kajiya1986rendering} by Kajiya \cite{kajiya1986rendering}.}
+	\label{fig:kajiya_figure}
+\end{figure}
+
+With this knowledge we can re-write Equation \ref{eq:renderingeq} as follows:
+\begin{equation}\label{eq:renderingeq_update}
+L(x, \omega_{o}) = L_{e}(x, \omega_{o}) \int_{H(x)} L(ray(x, \omega_{i}), -\omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
+\end{equation}
+
+The function $L(ray(x, \omega_{i}), -\omega_{i})$ recursively calculates the incoming radiance for all directions around the point $x$. A visual result of evaluating this function for each pixel in an image can be seen in Figure \ref{fig:cb_global}.
+
+\todo{variance and converging stuff}
 
 \section{Solid Representations in 3D Space}
 
 A large part of the work of ray tracing algorithms is the calculation of intersection points between rays with scene geometry.
 The way solid objects can be represented in the Euclidean space varies, thus does the testing for intersections with rays. The following section illustrates three types of solid representations in image synthesis environments, such as ART: Quadric surfaces, polygon meshes and constructive solid geometry.
 
-\subsection{Quadric Surfaces}
+\subsection{Analytic Surfaces}
 \label{sec:quadrics}
 Quadric surfaces are two dimensional surfaces in three dimensional Euclidean space, defined by quadric equations. Examples of these surfaces are spheres, cones, cylinders and paraboloids. The equations describing these shapes can be in implicit form, which have the pleasant property, that testing whether a point $p$ is located at the boundary of such a surface is easy. Generally speaking, implicit equations are relations of the form  $f(x_{0}, x_{1}, ..., x_{n}) = 0$ where $f$ is a function of multiple variables. Consider such a variable as a point $p$ in three dimensional space and evaluated by function $f$. An evaluation of $f$ will result in two possible outcomes: either $f(p) = 0$, which means $p$ is located on the surface of the shape, or  $f(p) \ne 0$, which means the opposite.
 Due to this evaluation, quadrics are well suited for intersection testing during ray tracing. These quadratic function can furthermore be expressed in explicit form (sometimes referred to as parametric equation). An explicit equation is \todo{explain explicit function}.
@@ -241,9 +286,11 @@ To obtain the two intersection points, the parametric equation defining $R$ is s
 and then, since all variables with the exception of $t$ are known, solved for $t$.
 Once the two resulting values $t_{0}$ and $t_{1}$ are obtained, the two intersection points $I_{0}$ and $I_{1}$ can be expressed as $I_{0} = P + t_{0}\omega$, and respectively $I_{1} = P + t_{1}\omega$.
 
-\subsection{Polygon Meshes}
+\subsection{Polygon meshes}
 
-Polygon meshes represent shapes as a composition of multiple, smaller polygons that are connected with each other. The higher the number of such polygons the mesh exhibits, the higher the accuracy of the approximation of the represented shape \todo{weird sentence.} The most common types of polygons used are triangles and quadrangles. An example of a representation of a shape with a triangle mesh can be seen in Figure \ref{fig:poly_mesh}. 
+Polygon meshes represent shapes as a composition of multiple, smaller polygons that are connected with each other via shared edges. The higher the number of such polygons the mesh exhibits, the higher the accuracy of the approximation of the represented shape \todo{weird sentence.} The most common types of polygons used are triangles and quadrangles. An example of a representation of a shape with a triangle mesh can be seen in Figure \ref{fig:poly_mesh}. These polygons are composed of a list of vertices, a list of edges connecting these vertices and a face, the area bounded by the vertices and edges. These information is sufficient to describe a polygon in 3D space (although there is no unique way of describing these polygons). A reason why triangles are the most commonly used polygon for meshes is their
+
+\todo{why are triangles preferred?}
 
 \begin{figure}
 	\centering
@@ -252,12 +299,14 @@ Polygon meshes represent shapes as a composition of multiple, smaller polygons t
 	\label{fig:poly_mesh}
 \end{figure}
 
+Various ray primitive intersection algorithms exist, for example the Möller– Trumbore intersection algorithm \cite{moller1997fast} for intersecting triangles. In order to test a given ray for intersection with a polygon mesh, theoretically all polygons contained in the mesh in question must be tested for intersection. This is of course a naive approach, since the number of intersection tests that need to be performed is linear in the number of polygons. As such polygon meshes are often composed of several thousand polygons, and testing them all for intersection has a decisive influence on the performance of the rendering process. Section \ref{sec:acceleration} introduces acceleration data structures, aiming at the minimization of those intersection tests.
+
 \subsection{Constructive Solid Geometry (CSG)}
 
 The idea behind constructive solid geometry (CSG) modeling is the application of the boolean set operations to geometry primitive in order to create more complex geometries. The boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted sometimes as \texttt{SUB}-operator). 
 Primitives are usually quadric surfaces such as spheres, cones and cylinders. Figure \ref{fig:csg} shows the application of each boolean operator to two sphere primitives. Multiple of such set operations can be hierarchically ordered with the help of a binary tree structure, called the CSG-tree.   
 
-\begin{figure} \label{csg}
+\begin{figure} 
 	\centering
 	\subfloat[Union of two spheres (\texttt{OR} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/or.png}\label{fig:csg_or}}
 	\hfill
@@ -265,8 +314,10 @@ Primitives are usually quadric surfaces such as spheres, cones and cylinders. Fi
 	\hfill
 	\subfloat[Left sphere with the right sphere "subtracted" from it (\texttt{SUB} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/sub.png}\label{fig:csg_sub}}
 	\caption{Boolean operators Union (\ref{fig:csg_or}), Intersection (\ref{fig:csg_and}) and Difference (\ref{fig:csg_sub}) applied to two sphere objects.}
+	\label{fig:csg}
 \end{figure}
 
+\todo{find out about mesh csg}
 One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leafs are associated with the geometry primitives, the nodes with the set operations. Due to the possibility that two primitives can face being translated, rotated or scaled before a boolean operator is applied to them, edges of the tree is associated with transformation information (this is denoted in the figure with the matrix icon). The transformation corresponding to an edge between a node and a node's parent can be "empty", meaning that it has no effect on the primitive represented by that node.  
 
 \begin{figure}
@@ -277,23 +328,94 @@ One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leafs
 	\label{fig:csg_tree}
 \end{figure}
 
+\subsubsection{Ray tracing with CSG}
+
 The intersection calculation for a given ray during the ray tracing process is straightforward: 
-All the primitives associated to the leafs of the CSG tree are tested for intersection. If an intersection test has a positive result, usually two intersection points are calculated: one  with one primitive is found, one point when the ray enters the primitive and one point when it exits it (there is the edge case that there exists infinitely many intersection points between a ray and a primitive when the ray is tangent to the primitive, however, this is seldom the case and can be safely ignored). Then the CSG tree is traversed bottom up and each time an interior node representing a boolean set operator is encountered, the intersection points of the ray with the primitives associated with the child nodes are evaluated and re-arranged. For example, when considering the \texttt{OR} operator in Figure \ref{fig:csg_or}, and imagining a single ray would intersect both spheres, there would be four intersection points: One entering the first sphere, followed by one entering the second sphere, then one exiting the first sphere, and finally one intersection point exiting the second sphere. The \text{OR} operator would treat the two spheres as one single object and therefore discard the inner intersection points. Similarly, the \text{AND} operator in Figure \ref{fig:csg_and} would discard the intersection of a sphere that is not in the interior of the other sphere. And finally, the \text{SUB} operator in Figure \ref{fig:csg_sub} discards every intersection point on the sphere on the right, which is "subtracted" from the sphere on the left.
+All the primitives associated to the leafs of the CSG tree are tested for intersection. If an intersection test has a positive result, usually two intersection points are calculated: one  with one primitive is found, one point when the ray enters the primitive and one point when it exits it (there is the edge case that there exists infinitely many intersection points between a ray and a primitive when the ray is tangent to the primitive, however, this is seldom the case and can be safely ignored). Then the CSG tree is traversed bottom up and each time an interior node representing a boolean set operator is encountered, the intersection points of the ray with the primitives associated with the child nodes are evaluated and re-arranged. For example, when considering the \texttt{OR} operator in Figure \ref{fig:csg_or}, and imagining a single ray would intersect both spheres, there would be four intersection points: One entering the first sphere, followed by one entering the second sphere, then one exiting the first sphere, and finally one intersection point exiting the second sphere. The \texttt{OR} operator would treat the two spheres as one single object and therefore discard the inner intersection points. Similarly, the \texttt{AND} operator in Figure \ref{fig:csg_and} would discard the intersection of a sphere that is not in the interior of the other sphere. And finally, the \texttt{SUB} operator in Figure \ref{fig:csg_sub} discards every intersection point on the sphere on the right, which is "subtracted" from the sphere on the left.
 
 The representation of CSG offers one significant advantage: Complex geometry can be expressed via the composition of a manageable amount of primitive shapes, as opposed to large numbers of polygons in a polygon mesh. Because testing whether a point lies inside or outside a primitive is easy, as noted in Section \ref{sec:quadrics}, and since compared to polygon meshes only a small amount of primitives exist, the number of intersection tests in each render pass is comparatively low.
 
-Although the CSG modeling technique is several years old (being introduced by \cite{roth1982ray}), it is still used in practice today, e.g. for computer-aided design.
+Although the CSG modeling technique, being introduced by \cite{roth1982ray}, is several years old, it is still used in practice today, e.g. for computer-aided design.
 
-% new section
-\section{Common ray acceleration data structures}
-The computational cost associated with ray tracing algorithms has always been regarded as a "necessary evil" one has to face when desiring highly realistic images. An often cited fact is Whitted's observation, that, for complex scenes, 95 percent of the time used by the algorithm is spend on intersection calculations \cite[p 349]{whitted1979improved}. The image displayed in figure \ref{fig:rendering_eq}, was rendered with a resolution of 512 by 512 pixels and with 40 paths per pixel on an IBM 3081 machine consumed during 1221 minutes \cite[p 149]{kajiya1986rendering}. 
 
-It was a logical consequence, that, over time, new ideas were introduced for accelerating the ray tracing process, mostly by minimizing the number of intersection tests. Nowadays, there exist various ray acceleration structures. In the following, two of these structures are that are commonly used, namely bounding volume hierarchies and binary space partitioning trees are introduced.
+\section{Spacial acceleration data structures} \label{sec:acceleration}
+The computational cost associated with ray tracing and path tracing algorithms has always been regarded as a "necessary evil" one has to face when desiring highly realistic images. An often cited fact is Whitted's observation, that, for complex scenes, 95 percent of the time used by the algorithm is spend on intersection calculations \cite[p 349]{whitted1979improved}. To give an example, the image displayed in figure \ref{fig:kajiya_figure}, was rendered with Kajyia's approach \todo{rephrase} and with a resolution of 512 by 512 pixels and with 40 paths per pixel on an IBM 3081 machine during 1221 minutes \cite[p 149]{kajiya1986rendering}. 
+
+\todo{hardware stuff}
+
+It was a logical consequence, that, over time, new ideas were introduced for accelerating the ray tracing process. Attempts can be the minimization of the number of rays that are cast into the scene, the development of faster intersection testing algorithms or the minimization of ray-primitive intersection tests. The upcoming of ray acceleration data structures intended to address the later problem. It is essentailly a trade between an increase of storage space and a decrease of the time needed to perform intersection tests \todo{what?}. The following section focuses on two popular acceleration data structures commonly used: Bounding volume hierarchies and KD trees.
 
 \subsection{Bounding volume hierarchy}
 
-\subsection{Binary space partitioning}
+Bounding volume hierarchies (BVHs), being introduced by \cite{rubin19803}, are a hierarchical structures of so called \emph{bounding volumes}, aiming at the reduction of unnecessary intersection tests. The idea behind bounding volumes is the enclosure of geometry with an analytical shape, such as a sphere, a cylinder or a box. As previously discussed in Section \ref{sec:quadrics}, testing for an intersection between a given ray and one such analytical shape is easy. If no such intersection is found, this concludes that an intersection between the ray and the enclosed geometry is not possible and thus, intersection tests with the geometry can be safely disregarded. These bounding volumes again can be enclosed in a bounding volume, and thus, complex hierarchies of bounding volumes can be formed.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=.7\linewidth]{img/1 fundamentals/bvh.png}
+	\caption{2D example of a bounding volume hierarchy, taken from \cite{pharr2016physically}. (a) represents the scene, consiting of simple shapes and their axis aligned bounding boxes and (b) the BVH tree structure associated with the scene from (a).}
+	\label{fig:bvh}
+\end{figure}
+
+Bounding volumes should ideally be chosen, such that they fit the underlying geometry as close as possible, in order to further reduce the number of unnecessary intersection test. However, a most commonly used volume is a \emph{axis aligned bounding box}, a hyperrectangle whos sides are parallel to the axis of the coordinate system. Such boxes might not enclose the geometry as tightly as possible, however, testing for intersection is computationally cheap and not much memory is needed to store them.
+A BVH then is a hierarchy of a number of such bounding volumes, stored in a tree structure (commonly in binary trees). In the tree, the leafs represent the bounding boxes of the geometry primitives and the interior nodes are associated with bounding volumes enclosing the node's children. An example of such a tree structure is given by Figure \ref{fig:bvh}. The root of a BVH is typically a bounding box, enclosing the entire virtual scene.
+
+Binary BVHs exhibit some convenient properties: Every geometrical primitive is present in exactly one bounding box, and these bounding boxes do not overlap. Thus, no primitive is possibly tested for intersection twice (unlike with KD trees, which are the subject of the next section). Furthermore, the amount of memory needed for storing a binary BVH is bounded. A BVH that is build over $n$ primitives obtains $2n-1$ total nodes, $n$ leave nodes and $n-1$ interior nodes \cite{pharr2016physically}. 
+
+During ray tracing, the BVH is traversed and a cast ray is tested for intersection between a bounding box that is associated with the current tree node. If an intersection is found, the traversal continues in the node's children, otherwise traversing the sub tree rooted at that node is disregarded.
+
+When compared to KD trees, BVHs usually require more time to be built, on the other hand, the ray-primitive-intersection testing is slightly faster. 
+
+\subsection{KD trees}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{img/1 fundamentals/kd_tree.png}
+	\caption{Partition of a 2D scene in sub spaces A, B, C, and D with planes 0, 1, and 2. This figure is taken from \cite{hapala2011kd}.}
+	\label{fig:kdtree}
+\end{figure}
+
+\emph{K-dimensional trees} (or KD trees), which were introduced by \cite{bentley1975multidimensional}, belong to the group of binary space partitioning trees (BSP trees). BSP trees recursively subdivide $k$ dimensional space with $k-1$ dimensional hyperplanes. One subdivision of space takes place when the number of geometric primitives contained in it are greater than a specified threshold. When one such subdivision happens, the space is decided into two smaller half-spaces for which this procedure is repeated until the number of primitives contained in a subdivided area is smaller or equal than the threshold. The hyperplanes that partition space are stored in a binary \todo{check that} tree structure. The root of the tree is associated with the hyperplane splitting the bounding volume of the entire scene. Its children to the left are the hyperlanes and primitives in one half-plane that particular plane, and the children to the right are the planes and primitives that are located on the other one. The leaf nodes resemble a list of primitives being located in the area defined by their parent node's hyperplanes.
+
+KD trees are a specialized case where the split-planes are perpendicular to one of the coordinate axis. During the recursive splitting, the axis to which the current plane is perpendicular to, is alternated. This allows for KD trees being efficiently constructed. However, unlike with BVHs, primitives can be located in overlapping sub spaces, therefore intersection points may be calculated twice during ray tracing. 
+
+When being compared to BVHs, the construction is faster (construction methods taking $O(n\log n)$ time exists \cite{wald2001interactive}.)
+
+
+\subsubsection{Surface Area Heuristic (SAH)}
+
+Devices and scenes. Rays. rtcIntersect();. RayHit structure.
 
 \section{Intel\textregistered's Embree Framework}
-Embree is a high performance rendering framework, consisting of a collection of kernels and data structures suited for the communication with [insert hardware types]. The latest version of Embree at the time of writing this thesis is 3.13.0.
+In spite the affect of various ray acceleration data structures and hardware optimizations, exploiting the full capabilities of modern CPUs, which exhibit different architectures and instruction sets and support different algorithms and data structures, remains challenging for ray tracing applications. To give an example, enabling multi-threading for the purpose of ray tracing is simple due to its nature. The calulated light intensities of the pixels in the resulting image are independent of each other. However, parallelizing the traversal through a ray acceleration data structure like a BVH is non-trivial \todo{check this}.
+
+Embree is a high performance rendering framework written in \texttt{C99} and \texttt{ISPC}, which addresses this problem. It offers a collection of vectorized kernels, being optimized for the communication with CPUs that support SSE, AVX, AVX2, AVX-512 and instruction sets. The provided kernels offer a variety of components, like different types of BVHs, traversal algorithms and intersection algorithms, Figure \ref{fig:embree} provides an overview. 
+An API for the integration into existing rendering systems is provided and described in a detailed documentation \cite{embree2021Doc}. 
+During a rendering process, Embree will decide on which components to use for building the acceleration structure and traversing it based on the hardware and information provided by the user.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{img/1 fundamentals/embree_overview.png}
+	\caption{System overview of Embree, taken from the SIGGRAPH presentation \citetitle{embreeSlides} \cite{embreeSlides}.}
+	\label{fig:embree}
+\end{figure}
+
+Interesting features of Embree are:
+\begin{description}
+	\setlength\itemsep{0.05em}
+	\item 	Finding the closest hit point, or alternatively any hit point
+	\item 	Support for the cast of single rays, ray packets containing 4, 8 or 16 rays, and so-called ray streams of any desired number of rays
+	\item 	High-quality BVH builders
+	\item 	Support for the Intel SPMD Program Compiler (ISPC) and the Intel Threading Building Blocks
+	\item 	Independence from any other graphics API such as OpenGl or DirectX
+\end{description}
+
+Embree supports a variety of geometric shapes such as triangles, quads, and all sorts of curves \todo{rephrase}.
+Another notable feature of Embree is the support of custom geometries. These will be referred to as \emph{User defined geometries}. All one has to do is providing a bounding box, and a function for intersection testing and another function for occlusion testings which get passed to Embree via function pointers.
+
+Embree is open source, and therefore publicly available. Supported platforms are (32-bit and 64-bit), Linux (64-bit), and macOS (64-bit). The latest version of Embree at the time of writing this thesis is 3.13.0. 
+
+\subsubsection{Ray tracing with Embree}
+bla bla bla
+\todo{ray hit and ray}
+\todo{user geometry}
+\todo{user pointer}
