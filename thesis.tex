@@ -53,20 +53,13 @@
 \usepackage{enumitem}
 
 % load bibliography tools
-% \usepackage[backend=bibtex,natbib,style=numeric,sorting=none]{biblatex}
+%\usepackage[backend=bibtex, natbib, style=numeric, sorting=none]{biblatex}
+
 
 % alternative with alphanumeric citations (more informative than numbers):
-%\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear]{biblatex}
-
-%\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear]{biblatex}
+\usepackage[backend=bibtex,natbib,style=alphabetic]{biblatex}
 
 
-\usepackage[backend=bibtex,natbib, style=ACM-Reference-Format, citestyle=authoryear-icomp, maxcitenames=1]{biblatex}
-
-\let\oldcite\cite
-\renewcommand*\cite[1]{[\oldcite{#1}]}
-
-%
 % alternatives that conform to iso690
 % (iso690 is not formally required on MFF, but may help elsewhere):
 %\usepackage[backend=bibtex,natbib,style=iso-numeric,sorting=none]{biblatex}
@@ -133,6 +126,13 @@
 
 % listing options
 \lstset{language=[Objective]C, breakindent=40pt, breaklines}
+
+% for \texttt to break
+\usepackage{algpseudocode}
+\algrenewcommand\textproc{\texttt}
+
+% foodnotes
+\counterwithout{footnote}{chapter}
 
 
 \begin{document}
