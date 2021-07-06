@@ -396,17 +396,8 @@ When being compared to BVHs, the construction is faster (construction methods ta
 \section{Intel\textregistered's Embree Framework}
 In spite the affect of various ray acceleration data structures and hardware optimizations, exploiting the full capabilities of modern CPUs, which exhibit different architectures and instruction sets and support different algorithms and data structures, remains challenging for ray tracing applications. 
 
-Embree is a high performance rendering framework written in \texttt{C99} and \texttt{ISPC}, which addresses this problem. It offers a collection of vectorized kernels, being optimized for the communication with CPUs that support SSE, AVX, AVX2, AVX-512 and instruction sets. The provided kernels offer a variety of components, e.g. different types of BVHs, traversal algorithms and intersection algorithms, Figure \ref{fig:embree} provides an overview.
-During a rendering process, Embree will decide on which components to use for building the acceleration structure and traversing it based information provided by the user and on the target CPU architecture. The later is performed by the "Ray Tracing Kernel Selection layer of the hierarchy shown in Figure \ref{fig:embree}.
-
-A \texttt{C99} API for the integration into existing rendering systems is provided and described in a detailed documentation \cite{embree2021Doc}. 
-
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{img/1 fundamentals/embree_overview.png}
-	\caption{System overview of Embree, taken from the SIGGRAPH presentation \citetitle{embreeSlides} \cite{embreeSlides}.}
-	\label{fig:embree}
-\end{figure}
+Embree is a high performance rendering framework written in \texttt{C99} which addresses this problem. It offers a collection of vectorized kernels, being optimized for the communication with CPUs that support SSE, AVX, AVX2, AVX-512 and instruction sets. The provided kernels offer a variety of components, e.g. different types of BVHs, traversal algorithms and intersection algorithms, Figure \ref{fig:embree} provides an overview.
+During a rendering process, Embree will decide on which components to use for building the acceleration structure and traversing it based information provided by the user and on the target CPU architecture. The later is performed by the "Ray Tracing Kernel Selection" layer of the hierarchy shown in Figure \ref{fig:embree}.
 
 Interesting features of Embree are:
 \begin{itemize}
@@ -415,18 +406,42 @@ Interesting features of Embree are:
 	\item 	support for the cast of single rays, ray packets containing 4, 8 or 16 rays, and so-called ray streams of any desired number of rays,
 	\item 	high-quality BVH builders,
 	\item 	support for the Intel SPMD Program Compiler (ISPC) and the Intel Threading Building Blocks (TBB), and
-	\item 	independence from any other graphics API such as OpenGl or DirectX
+	\item 	independence from any other graphics API such as OpenGL or DirectX
 \end{itemize}
 
-Embree supports a variety of geometric shapes such as triangles, quads, and certain types of curves, such as Bézier curve, B-Splines and Catmull-Rom-Splines.
-Another notable feature of Embree is the support of custom geometries. These will be referred to as \emph{User defined geometries}. In order to initialize a user defined geometry, one has to provide a function for calculating the bounding box for the geometry, and a function for intersection testing and another function for occlusion testings. These functions are passed to Embree as callback functions.
+An API for the integration into existing rendering systems is provided and described in a detailed documentation \cite{embree2021Doc}. This documentation furthermore offers tutorial for the familiarization of the framework to new users. The name of the functions belonging to this API are preceded by the abbreviation \texttt{rtc} ("ray tracing kernels"), data types have the abbreviation \texttt{RTC} predeceasing their name. For example the variable \texttt{RTCScene} stores the virtual scene for Embree, and the function \texttt{rtcIntersect1()} performs the intersection testing with a single ray.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{img/1 fundamentals/embree_overview.png}
+	\caption{System overview of Embree, taken from the SIGGRAPH presentation \citetitle{embreeSlides} \cite{embreeSlides}.}
+	\label{fig:embree}
+\end{figure}
+
+Embree supports a variety of geometric shapes such as triangles, quads, and certain types of curves, such as Bézier curves, B-Splines and Catmull-Rom-Splines.
+Another notable feature of Embree is the support of custom geometries. These will be referred to as \emph{User defined geometries}. 
 
 Embree is open source, and therefore publicly available. Supported platforms are (32-bit and 64-bit), Linux (64-bit), and macOS (64-bit). The latest version of Embree at the time of writing this thesis is 3.13.0. 
 
-\subsubsection{Geometry Initialization and Ray Tracing in Embree}
+\subsubsection{Ray Tracing in Embree}
+Embree follows a device concept, allowing for the use of the Embree API by different components of the image synthesis application without interfering each other. An \texttt{RTCDevice} can be created with the function \texttt{rtcNewDevice} and released via the function \texttt{rtcReleaseDevice}. Such device types are used by Embree to create further components, such as virtual scenes which serve as the container for various scene geometry. A scene in Embree, represented by the data type \texttt{RTCScene}, can be created via the function \texttt{rtcNewScene}, to which the \texttt{RTCDevice} is passed to as an argument, and released via the function \texttt{rtcReleaseScene}. Different geometries can be attached or detached by the functions \texttt{rtcAttachGeometry}, which will furthermore assign a unique ID to the geometry, and \texttt{rtcDetachGeometry}. Once an \texttt{RTCGeometry} is attached to the \texttt{RTCScene}, it can be released via the call of the function \texttt{rtcReleaseGeometry}.
+After the attachment of the complete scene geometry, the scene can be committed by calling the function \texttt{rtcCommitScene} in order to trigger the creation of Embree's internal acceleration structures. After the invocation of this function, the individual geometries cannot be edited or manipulated.
 
+Geometries in Embree are represented by a \texttt{RTCGeometry} data type. These types can be created with the function \texttt{rtcNewGeometry} which takes the \texttt{RTCDevice} and an enum specifying the geometry type (e.g. triangle, quad, user defined geometry) as input parameters. In case the geometry being a triangle, quadrangle or a type of curve, so-called \emph{geometry buffers} can be created and linked to the \texttt{RTCGeometry} by invoking the function \texttt{rtcSetNewGeometryBuffer}. These buffers will store information such as vertices, indices and surface normals of the geometry.  
 
+In order to initialize a user defined geometry, one has to provide a function for calculating the bounding box for the geometry, a function for intersection testing and another function for occlusion testings. These functions are passed to Embree as callback functions. Furthermore, the number of geometric primitives, which together compose the geometry, has to be set, and a so-called \emph{User data pointer} associated with the geometry. A user data pointer points to the representation of the geometry by the rendering application in memory. In the interior of the callback function for calculating the intersection with the user defined geometry, the original representation of the geometry can be easily retrieved via this pointer. The passing of the various callback functions to Embree is done via invocation of the functions \texttt{rtcSetGeometryUserPrimitiveCount}, \texttt{rtcSetGeometryUserData}, \texttt{rtcSetGeometryBoundsFunction}, \texttt{rtcSetGeometryIntersectFunction}, \newline and \texttt{rtcSetGeometryOccludedFunction}.
 
-\todo{ray hit and ray}
-\todo{user geometry}
-\todo{user pointer}
+Once the \texttt{RTCDevice} and the \texttt{RTCScene} are set up, the scene geometry is attached to the \texttt{RTCScene}, and the internal acceleration data structures have been built, nothing stands in the way of performing the actual ray tracing with Embree. 
+
+In the following example, only ray tracing with single rays as opposed to packet ray tracing is considered. We will furthermore not consider instancing, due to the reason that this feature does not find use in the work of this thesis.
+
+In order to ray trace a virtual scene, a per ray query intersection context, \texttt{RTCIntersectContext}, has to be set up via the function \texttt{rtcInitIntersectContext}. This structure is used for the configuration of intersection flags, among other things. 
+Subsequently, a \texttt{RTCRayHit} struct is declared. This struct is composed of an \texttt{RTCRay} struct, abstracting the ray that is used by Embree to preform the intersection testing, and an \texttt{RTCHit} struct, in which information concerning the intersection point, such as the surface normal, the barycentric UV coordinates of the point, and the geometry ID associated with the intersected geometry are stored.
+The \texttt{RTCRay} struct stores the ray orientation and direction, so-called \texttt{tnear} and \texttt{tfar} values, indicating the boundaries of a range of possible hit distances, and other information such as an id for the ray, a ray mask and a \texttt{time} value useful when motion blur is desired.
+When the target ray tracing application is generating a ray, the values of the \texttt{RTCRay} struct are updated with the ray orientation and direction. The \texttt{tnear} value is usually set to zero and the \texttt{tfar} value is set to infinity. The geometry ID of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}.
+
+After the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} structs have been successfully initialized and updated, the ray-primitive intersection testing is performed via invocation of the function \texttt{rtcIntersect1} to which the \texttt{RTCScene}, a reference to both the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} are passed as arguments. In case of a found intersection, this function will update the \texttt{tfar} value of the \texttt{RTCRay} with the closest hit distance and the geometry ID of the \texttt{RTCHit} with the geometry ID associated to the intersected geometry.
+
+In case of performing intersection testing between a user defined geometry and a ray, these values have to be updated manually inside the intersection function that was passed to Embree as a callback function.
+
+When the intersecting testing procedure has finished, the geometry ID of the \texttt{RTCHit} will give insight on whether an intersection was found or not. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, one can conclude that no intersection was found. Otherwise, an intersection was found and the \texttt{RTCRay} and \texttt{RTCHit} components of the \texttt{RTCRayHit} will provide the hit distance, the coordinates of the surface normal at the intersection point and the UV coordinates of the intersection point.

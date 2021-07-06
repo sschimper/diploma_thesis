@@ -43,39 +43,37 @@ To achieve lock free parallelism between the individual threads, the scene graph
 \section{Scene graph infrastructure}
 Some popular rendering systems (among them Mitsuba 2 and pbrt) describe a virtual scene in the following way: A virtual scene, abstracted by a \texttt{Scene} class object, obtains a collection of geometric shapes. These shapes are represented by a \texttt{Shape} base class, which offers functions for calculating its bounding box and performing intersection tests with a given ray. Various shape types can be represented as a child classes of this \texttt{Shape} class. This is an ideal design for Embree since these shapes can be initialized as User Defined Geometries. Once Embree finds an intersection with a bounding box of a particular shape, its representation in memory can be retrieved via the User pointer \todo{explain} and an instance function of the \texttt{Shape} class for ray-intersection testing can be called. 
 
-The scene graph being utilized by ART diverges from this design. This section provides an overview over different nodes in the scene graph and their functionality on the basis of a provided example scene graph. This scene graph, which was used by ART to render the image displayed in Figure \ref{fig:csg_or}, is shown in Figure \ref{fig:scene_graph}. Table \ref{tab:scenegraph} displays its nodes and a brief description of their functionality and relation to other nodes. However, we will only list nodes for which the comprehension of their functionality is important to follow the implementation description in the next chapter.
-On particularity of the scene graph is that it can be utilized by every application mentioned in the previous section, with the exception of \texttt{impresario}. \todo{verify}. 
-
-
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=1\linewidth]{img/2 art/scene_graph.png}
 	\caption{Scene graph used to render Figure \ref{fig:csg_or}. In this graph, bounding boxes have already been inserted and a KD tree was built over the scene.} 
 	\label{fig:scene_graph}
 \end{figure}
 
-\comment{
 \begin{table}
 	\centering
 	{%\footnotesize\sf
-		\begin{tabular}{llrl}
+		\begin{tabular}{p{0.2\linewidth} p{0.8\linewidth}}
 			\toprule
-			Scene graph node & Role  \\
+			Scene graph node & Function  \\
 			\midrule
-			\includegraphics{img/2 art/shape_node.png} & QWERTY- \\
-			\includegraphics{img/2 art/comb_attr_node.png} & \textcolor{red}{BAD} \\
-			\includegraphics{img/2 art/box_node.png} & Bounding box, enclosing the components of its sub tree. \\
-			\includegraphics{img/2 art/csg_node.png} & Nodes with two children, representing the primitives to which this CSG operation is applied to (in this example, it the two nodes are representing the union operation). \\
-			\includegraphics{img/2 art/bsp_node.png} & Represents the KD tree that is build over the scene. Its children are the entire scene geometry, a  \\
+			\includegraphics[scale=0.5]{img/2 art/shape_node.png} & This node belongs to the category of "shape nodes" that are associated with the representation of a geometry by ART. Nodes of this type are always leafs.\\
+			\includegraphics[scale=0.5]{img/2 art/comb_attr_node.png} & This node is \\
+			\includegraphics[scale=0.5, valign=c]{img/2 art/bounding_box.png} & This node represents a bounding box, enclosing the components of the sub tree rooted at the node. \\
+			\includegraphics[scale=0.5]{img/2 art/or.png} & Nodes with two children, representing the primitives to which this CSG operation is applied to (in this example, it the two nodes are representing the union operation). \\
+			\includegraphics[scale=0.5]{img/2 art/bsp_node.png} & Represents the KD tree that is build over the scene. Its children are the entire scene geometry, a  \\
 			% \addlinespace % a nice non-intrusive separator of data groups (or final table sums)
 			\bottomrule
 	\end{tabular}}
-	\caption{Nodes in the scene graph and their functionality}
-	\label{tab:z}
+	\caption{Nodes in the scene graph displayed in Figure \ref{fig:scene_graph} and their functionality.}
+	\label{tab:nodes}
 \end{table}
-} % comment
 
-\section{The Raycaster object}
-\todo{don't spend too much time on this}
 
-\section{Other information (WT)}
+The scene graph being utilized by ART diverges from this design. This section provides an overview over different nodes in the scene graph and their functionality on the basis of a provided example scene graph. This scene graph, which was used by ART to render the image displayed in Figure \ref{fig:csg_or}, is shown in Figure \ref{fig:scene_graph}. Table \ref{tab:nodes} displays its nodes and a brief description of their functionality and relation to other nodes. However, we will only list nodes for which the comprehension of their functionality is important to follow the implementation description in the next chapter.
+On particularity of the scene graph is that it can be utilized by every application mentioned in the previous section, with the exception of \emph{impresario}.
+
+\section{Ray Tracing with ART}
+The functionality redarding ray tracing in ART is abstracted in the \texttt{ArnRayCaster} class. This class is inherited from the \texttt{ArnGraphTraversal} class. 
+
+\todo{talk this over with Alban}
