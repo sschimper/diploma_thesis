@@ -1,0 +1,127 @@
+From ed7cecaa78fb079231cb1d6abc2cd3d8bb3f7c4f Mon Sep 17 00:00:00 2001
+From: Thomas Schimper <thomasschimper94@gmail.com>
+Date: Tue, 6 Jul 2021 21:01:11 +0200
+Subject: [PATCH] fixing table
+
+---
+ ch2.tex    | 78 +++++++++++++++++++++++++++++++++++++++++++-----------
+ thesis.tex |  4 +--
+ 2 files changed, 64 insertions(+), 18 deletions(-)
+
+diff --git a/ch2.tex b/ch2.tex
+index 6dcfde8..781a646 100644
+--- a/ch2.tex
++++ b/ch2.tex
+@@ -51,22 +51,68 @@ Some popular rendering systems (among them Mitsuba 2 and pbrt) describe a virtua
+ \end{figure}
+ 
+ \begin{table}
+-	\centering
+-	{%\footnotesize\sf
+-		\begin{tabular}{p{0.2\linewidth} p{0.8\linewidth}}
+-			\toprule
+-			Scene graph node & Function  \\
+-			\midrule
+-			\includegraphics[scale=0.5]{img/2 art/shape_node.png} & This node belongs to the category of "shape nodes" that are associated with the representation of a geometry by ART. Nodes of this type are always leafs.\\
+-			\includegraphics[scale=0.5]{img/2 art/comb_attr_node.png} & This node is \\
+-			\includegraphics[scale=0.5, valign=c]{img/2 art/bounding_box.png} & This node represents a bounding box, enclosing the components of the sub tree rooted at the node. \\
+-			\includegraphics[scale=0.5]{img/2 art/or.png} & Nodes with two children, representing the primitives to which this CSG operation is applied to (in this example, it the two nodes are representing the union operation). \\
+-			\includegraphics[scale=0.5]{img/2 art/bsp_node.png} & Represents the KD tree that is build over the scene. Its children are the entire scene geometry, a  \\
+-			% \addlinespace % a nice non-intrusive separator of data groups (or final table sums)
+-			\bottomrule
+-	\end{tabular}}
+-	\caption{Nodes in the scene graph displayed in Figure \ref{fig:scene_graph} and their functionality.}
+-	\label{tab:nodes}
++  \centering
++  {\footnotesize
++    \begin{tabular}{m{3cm}m{5cm}}
++      \toprule
++      Scene graph node & Function  \\
++      \midrule
++      \includegraphics[scale=0.5]{img/2 art/shape_node.png} & This node belongs
++                                                              to the category of
++                                                              "shape nodes" that
++                                                              are associated
++                                                              with the
++                                                              representation of
++                                                              a geometry by
++                                                              ART. Nodes of this
++                                                              type are always
++                                                              leafs.\\
++      \midrule
++      \includegraphics[scale=0.5]{img/2 art/comb_attr_node.png} & This node is
++      \\
++      \midrule
++    \includegraphics[scale=0.5]{img/2 art/bounding_box.png} & This node
++                                                                       represents
++                                                                       a
++                                                                       bounding
++                                                                       box,
++                                                                       enclosing
++                                                                       the
++                                                                       components
++                                                                       of the
++                                                                       sub tree
++                                                                       rooted at
++                                                                       the
++                                                                       node. \\
++      \midrule
++     \includegraphics[scale=0.5]{img/2 art/or.png} & Nodes with two
++                                                              children,
++                                                              representing the
++                                                              primitives to
++                                                              which this CSG
++                                                              operation is
++                                                              applied to (in
++                                                              this example, it
++                                                              the two nodes are
++                                                              representing the
++                                                              union
++                                                              operation). \\
++      \midrule
++     \includegraphics[scale=0.5]{img/2 art/bsp_node.png} & Represents
++                                                                    the KD tree
++                                                                    that is
++                                                                    build over
++                                                                    the
++                                                                    scene. Its
++                                                                    children are
++                                                                    the entire
++                                                                    scene
++                                                                    geometry, a
++      \\
++      \bottomrule
++    \end{tabular}}
++  \caption{Nodes in the scene graph displayed in Figure \ref{fig:scene_graph} and their functionality.}
++  \label{tab:nodes}
+ \end{table}
+ 
+ 
+diff --git a/thesis.tex b/thesis.tex
+index 9021d60..7ba7d86 100644
+--- a/thesis.tex
++++ b/thesis.tex
+@@ -43,6 +43,7 @@
+ % some useful packages
+ \usepackage{amsmath,amsfonts,amsthm,bm}
+ \usepackage{graphicx}
++%\usepackage{graphbox}
+ \usepackage{subfig}
+ \usepackage{xcolor}
+ \usepackage{booktabs}
+@@ -94,11 +95,10 @@
+ 
+ % remove this if you won't use fancy verbatim environments
+ \usepackage{fancyvrb}
+-
++\usepackage{array}
+ % remove this if you won't typeset TikZ graphics
+ \usepackage{tikz}
+ \usetikzlibrary{positioning} %add libraries as needed (shapes, decorations, ...)
+-
+ % remove this if you won't typeset any pseudocode
+ \usepackage{algpseudocode}
+ \usepackage{algorithm}
+-- 
+2.31.1
+

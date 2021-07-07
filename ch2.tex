@@ -1,4 +1,6 @@
 \chapter{A brief introduction to ART}
+\label{chap:art}
+
 The Advanced Rendering Toolkit (ART), serves as the environment in which Embree shall be integrated into. Therefore, this chapter provides a brief introduction to ART to familiarize the reader with its core mechanics. Apart from a short description of the general workflow of ART, only its aspects that are relevant for the integration of Embree are considered in this chapter. For a more detailed description of ART and the scene description language, we would like to refer the reader to the ART Handbook \cite{arthandbook} and the ARM File Reference Manual \cite{artreferencemanual}.\footnote{It should be mentioned here that at the time of writing this thesis, both documents are still work in progress, and therefore incomplete. However, they will be expanded in the future.}
 
 The latest version of ART at the time of writing this thesis is Version 2.0.3.
@@ -77,3 +79,5 @@ On particularity of the scene graph is that it can be utilized by every applicat
 The functionality redarding ray tracing in ART is abstracted in the \texttt{ArnRayCaster} class. This class is inherited from the \texttt{ArnGraphTraversal} class. 
 
 \todo{talk this over with Alban}
+
+\todo{talk about intersection list}
