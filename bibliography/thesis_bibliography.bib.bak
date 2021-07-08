@@ -502,6 +502,14 @@
   title     = {Bounding volume hierarchies versus kd-trees on contemporary many-core architectures},
   year      = {2014},
   pages     = {29--36},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Online{plyRepo,
+  title   = {The Stanford 3D Scanning Repository},
+  url     = {http://graphics.stanford.edu/data/3Dscanrep/},
+  urldate = {2021-07-08},
+  year    = {2014},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}

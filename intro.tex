@@ -8,7 +8,7 @@ The origins of ray tracing can be traced back as far as 1968. At that time, a me
 \begin{figure} \label{fig:whitted_result}
 	\centering
 	\includegraphics[width=.7\linewidth]{img/0 introduction/whitted_}
-	\caption{A frame of the animation used to demonstrate the recursive ray tracer described in \cite{whitted1979improved}.\cite{raytracingvideo}}
+	\caption{A frame of the animation used to demonstrate the recursive ray tracer described in \cite{whitted1979improved}\cite{raytracingvideo}.}
 	\label{fig:g}
 \end{figure}
 
@@ -22,9 +22,9 @@ One of the design goals behind Embree was an easy integration of the framework i
 
 
 \section*{Thesis subject and motivation}
-The goal of this thesis is a successful integration of the Embree framework into the rendering engine \emph{The Advanced Rendering Toolkit} \cite{artSoftware} (which will be referred to with its abbreviation \emph{ART} throughout this thesis). It offers innovative features, such as spectral rendering support, proper handling of bi-spectral materials (e.g., fluorescent surfaces) \cite{mojzik2018handling} and a physically plausible sky dome lighting model \cite{wilkie2013predicting}. Until the release of the Mitsuba 2 renderer \cite{nimier2019mitsuba}, ART was, to our best knowledge, the sole rendering system that would support rendering polarization effects. These features make ART an interesting environment for computer graphics researchers interested in the field of \emph{Predictive Rendering}. 
+The goal of this thesis is a successful integration of the Embree framework into the rendering engine \emph{The Advanced Rendering Toolkit} \cite{artSoftware} (which will be referred to with its abbreviation \emph{ART} throughout this thesis). ART offers innovative features, such as spectral rendering support, proper handling of bi-spectral materials (e.g., fluorescent surfaces) \cite{mojzik2018handling} and a physically plausible sky dome lighting model \cite{wilkie2013predicting}. Until the release of the Mitsuba 2 renderer \cite{nimier2019mitsuba}, ART was, to our best knowledge, the sole rendering system that would support rendering polarization effects. These features make ART an interesting environment for computer graphics researchers interested in the field of \emph{Predictive Rendering}. 
 
-To facilitate these features, ART provides a documented scene description language which is essentially Objective-C, the same language ART is primarily written in, compiled and linked against ART at the beginning of a rendering process. This brings the advantage that scene geometry can be modelled by using programming concepts \todo{rephrase} \todo{shading!!} such as functions and loops. Additionally to the support of various geometry primitive types, the scene description language provides functionality for modelling Constructive Solid Geometry (CSG) and importing PLY meshes as geometry objects. Furthermore, in these Objective-C scene files, one has to assemble a so-called \emph{Action Sequence}, which can be thought of as a pipeline, directing how ART processes a given scene. 
+To facilitate these features, ART provides a documented scene description language which is essentially Objective-C, the same language ART is primarily written in, compiled and linked against ART at the beginning of a rendering process. This brings the advantage that scene geometry can be modeled by using programming concepts \todo{rephrase} \todo{shading!!} such as functions and loops. Additionally to the support of various geometry primitive types, the scene description language provides functionality for modelling Constructive Solid Geometry (CSG) and importing PLY meshes as geometry objects. Furthermore, in these Objective-C scene files, one has to assemble a so-called \emph{Action Sequence}, which can be thought of as a pipeline, directing how ART processes a given scene. 
 This allows for great flexibility. However, to ensure this functionality, ART relies on its very own scene description data structures, that diverge from those present in other popular rendering engines (e.g., pbrt \cite{pharr2016physically} and Mitsuba 2).
 
 The main focus of this work is the proposing of a way to incorporate the Embree with all types of geometries one can model with ART's scene description language. Particular attention in this thesis is paid to enabling the rendering of CSG geometry with Embree. 
@@ -33,14 +33,18 @@ Although Embree was developed with the intention of it being "used in existing r
 The successful integration of Embree into ART would elevate a complex image synthesis system with unique features regarding spectral rendering to modern ray tracing standards. 
 
 
-\section*{How this thesis is structured}
+\section*{Outline}
 
 This thesis is structured as follows: 
 
-\textbf{Chapter 2} will provide fundamental background information including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and an overview of both ART and the Embree framework.
+\textbf{Chapter \ref{chap:fundamentals}} will provide fundamental background information including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and a brief overview of functionality of the Embree framework.
 
-In \textbf{Chapter 3} provides a brief introduction to ART, in which Embree will be integrated into. This introduction focuses on the aspects of ART that are important for the comprehension of our integration approach. For a complete overview of the functionality of ART, we refer to the Art Handbook \cite{arthandbook} and the ARM File Reference Manual \cite{artreferencemanual}. 
+In \textbf{Chapter \ref{chap:art}} provides a brief introduction to ART, in which Embree will be integrated into. This introduction focuses on the aspects of ART that are important for the comprehension of our integration approach.
 
-\textbf{Chapter 3} -> Evaluation and results
+\textbf{Chapter \ref{chap:integration}} is dedicated to the description of our approach on the integration of Embree into ART, as well as the implementation of the CSG operations with Embree.
 
-This work is concluded in \textbf{Chapter 5}
+The integration approach is then evaluated and obtained results are discussed in \textbf{Chapter \ref{chap:results}}  
+
+The work of this thesis is concluded in \textbf{Chapter \ref{chap:conclusion}}.
+
+Finally, \textbf{Appendix \ref{sec:embree_app}} provides a user guide for compiling ART with Embree support.

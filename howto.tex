@@ -1,9 +1,8 @@
 \chapter{Electronic attachments} \label{chap:attachments}
 
-\todo{reformulate!!!}
-Attached to the document is the original ART repository in electronic form the original ART source code, as well as the ART handbook and the ARM scene file reference manual. 
+Attached to this thesis in electronic form, one can find the ART repository, the ART handbook, and the ARM scene file reference manual.
 
-The following directory tree shows the files of the attachment, that are the most interesting to novel users:
+The following directory tree shows the files of the attachment that are the most interesting to novel users:
 
 \medspace
 
@@ -22,13 +21,13 @@ The following directory tree shows the files of the attachment, that are the mos
 In this appendix, a user guide for both compiling and running ART with Embree support is provided. 
 
 \section{Installing Embree}
-\label{embree}
-The first thing one has to consider is the installation of Embree. Embree can be obtained via its \href{https://www.embree.org/}{homepage \emph{https://www.embree.org/}} which provides a link to the dedicated \href{https://github.com/embree/embree}{Github repository}. It can either be build from source or installed from pre-compiled binaries. A detailed description of the installation procedure for Windows (32-bit and 64-bit), Linux (64-bit), and macOS (64-bit) can be found in the \texttt{README.md} file in the repository or in the included user documentation \cite{embree2021Doc}.
+\label{sec:embree_app}
+The first thing one has to consider is the installation of Embree. Embree can be obtained via its \href{https://www.embree.org/}{homepage \emph{https://www.embree.org/}}, which provides a link to the dedicated \href{https://github.com/embree/embree}{Github repository}. It can either be build from source or installed from pre-compiled binaries. A detailed description of the installation procedure for Windows (32-bit and 64-bit), Linux (64-bit), and macOS (64-bit) can be found in the \texttt{README.md} file in the repository or in the included user documentation \cite{embree2021Doc}.
 
 \section{Compiling ART with Embree support}
 \label{art}
-After a successful installation of Embree, ART is ready to be used. A limitation of ART is the fact, that it does only support macOS and Linux systems. However, by installing a Linux subsystem, making ART work on Windows 10 is possible. The next chapter is dedicated to this. 
-The installation procedure of ART with Embree support is almost identical to the one described in the ART handbook \cite{arthandbook}. Since at the time of writing this thesis, the source code of ART is hosted on a GitLab server which is private, a zipped folder of the ART source code is provided as an attachment to this thesis. It furthermore contains the ART Handbook as a PDF file. For building ART on Windows 10, jump to the next section. Otherwise, execute the following steps:
+After a successful installation of Embree, ART is ready to be used. A limitation of ART is the fact that it does only support macOS and Linux systems. However, by installing a Linux subsystem, making ART work on Windows 10 is possible. The next chapter is dedicated to this.
+The installation procedure of ART with Embree support is almost identical to the one described in the ART handbook \cite{arthandbook}. Since, at the time of writing this thesis, the source code of ART is hosted on a private GitLab server, a zipped folder of the ART source code is provided as an attachment to this thesis. It furthermore contains the ART Handbook as a PDF file. For building ART on Windows 10, jump to the next section. Otherwise, execute the following steps:
 
 \begin{enumerate}
 	
@@ -138,7 +137,7 @@ export DISPLAY=:0
 	This will enable the display of graphical user interfaces from the Linux subsystem in Windows.
 	
 	
-	\item Follow the instructions in Section \ref{embree} and \ref{art} to setup Embree and ART.
+	\item Follow the instructions in Section \ref{sec:embree_app} and \ref{art} to setup Embree and ART.
 	
 \begin{figure}[h]
 	\centering

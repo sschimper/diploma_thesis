@@ -53,22 +53,68 @@ Some popular rendering systems (among them Mitsuba 2 and pbrt) describe a virtua
 \end{figure}
 
 \begin{table}
-	\centering
-	{%\footnotesize\sf
-		\begin{tabular}{p{0.2\linewidth} p{0.8\linewidth}}
-			\toprule
-			Scene graph node & Function  \\
-			\midrule
-			\includegraphics[scale=0.5]{img/2 art/shape_node.png} & This node belongs to the category of "shape nodes" that are associated with the representation of a geometry by ART. Nodes of this type are always leafs.\\
-			\includegraphics[scale=0.5]{img/2 art/comb_attr_node.png} & This node is \\
-			\includegraphics[scale=0.5, valign=c]{img/2 art/bounding_box.png} & This node represents a bounding box, enclosing the components of the sub tree rooted at the node. \\
-			\includegraphics[scale=0.5]{img/2 art/or.png} & Nodes with two children, representing the primitives to which this CSG operation is applied to (in this example, it the two nodes are representing the union operation). \\
-			\includegraphics[scale=0.5]{img/2 art/bsp_node.png} & Represents the KD tree that is build over the scene. Its children are the entire scene geometry, a  \\
-			% \addlinespace % a nice non-intrusive separator of data groups (or final table sums)
-			\bottomrule
-	\end{tabular}}
-	\caption{Nodes in the scene graph displayed in Figure \ref{fig:scene_graph} and their functionality.}
-	\label{tab:nodes}
+  \centering
+  {\footnotesize
+    \begin{tabular}{m{3cm}m{8cm}}
+      \toprule
+      Scene graph node & Function  \\
+      \midrule
+      \includegraphics[scale=0.5]{img/2 art/shape_node.png} & This node belongs
+                                                              to the category of
+                                                              "shape nodes" that
+                                                              are associated
+                                                              with the
+                                                              representation of
+                                                              a geometry by
+                                                              ART. Nodes of this
+                                                              type are always
+                                                              leafs.\\
+      \midrule
+      \includegraphics[scale=0.5]{img/2 art/comb_attr_node.png} & This node is
+      \\
+      \midrule
+    \includegraphics[scale=0.5]{img/2 art/bounding_box.png} & This node
+                                                                       represents
+                                                                       a
+                                                                       bounding
+                                                                       box,
+                                                                       enclosing
+                                                                       the
+                                                                       components
+                                                                       of the
+                                                                       sub tree
+                                                                       rooted at
+                                                                       the
+                                                                       node. \\
+      \midrule
+     \includegraphics[scale=0.5]{img/2 art/or.png} & Nodes with two
+                                                              children,
+                                                              representing the
+                                                              primitives to
+                                                              which this CSG
+                                                              operation is
+                                                              applied to (in
+                                                              this example, it
+                                                              the two nodes are
+                                                              representing the
+                                                              union
+                                                              operation). \\
+      \midrule
+     \includegraphics[scale=0.5]{img/2 art/bsp_node.png} & Represents
+                                                                    the KD tree
+                                                                    that is
+                                                                    build over
+                                                                    the
+                                                                    scene. Its
+                                                                    children are
+                                                                    the entire
+                                                                    scene
+                                                                    geometry, a
+      \\
+      \bottomrule
+    \end{tabular}}
+  \caption{Nodes in the scene graph displayed in Figure \ref{fig:scene_graph} and their functionality.}
+  \label{tab:nodes}
 \end{table}
 
 
@@ -79,5 +125,16 @@ On particularity of the scene graph is that it can be utilized by every applicat
 The functionality redarding ray tracing in ART is abstracted in the \texttt{ArnRayCaster} class. This class is inherited from the \texttt{ArnGraphTraversal} class. 
 
 \todo{talk this over with Alban}
+
+\todo{talk about org scene graph rendering}
+
+\begin{figure}[!tbp]
+	\centering
+	\subfloat[Image rendered by traversing the KD Tree.]{\includegraphics[width=.4\textwidth]{img/2 art/plane.png}}
+	\hfill
+	\subfloat[Image renderd by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/2 art/planeArtifacts.png}}
+	\caption{Comparison of rendered images by traversing ART's internal KD tree and traversing the original scene graph.}
+	\label{fig:org_scenegraph}
+\end{figure}
 
 \todo{talk about intersection list}
