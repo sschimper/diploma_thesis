@@ -222,7 +222,7 @@ This function is a higher order integral which is difficult to calculate. The mo
 	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_direct.png}\label{fig:cb_local}}
 	\hfill
 	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_global.png}\label{fig:cb_global}}
-	\caption{The Cornell Box scene with local illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}).}
+	\caption{The Cornell Box scene with direct illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}).}
 \end{figure}
 
 
@@ -409,7 +409,7 @@ Interesting features of Embree are:
 	\item 	independence from any other graphics API such as OpenGL or DirectX
 \end{itemize}
 
-An API for the integration into existing rendering systems is provided and described in a detailed documentation \cite{embree2021Doc}. This documentation furthermore offers tutorial for the familiarization of the framework to new users. The name of the functions belonging to this API are preceded by the abbreviation \texttt{rtc} ("ray tracing kernels"), data types have the abbreviation \texttt{RTC} predeceasing their name. For example the variable \texttt{RTCScene} stores the virtual scene for Embree, and the function \texttt{rtcIntersect1()} performs the intersection testing with a single ray.
+An API for the integration into existing rendering systems is provided and described in a detailed documentation \cite{embree2021Doc}. This documentation furthermore offers tutorial for the familiarization of the framework to new users. The name of the functions belonging to this API are preceded by the abbreviation \texttt{rtc} ("ray tracing kernels"), data types have the abbreviation \texttt{RTC} predeceasing their name. For example the variable \texttt{RTCScene} stores the virtual scene for Embree, and the function \texttt{rtcIntersect1} performs the intersection testing with a single ray.
 
 \begin{figure}
 	\centering

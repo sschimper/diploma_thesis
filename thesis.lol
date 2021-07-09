@@ -8,3 +8,7 @@
 \contentsline {lstlisting}{\numberline {3.4}Setting up geometry buffers for the vertices and indices of a triangle shape.}{43}{lstlisting.3.4}%
 \defcounter {refsection}{0}\relax 
 \contentsline {lstlisting}{\numberline {3.5}Casting of a double precision floating point number to a single precision floating point number by explicit conversion.}{48}{lstlisting.3.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {lstlisting}{\numberline {3.6}Updated \texttt {GeometryData} struct for CSG rendering.}{52}{lstlisting.3.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {lstlisting}{\numberline {3.7}Representation of a node of the linked list, in which the collected intersections are stored, together with a reference to the \texttt {Combined Attributes} node of the associated shape.}{53}{lstlisting.3.7}%
