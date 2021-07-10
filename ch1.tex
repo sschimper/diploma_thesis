@@ -49,57 +49,33 @@ I = S\frac{\cos{\theta}}{{D}^2}
 	\label{fig:appel}
 \end{figure}
 
-Figure \ref{fig:appel} shows the result. Without the additional shading information, it would be difficult for the observer to perceive the position of the upper geometry relative to the plane.
-
-In order to achieve convincing results, a high number of rays had to be generated ("Even for about 1000 light rays results were splotchy." \cite[p 3]{appel1968some}). At the time of publication, computational power of hardware could hardly be used for this approach.
+Figure \ref{fig:appel} shows the result. Without the additional shading information, it would be difficult for the observer to perceive the position of the upper geometry relative to the plane. In order to achieve convincing results, a high number of rays had to be generated ("Even for about 1000 light rays results were splotchy." \cite[p 3]{appel1968some}). At the time of publication, computational power of hardware could hardly be used for this approach.
 
 The idea of casting rays later became a key utilization for a shading model that aimed for higher realism by taking the "global setting" of geometries into account \cite{whitted1979improved}. A variety of shading models existed at that time, which were able to convincingly display optical effects. However, these models usually worked only in special cases and not well with each other, as noted by Andrew Glassner in the preface of his book \citetitle{glassner1989introduction} \cite{glassner1989introduction}. Some models existed that were good at calculating reflection effects, but could not handle refraction effects well. And vice versa. 
 
 \cite{whitted1979improved} introduced a shading model that would truthfully simulate reflection, shadows and refraction as well as the effects of other conventional shading models at that time.  
+The model is partially derived from an empirical reflection model developed by \cite{phong1975illumination}, which assumes that light, which is reflected from a surface, is composed of ambient reflection, diffuse reflection and specular reflection.
+In contrast, Whitted's model assumes that the light intensity $I$ arriving at the $Eye Point$ from the intersection point $x$ along the outgoing direction $\omega_{o}$ is conglomerated by a specular reflection component $S$, being propagated along direction $\omega_{s}$ and a transmission component $T$, being propagated along direction $\omega_{t}$. 
 
-The model is partially derived from an empirical reflection model developed by \cite{phong1975illumination}, which assumes that light, which is reflected from a surface, is composed by three types of reflection: ambient reflection, diffuse reflection and specular reflection. The following equation describes this model:
-
-\begin{equation} \label{eq:phong}
-I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}\sum_{j}(n*L_{j}\prime)^{\alpha}
+The model is given by the equation:
+\begin{equation} \label{eq:whitted}
+I = k_{a} + k_{d}\sum_{j}(n \cdot L_{j}) + k_{s}S + k_{t}T
 \end{equation}
 
 \noindent where
 \begin{itemize}
 	\setlength\itemsep{0.05em}
 	\item  $I$ is the reflected intensity,
-	\item  $I_{a}$ is the ambient reflection coefficient,
+	\item  $k_{a}$ is the ambient reflection coefficient,
 	\item  $k_{d}$ is the diffuse reflection coefficient,
 	\item  $k_{s}$ is the specular reflection coefficient,
 	\item  $n$ is the unit surface normal at an intersection point,
 	\item  $L_{j}$ is a vector in the direction of the $j$th light source,
-	\item  $L_{j}\prime$ is a half vector between the eye point and the $j$th light source, and
-	\item  $\alpha$ is the glossiness coefficient.
-\end{itemize}
-
-This model even nowadays finds popularity among real time graphics due to its low computational cost and convincing (although not physically plausible) results.
-The model assumes furthermore that light sources are located at an infinite distance from the scene geometry, and thus, it does not account for objects within the scene acting as light sources. It was noted in \cite{newell1977progression}, that this assumption can critically affect the specular reflection component of Equation \ref{eq:phong}.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=.7\linewidth]{img/1 fundamentals/whitted.png}
-	\caption{Light intensity propagated towards an observer being composed of a specular reflection component $S$ and a transmissive reflection component $T$.}
-	\label{fig:whitted_model}
-\end{figure}
-
-As opposed to the Phong shading model, Whitted's model assumes that the light intensity $I$ arriving at the $Eye Point$ from the intersection point $x$ along the outgoing direction $\omega_{o}$ is conglomerated by a specular reflection component $S$, being propagated along direction $\omega_{s}$ and a transmission component $T$, being propagated along direction $\omega_{t}$. This is shown in Figure \ref{fig:whitted_model}.
-The model is given by the equation:
-\begin{equation} \label{eq:whitted}
-I = k_{a} + k_{d}\sum_{j}(n*L_{j}) + k_{s}S + k_{t}T
-\end{equation}
-
-\noindent where
-\begin{itemize}
-	\setlength\itemsep{0.05em}
-	\item  $S$ is the light intensity of the specular reflection
+	\item  $L_{j}\prime$ is a half vector between the eye point and the $j$th light source,
+	\item  $S$ is the light intensity of the specular reflection,
 	\item  $T$ is the light intensity of the transmission, and
 	\item  $k_{s}$ is the transmission coefficient
 \end{itemize}
-The ambient and diffuse term are maintained from Equation \ref{eq:phong}. 
 
 The model is capable of generating images with a high degree of realism, preconditioned that the coefficients of equation \ref{eq:whitted} are reasonably chosen. Whitted noted in his paper that "for the best
 accuracy they [the coefficients] should be functions that incorporate an
@@ -422,28 +398,3 @@ Embree supports a variety of geometric shapes such as triangles, quads, and cert
 Another notable feature of Embree is the support of custom geometries. These will be referred to as \emph{User defined geometries}. 
 
 Embree is open source, and therefore publicly available. Supported platforms are (32-bit and 64-bit), Linux (64-bit), and macOS (64-bit). The latest version of Embree at the time of writing this thesis is 3.13.0. 
-
-\subsubsection{Ray Tracing in Embree}
-\label{sec:embree_raytracing}
-Embree follows a device concept, allowing for the use of the Embree API by different components of the image synthesis application without interfering each other. An \texttt{RTCDevice} can be created with the function \texttt{rtcNewDevice} and released via the function \texttt{rtcReleaseDevice}. Such device types are used by Embree to create further components, such as virtual scenes which serve as the container for various scene geometry. A scene in Embree, represented by the data type \texttt{RTCScene}, can be created via the function \texttt{rtcNewScene}, to which the \texttt{RTCDevice} is passed to as an argument, and released via the function \texttt{rtcReleaseScene}. Different geometries can be attached or detached by the functions \texttt{rtcAttachGeometry}, which will furthermore assign a unique ID to the geometry, and \texttt{rtcDetachGeometry}. Once an \texttt{RTCGeometry} is attached to the \texttt{RTCScene}, it can be released via the call of the function \texttt{rtcReleaseGeometry}.
-After the attachment of the complete scene geometry, the scene can be committed by calling the function \texttt{rtcCommitScene} in order to trigger the creation of Embree's internal acceleration structures. After the invocation of this function, the individual geometries cannot be edited or manipulated.
-
-Geometries in Embree are represented by a \texttt{RTCGeometry} data type. These types can be created with the function \texttt{rtcNewGeometry} which takes the \texttt{RTCDevice} and an enum specifying the geometry type (e.g. triangle, quad, user defined geometry) as input parameters. In case the geometry being a triangle, quadrangle or a type of curve, so-called \emph{geometry buffers} can be created and linked to the \texttt{RTCGeometry} by invoking the function \texttt{rtcSetNewGeometryBuffer}. These buffers will store information such as vertices, indices and surface normals of the geometry.  
-
-In order to initialize a user defined geometry, one has to provide a function for calculating the bounding box for the geometry, a function for intersection testing and another function for occlusion testings. These functions are passed to Embree as callback functions. Furthermore, the number of geometric primitives, which together compose the geometry, has to be set, and a so-called \emph{User data pointer} associated with the geometry. A user data pointer points to the representation of the geometry by the rendering application in memory. This user data pointer can be associated with geometry types other than user defined geometry.
-In the interior of the callback function for calculating the intersection with the user defined geometry, the original representation of the geometry can be easily retrieved via this pointer. The passing of the various callback functions to Embree is done via invocation of the functions \texttt{rtcSetGeometryUserPrimitiveCount}, \texttt{rtcSetGeometryUserData}, \texttt{rtcSetGeometryBoundsFunction}, \texttt{rtcSetGeometryIntersectFunction}, \newline and \texttt{rtcSetGeometryOccludedFunction}.
-
-Once the \texttt{RTCDevice} and the \texttt{RTCScene} are set up, the scene geometry is attached to the \texttt{RTCScene}, and the internal acceleration data structures have been built, nothing stands in the way of performing the actual ray tracing with Embree. 
-
-In the following example, only ray tracing with single rays as opposed to packet ray tracing is considered. We will furthermore not consider instancing, due to the reason that this feature does not find use in the work of this thesis.
-
-In order to ray trace a virtual scene, a per ray query intersection context, \texttt{RTCIntersectContext}, has to be set up via the function \texttt{rtcInitIntersectContext}. This structure is used for the configuration of intersection flags, among other things. 
-Subsequently, a \texttt{RTCRayHit} struct is declared. This struct is composed of an \texttt{RTCRay} struct, abstracting the ray that is used by Embree to preform the intersection testing, and an \texttt{RTCHit} struct, in which information concerning the intersection point, such as the surface normal, the barycentric UV coordinates of the point, and the geometry ID associated with the intersected geometry are stored.
-The \texttt{RTCRay} struct stores the ray orientation and direction, so-called \texttt{tnear} and \texttt{tfar} values, indicating the boundaries of a range of possible hit distances, and other information such as an id for the ray, a ray mask and a \texttt{time} value useful when motion blur is desired.
-When the target ray tracing application is generating a ray, the values of the \texttt{RTCRay} struct are updated with the ray orientation and direction. The \texttt{tnear} value is usually set to zero and the \texttt{tfar} value is set to infinity. The geometry ID of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}.
-
-After the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} structs have been successfully initialized and updated, the ray-primitive intersection testing is performed via invocation of the function \texttt{rtcIntersect1} to which the \texttt{RTCScene}, a reference to both the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} are passed as arguments. In case of a found intersection, this function will update the \texttt{tfar} value of the \texttt{RTCRay} with the closest hit distance and the geometry ID of the \texttt{RTCHit} with the geometry ID associated to the intersected geometry.
-
-In case of performing intersection testing between a user defined geometry and a ray, these values have to be updated manually inside the intersection function that was passed to Embree as a callback function.
-
-When the intersecting testing procedure has finished, the geometry ID of the \texttt{RTCHit} will give insight on whether an intersection was found or not. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, one can conclude that no intersection was found. Otherwise, an intersection was found and the \texttt{RTCRay} and \texttt{RTCHit} components of the \texttt{RTCRayHit} will provide the hit distance, the coordinates of the surface normal at the intersection point and the UV coordinates of the intersection point.

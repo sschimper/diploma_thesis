@@ -1,4 +1,33 @@
-\chapter{A brief introduction to ART}
+\chapter{Technical details regarding Embree and ART (WT)}
+
+Some introduction stuff. \todo{do}
+
+\section{Ray Tracing in Embree}
+\label{sec:embree_raytracing}
+Embree follows a device concept, allowing for the use of the Embree API by different components of the image synthesis application without interfering each other. An \texttt{RTCDevice} can be created with the function \texttt{rtcNewDevice} and released via the function \texttt{rtcReleaseDevice}. Such device types are used by Embree to create further components, such as virtual scenes which serve as the container for various scene geometry. A scene in Embree, represented by the data type \texttt{RTCScene}, can be created via the function \texttt{rtcNewScene}, to which the \texttt{RTCDevice} is passed to as an argument, and released via the function \texttt{rtcReleaseScene}. Different geometries can be attached or detached by the functions \texttt{rtcAttachGeometry}, which will furthermore assign a unique ID to the geometry, and \texttt{rtcDetachGeometry}. Once an \texttt{RTCGeometry} is attached to the \texttt{RTCScene}, it can be released via the call of the function \texttt{rtcReleaseGeometry}.
+After the attachment of the complete scene geometry, the scene can be committed by calling the function \texttt{rtcCommitScene} in order to trigger the creation of Embree's internal acceleration structures. After the invocation of this function, the individual geometries cannot be edited or manipulated.
+
+Geometries in Embree are represented by a \texttt{RTCGeometry} data type. These types can be created with the function \texttt{rtcNewGeometry} which takes the \texttt{RTCDevice} and an enum specifying the geometry type (e.g. triangle, quad, user defined geometry) as input parameters. In case the geometry being a triangle, quadrangle or a type of curve, so-called \emph{geometry buffers} can be created and linked to the \texttt{RTCGeometry} by invoking the function \texttt{rtcSetNewGeometryBuffer}. These buffers will store information such as vertices, indices and surface normals of the geometry.  
+
+In order to initialize a user defined geometry, one has to provide a function for calculating the bounding box for the geometry, a function for intersection testing and another function for occlusion testings. These functions are passed to Embree as callback functions. Furthermore, the number of geometric primitives, which together compose the geometry, has to be set, and a so-called \emph{User data pointer} associated with the geometry. A user data pointer points to the representation of the geometry by the rendering application in memory. This user data pointer can be associated with geometry types other than user defined geometry.
+In the interior of the callback function for calculating the intersection with the user defined geometry, the original representation of the geometry can be easily retrieved via this pointer. The passing of the various callback functions to Embree is done via invocation of the functions \texttt{rtcSetGeometryUserPrimitiveCount}, \texttt{rtcSetGeometryUserData}, \texttt{rtcSetGeometryBoundsFunction}, \texttt{rtcSetGeometryIntersectFunction}, \newline and \texttt{rtcSetGeometryOccludedFunction}.
+
+Once the \texttt{RTCDevice} and the \texttt{RTCScene} are set up, the scene geometry is attached to the \texttt{RTCScene}, and the internal acceleration data structures have been built, nothing stands in the way of performing the actual ray tracing with Embree. 
+
+In the following example, only ray tracing with single rays as opposed to packet ray tracing is considered. We will furthermore not consider instancing, due to the reason that this feature does not find use in the work of this thesis.
+
+In order to ray trace a virtual scene, a per ray query intersection context, \texttt{RTCIntersectContext}, has to be set up via the function \texttt{rtcInitIntersectContext}. This structure is used for the configuration of intersection flags, among other things. 
+Subsequently, a \texttt{RTCRayHit} struct is declared. This struct is composed of an \texttt{RTCRay} struct, abstracting the ray that is used by Embree to preform the intersection testing, and an \texttt{RTCHit} struct, in which information concerning the intersection point, such as the surface normal, the barycentric UV coordinates of the point, and the geometry ID associated with the intersected geometry are stored.
+The \texttt{RTCRay} struct stores the ray orientation and direction, so-called \texttt{tnear} and \texttt{tfar} values, indicating the boundaries of a range of possible hit distances, and other information such as an id for the ray, a ray mask and a \texttt{time} value useful when motion blur is desired.
+When the target ray tracing application is generating a ray, the values of the \texttt{RTCRay} struct are updated with the ray orientation and direction. The \texttt{tnear} value is usually set to zero and the \texttt{tfar} value is set to infinity. The geometry ID of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}.
+
+After the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} structs have been successfully initialized and updated, the ray-primitive intersection testing is performed via invocation of the function \texttt{rtcIntersect1} to which the \texttt{RTCScene}, a reference to both the \texttt{RTCIntersectContext} and the \texttt{RTCRayHit} are passed as arguments. In case of a found intersection, this function will update the \texttt{tfar} value of the \texttt{RTCRay} with the closest hit distance and the geometry ID of the \texttt{RTCHit} with the geometry ID associated to the intersected geometry.
+
+In case of performing intersection testing between a user defined geometry and a ray, these values have to be updated manually inside the intersection function that was passed to Embree as a callback function.
+
+When the intersecting testing procedure has finished, the geometry ID of the \texttt{RTCHit} will give insight on whether an intersection was found or not. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, one can conclude that no intersection was found. Otherwise, an intersection was found and the \texttt{RTCRay} and \texttt{RTCHit} components of the \texttt{RTCRayHit} will provide the hit distance, the coordinates of the surface normal at the intersection point and the UV coordinates of the intersection point.
+
+\section{A brief introduction to ART}
 \label{chap:art}
 
 The Advanced Rendering Toolkit (ART), serves as the environment in which Embree shall be integrated into. Therefore, this chapter provides a brief introduction to ART to familiarize the reader with its core mechanics. Apart from a short description of the general workflow of ART, only its aspects that are relevant for the integration of Embree are considered in this chapter. For a more detailed description of ART and the scene description language, we would like to refer the reader to the ART Handbook \cite{arthandbook} and the ARM File Reference Manual \cite{artreferencemanual}.\footnote{It should be mentioned here that at the time of writing this thesis, both documents are still work in progress, and therefore incomplete. However, they will be expanded in the future.}
@@ -6,14 +35,14 @@ The Advanced Rendering Toolkit (ART), serves as the environment in which Embree 
 The latest version of ART at the time of writing this thesis is Version 2.0.3.
 
 
-\section{Purpose and features}
+\subsection{Purpose and features}
 
 As indicated in the introduction, ART considers its target audience computer graphics researchers who are interested in the field of predictive rendering. Predictive rendering is a branch of the computer graphics field that is dedicated to the research of light transport simulation, with which one can accurately predict the appearance of tan object or a virtual scene under different viewing conditions (compare \cite{wilkie2009predictive}.) \todo{use Alban's example} While the purpose of "conventional rendering" (to which we count the rendering procedures encountered in Chapter \ref{chap:fundamentals}) lies in the creation of "believable" imagery to create a certain impression to an observer, predictive rendering is concerned with the synthesis of radiometrically correct images, which serve as matters of conducting actual research as opposed to communicating a visual impression on an observer.
 
 ART offers a variety of important features for predictive rendering that are currently non-standard in other "mainstream" rendering systems, such as polarization visualization support, the physically plausible handling of fluorescent materials \cite{mojzik2018handling}, and the enabling of spectral rendering. For the later, ART implements the "Hero wavelength spectral sampling" technique \cite{wilkie2014hero} and utilizes its own spectral image file format. Additionally, various research projects belonging to the "Sky Dome Appearance Project" are implemented in ART \cite{hosek2012analytic, hovsek2013adding, wilkie2013predicting}.
 
 
-\section{Technical details}
+\subsection{Technical details}
 ART	is composed of a number of UNIX-like-command line applications (therefore the name Advanced Rendering \emph{Toolkit}). The applications are written in \texttt{C} and \texttt{Objective-C}. 
 
 In the following, we provide an overview over the individual applications contained in the toolkit:
@@ -42,7 +71,7 @@ where \texttt{<n>} is the number of preferable cores.
 To achieve lock free parallelism between the individual threads, the scene graph is copied and one such copy is assigned to each thread. 
  
 
-\section{Scene graph infrastructure}
+\subsection{Scene graph infrastructure}
 Some popular rendering systems (among them Mitsuba 2 and pbrt) describe a virtual scene in the following way: A virtual scene, abstracted by a \texttt{Scene} class object, obtains a collection of geometric shapes. These shapes are represented by a \texttt{Shape} base class, which offers functions for calculating its bounding box and performing intersection tests with a given ray. Various shape types can be represented as a child classes of this \texttt{Shape} class. This is an ideal design for Embree since these shapes can be initialized as User Defined Geometries. Once Embree finds an intersection with a bounding box of a particular shape, its representation in memory can be retrieved via the User pointer \todo{explain} and an instance function of the \texttt{Shape} class for ray-intersection testing can be called. 
 
 \begin{figure}[H]
@@ -122,7 +151,7 @@ Some popular rendering systems (among them Mitsuba 2 and pbrt) describe a virtua
 The scene graph being utilized by ART diverges from this design. This section provides an overview over different nodes in the scene graph and their functionality on the basis of a provided example scene graph. This scene graph, which was used by ART to render the image displayed in Figure \ref{fig:csg_or}, is shown in Figure \ref{fig:scene_graph}. Table \ref{tab:nodes} displays its nodes and a brief description of their functionality and relation to other nodes. However, we will only list nodes for which the comprehension of their functionality is important to follow the implementation description in the next chapter.
 On particularity of the scene graph is that it can be utilized by every application mentioned in the previous section, with the exception of \emph{impresario}.
 
-\section{Ray Tracing with ART}
+\subsection{Ray Tracing with ART}
 The functionality redarding ray tracing in ART is abstracted in the \texttt{ArnRayCaster} class. This class is inherited from the \texttt{ArnGraphTraversal} class. 
 
 \todo{talk this over with Alban}
