@@ -55,7 +55,7 @@ ART supports a variety of different geometrical shapes. An overview of these sha
 	\hfill
 	\subfloat[An example of an alytical shape: a torus aligned on Y-axis.]{\includegraphics[width=.3\textwidth]{img/3 approach/torus.png}\label{fig:art_torus}}
 	\hfill
-	\subfloat[Constructive solid geometry: a grooved sphere.]{\includegraphics[width=.3\textwidth]{img/3 approach/csg_shape.png}\label{fig:art_csg}}
+	\subfloat[Constructive solid geometry: a grooved sphere.]{\includegraphics[width=.3\textwidth]{img/3 approach/csg_shape.png}\label{fig:art_groovedsphere}}
 	\caption{Types of shapes in ART.}
 	\label{fig:shape_types}
 \end{figure}
@@ -247,6 +247,7 @@ We therefore consider Embree as a "black box" for which we provide information s
 
 
 \subsection{Approach 1: Evaluation of collected intersections according to the scene graph}
+\label{subsec:apprach1}
 
 In the past, an attempt for the implementation of CSG rendering with Embree was conducted by Karaffová and described in her master thesis \cite{karaffova2016}. Her approach consists in the collection of intersections between the scene geometry and a ray that are calculated by Embree, and their subsequent evaluation and arrangement according to a provided CSG tree. The difference between this work and the work of this thesis is that instead of integrating Embree into a target application that supports CSG rendering,  \todo{later}.
 With the approach outlined in this subsection, we adapt the procedures described in \cite{karaffova2016} for ART, which serves as the target application. 
@@ -301,6 +302,7 @@ The results of \cite{karaffova2016} showed that
 
 
 \subsection{Approach 2: Initializing the complete CSG as user defined geometry}
+\label{subsec:apprach2}
 
 The increased render times that resulted from the previous approach served as a motivation for the development of superior procedures for ray tracing CSG with Embree. 
 
@@ -364,5 +366,5 @@ However, there exists some limitations with this approach. One issue was encount
 
 
 \subsection{Approach 3: Creation of KD trees for constructive solid geometries}
-
+\label{subsec:apprach3}
 bla blub

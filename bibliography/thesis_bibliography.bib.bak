@@ -18,7 +18,7 @@
   title     = {Predicting sky dome appearance on earth-like extrasolar worlds},
   year      = {2013},
   pages     = {145--152},
-  groups    = {ART, Skydome appearance model},
+  groups    = {ART, Skydome appearance model, scenes},
 }
 
 @InProceedings{mojzik2018handling,
@@ -402,7 +402,7 @@
   organization = {Wiley Online Library},
   pages        = {1269--1276},
   volume       = {30},
-  groups       = {ART},
+  groups       = {ART, scenes},
 }
 
 @Thesis{todova2021,
@@ -551,6 +551,26 @@
   year    = {n.d},
 }
 
+@InProceedings{oren1994generalization,
+  author    = {Oren, Michael and Nayar, Shree K},
+  booktitle = {Proceedings of the 21st annual conference on Computer graphics and interactive techniques},
+  title     = {Generalization of Lambert's reflectance model},
+  year      = {1994},
+  pages     = {239--246},
+  groups    = {scenes},
+}
+
+@Article{torrance1967theory,
+  author    = {Torrance, Kenneth E and Sparrow, Ephraim M},
+  journal   = {Josa},
+  title     = {Theory for off-specular reflection from roughened surfaces},
+  year      = {1967},
+  number    = {9},
+  pages     = {1105--1114},
+  volume    = {57},
+  publisher = {Optical Society of America},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
 
 @Comment{jabref-meta: grouping:
@@ -571,4 +591,5 @@
 1 StaticGroup:Appendix\;0\;0\;0x8a8a8aff\;\;\;;
 1 StaticGroup:CSG Embree\;0\;1\;0x8a8a8aff\;\;\;;
 1 StaticGroup:exterior scenes\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:scenes\;0\;1\;0x8a8a8aff\;\;\;;
 }
