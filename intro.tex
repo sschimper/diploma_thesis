@@ -22,7 +22,7 @@ One of the design goals behind Embree was an easy integration of the framework i
 
 
 \section*{Thesis subject and motivation}
-The goal of this thesis is a successful integration of the Embree framework into the rendering engine \emph{The Advanced Rendering Toolkit} \cite{artSoftware} (which will be referred to with its abbreviation \emph{ART} throughout this thesis), to facilitate the acceleration of the ray casting procedure for constructive solid geometry performed by ART.
+The goal of this thesis is a successful integration of the Embree framework into the rendering engine \emph{The Advanced Rendering Toolkit} \cite{artSoftware} (which will be referred to with its abbreviation \emph{ART} throughout this thesis), to facilitate the acceleration of the ray casting procedure for constructive solid geometry performed by ART. \todo{definetely rephrase}
 
 ART offers innovative features, such as spectral rendering support, proper handling of bi-spectral materials (e.g., fluorescent surfaces) \cite{mojzik2018handling} and a physically plausible sky dome lighting model \cite{wilkie2013predicting}. Until the release of Mitsuba 2 \cite{nimier2019mitsuba}, ART was, to our best knowledge, the sole rendering system that would support rendering polarization effects. These features make ART an interesting environment for computer graphics researchers interested in the field of \emph{Predictive Rendering}.
 
@@ -36,16 +36,19 @@ The successful integration of Embree into ART would elevate a complex image synt
 
 \section*{Thesis outline}
 
-This thesis is structured as follows: 
+This thesis is structured as follows:
 
-\textbf{Chapter \ref{chap:fundamentals}} will provide fundamental background information including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and a brief overview of functionality of the Embree framework.
-
-In \textbf{Chapter \ref{chap:art}} provides a brief introduction to ART, in which Embree will be integrated into. This introduction focuses on the aspects of ART that are important for the comprehension of our integration approach.
-
-\textbf{Chapter \ref{chap:integration}} is dedicated to the description of our approach on the integration of Embree into ART, as well as the implementation of the CSG operations with Embree.
-
-The integration approach is then evaluated and obtained results are discussed in \textbf{Chapter \ref{chap:results}}  
-
-The work of this thesis is concluded in \textbf{Chapter \ref{chap:conclusion}}.
-
-Finally, \textbf{Appendix \ref{sec:embree_app}} provides a user guide for compiling ART with Embree support.
+\begin{itemize}
+	\setlength\itemsep{0.05em}
+	
+	\item \textbf{Chapter \ref{chap:fundamentals}} will provide fundamental background information, including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and a brief overview of the functionality of the Embree framework.
+	
+	\item In \textbf{Chapter \ref{chap:technical_overview}} provides a description of Embree can be used for ray tracing and a brief introduction to ART, in which Embree will be integrated into.
+	
+	\item \textbf{Chapter \ref{chap:integration}} is dedicated to the description of our approach on the integration of Embree into ART, as well as the implementation of the CSG operations with Embree.
+	
+	\item Results obtained by testing our implementation on various virtual scenes are presented and evaluated in \textbf{Chapter \ref{chap:results}}.
+	
+	\item Lastly, \textbf{Appendix \ref{sec:embree_app}} provides a user guide for compiling ART with Embree support.
+	
+\end{itemize}

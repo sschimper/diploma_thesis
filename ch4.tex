@@ -19,7 +19,7 @@ We tested our implementation of the CSG operations with Embree on six scenes, wh
 	\setlength\itemsep{0.05em}
 	
 	\item The scene shown in Figure \ref{fig:csg_shell} will be referred to as the \textbf{Shell} scene.
-	It consists of a single CSG and multiple cube, which are aligned and form the checkerboard pattern, and a procedurally modeled shell. \todo{explain how modeled}
+	It consists of a single CSG and multiple cubes, which are aligned and form the checkerboard pattern, and a procedurally modeled shell. \todo{explain how modeled}
 	 This shell is considered a single CSG, therefore only one topmost CSG node associated with it in the scene graph.
 	
 	
@@ -91,12 +91,13 @@ Therefore, our final implementation of the facilitation of CSG rendering with Em
 The intersection calculations between rays and CSG that are not constructed of at least one triangle mesh, are calculated by traversal of the scene subgraph rooted at the topmost CSG node corresponding to the particular CSG, according to Approach 2.
 
 This section provides results of this final implementation.
+\\
 
 \noindent In the following, we provide an overview of the scenes used for testing the overall performance of ART with Embree support:
 \begin{itemize}
 	\setlength\itemsep{0.05em}
 	
-	\item
+	\item 
 	
 	
 \end{itemize}
@@ -136,22 +137,55 @@ This section provides results of this final implementation.
 \end{table}
 
 
+\begin{figure}
+	\centering
+	\subfloat[Macbeth ColorChecker]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeDetail.png}\label{fig:gandalf_embree}}
+	\hfill
+	\subfloat[Cornell box with texture mapping]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceEmbreeNormal.png}\label{fig:difference_embree}}
+	\\
+	\subfloat[Glowing spheres]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeUserDetail.png}\label{fig:gandalf_embree_user}}
+	\hfill
+	\subfloat[Exoplanet scene]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceUserNormal.png}\label{fig:difference_embree_user}}
+	
+	
+	\caption{Scenes from the gallery of the ART repository.}
+	\label{fig:res_gandalf_issue}
+\end{figure}
+
+
 \section{Performance of ray tracing triangle meshes}
 \label{sec:result_meshes}
 
+Since the rendering of large polygon meshes is the ideal use case for Embree, we tested our implementation on various scenes containing a triangle mesh in increasing size of the amount of triangles they are composed of.
+
+Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle serving as ground, an infinite sphere acting as a sky dome for illumination and a single triangle mesh, that are loaded from a PLY file. 
+\\
+
+\noindent The triangle meshes are \todo{rephrase}
+\begin{itemize}
+	\setlength\itemsep{0.05em}
+	
+	\item The \textbf{Utah Teapot}, provided by Ben Houston \cite{teapot}, shown in Figure \ref{fig:mesh_teapot}
+	\item The \textbf{Stanford Bunny}, provided by the Stanford PLY repository \cite{plyRepo}, shown in Figure \ref{fig:mesh_bunny}
+	\item \textbf{Michelangelo's David}, provided by Jerry Fisher \cite{david}, shown in Figure \ref{fig:mesh_mike}
+	\item The \textbf{Happy Buddha}, provided by the Stanford PLY repository \cite{plyRepo}, shown in Figure \ref{fig:mesh_buddha}
+	\item The \textbf{Asian Dragon}, provided by the Stanford PLY repository \cite{plyRepo}, shown in Figure \ref{fig:mesh_dragon}
+	\item \textbf{Lucy}, provided by the Stanford PLY repository \cite{plyRepo}, shown in Figure \ref{fig:mesh_lucy}
+\end{itemize}
+
 \begin{figure}
 	\centering
-	\subfloat[Teapot - 4,032 faces]{\includegraphics[width=.3\textwidth]{img/4 results/ply/teapotEmbree.png}\label{fig:mesh_teapot}}
+	\subfloat[Utha teapot]{\includegraphics[width=.3\textwidth]{img/4 results/ply/teapotEmbree.png}\label{fig:mesh_teapot}}
 	\hfill
-	\subfloat[Bunny - 69,451 faces]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bunnyEmbree.png}\label{fig:mesh_bunny}}
+	\subfloat[Stanford bunny]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bunnyEmbree.png}\label{fig:mesh_bunny}}
 	\hfill
-	\subfloat[Michelangelo - 366,011 faces ]{\includegraphics[width=.3\textwidth]{img/4 results/ply/michelangeloEmbree.png}\label{fig:mesh_mike}}
+	\subfloat[Michelangel's David]{\includegraphics[width=.3\textwidth]{img/4 results/ply/michelangeloEmbree.png}\label{fig:mesh_mike}}
 	\\
-	\subfloat[Happy Buddha - 1,087,716 faces]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bhuddaEmbree.png}\label{fig:mesh_buddha}}
+	\subfloat[Happy Buddha]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bhuddaEmbree.png}\label{fig:mesh_buddha}}
 	\hfill
-	\subfloat[Asian Dragon - 7,219,045 faces]{\includegraphics[width=.3\textwidth]{img/4 results/ply/dragonEmbree.png}\label{fig:mesh_dragon}}
+	\subfloat[Asian Dragon]{\includegraphics[width=.3\textwidth]{img/4 results/ply/dragonEmbree.png}\label{fig:mesh_dragon}}
 	\hfill
-	\subfloat[Lucy - 28,055,742 faces ]{\includegraphics[width=.3\textwidth]{img/4 results/ply/lucyEmbree.png}\label{fig:mesh_lucy}}
+	\subfloat[Lucy]{\includegraphics[width=.3\textwidth]{img/4 results/ply/lucyEmbree.png}\label{fig:mesh_lucy}}
 	
 	\caption{Scenes for triangle meshes}
 	\label{fig:mesh_scenes}
@@ -177,7 +211,7 @@ This section provides results of this final implementation.
 	\label{tab:mesh}
 \end{table}
 
-
+Table \ref{tab:mesh} shows the results
 
 
 

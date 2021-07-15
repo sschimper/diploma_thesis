@@ -1,38 +1,47 @@
 \chapwithtoc{Conclusion}
 \label{chap:conclusion}
 
-In the conclusion, you should summarize what was achieved by the thesis. In a few paragraphs, try to answer the following:
+This thesis has shown how to integrate Intel's high-performance raycasting library Embree into the CSG rendering framework ART, whose internal structures and core mechanics diverge significantly from those of other common image synthesis systems, such as part or Mitsuba 2.
+
+We have described how to initialize different geometry types for Embree, namely shapes described by vertices and indices with Embree's own primitive types and analytical surfaces as user-defined geometry, and have outlined how intersection points can be calculated with the help of Embree. 
+
+Despite Embree not directly supporting CSG rendering, we ensured this functionality in ART with Embree by initializing a given CSG, composed of multiple primitives, as a single user-defined geometry for Embree. Embree's internal BVH is traversed during the ray tracing process until it intersects the bounding box enclosing the CSG in question. From there, a subgraph of ART's internal scene graph is traversed to calculate the intersections with the CSG primitives. This procedure proved itself as a satisfactory compromise between ART and Embree's target application: The main advantage of using the Embree library, namely the acceleration of the ray tracing process, could be preserved for virtual scenes containing CSG that are not (at least partially) constructed from triangle meshes.
+
+
+
+Despite all, our approach is not entirely free from flaws. These are addressed in the next section together with suggested ideas for their resolution.  
+
+
+\section*{Future work}
+
+We do not claim that our approach is the ideal integration of Embree into a CSG rendering framework, nor do we claim that our implementation is the best, concerning, e.g., performance and building times of interior data structures.
+In this section, we provide an overview of known issues, some of them discussed in previous chapters, and suggest potential methods of resolution:
+\\
+
 \begin{itemize}
-\item Was the problem stated in the introduction solved? (Ideally include a list of successfully achieved goals.)
-\item What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
-\item Does the result have any practical applications that improve upon something realistic?
-\item Is there any good future development or research direction that could further improve the results of this thesis? (This is often summarized in a separate subsection called `Future work'.)
+	\setlength\itemsep{0.05em}
+	
+	\item \textbf{Rendering CSG composed of triangle meshes}
+	
+	\item[] The most crucial drawback of our implementation is the inefficient rendering of CSG composed of at least one triangle mesh. By treating such CSG as a single user defined geometry, ART's interior structures are utilized for the intersection calculations after the CSG's bounding box is intersected with an \texttt{RTCRay}. Therefore, \todo{do} \todo{traingle meshes csg'd with bvh}
+	\\
+	
+	\item \textbf{Investigating the original scene graph traversal when rendering CSG}
+	
+	\item[] In Subsection \ref{subsec:apprach2}, we mentioned an issue we encountered while rendering the Villa Rotonda scene by traversing the original scene subgraphs rooted at the two topmost CSG nodes of the scene graph. As mentioned before, we believe that this issue results from traversing the subgraphs during rendering and may not necessarily be caused by our implementation. From all the scenes on which we conducted our experiments, only the Villa Rotonda scene exhibited this artifact. Nevertheless, it can be possible that this issue arises with other scenes, too. A verification of this procedure being stable would be desirable.
+	\\
+	
+	\item \textbf{"Obvious" optimizations}
+	
+	\item[] Our implementation utilizes two linked list data structures, one in which the \texttt{GeometryData} structs that are associated with individual scene geometry, and one in which the intersections between a ray and the scene geometry are stored. The location for a specific item in the lists is performed via linear search, which might decrease the performance of rendering scenes containing a high number of geometries. Furthermore, nodes inserted in the linked list storing the intersections are dynamically allocated on the heap during the ray tracing process, which might negatively impact the performance. A solution consists of the replacement of these linked lists with more sophisticated data structures and query algorithms. Concerning the collection of intersections, Embree provides a function, \texttt{rtcSetGeometryIntersectFilterFunction}, with which a callback function is dedicated to the filtering of the collected intersections can be passed to Embree. We did not implement this callback function due to the return of just a single intersection. We needed all intersections for our approach of collecting and evaluating all intersections along a ray according to the scene graph. After we abandoned this approach, we did not bother implementing this callback filter function because we focused on implementing the two other approaches on rendering CSG.
+	
 \end{itemize}
 
-\begin{figure} 
-	\centering
-	\includegraphics[width=1\linewidth]{img/concl/moana.png}
-	\caption{The Moana Island Scene provided by Walt Disney Animation Studios \cite{moana2021}.}
-	\label{fig:moana}
-\end{figure}
 
-\section{Future work}
+\section*{Personal note to the potential user from the author}
 
-\todo{traingle meshes csg'd with bvh}
+The main purpose of the work described in this thesis is (besides the author's graduation) our desire to provide functionality that is of actual use for both computer graphics researchers and computer graphics enthusiasts using ART. In Chapter \ref{chap:results}, we have shown that our integration of Embree into ART is competitive with native ART, and in some cases, can indeed accelerate the rendering process of virtual scenes.
 
-\begin{figure}[!tbp]
-	\centering
-	\subfloat{\includegraphics[width=.4\textwidth]{img/concl/teapotEmbree.png}}
-	\hfill
-	\subfloat{\includegraphics[width=.4\textwidth]{img/concl/teapotNormal.png}}
-	\caption{Comparison between the resulting image of a scene containing the Utah teapot by ray tracing with and without Embree support.}
-	\label{fig:teapot}
-\end{figure}
-
-\section{Personal note to the potential user from the author}
-
-The main purpose of the work described in this thesis (besides the graduation of the author) is our desire to provide functionality that is of actual use for both computer graphics researchers and computer graphics enthusiasts using ART. In Chapter \ref{chap:results}, we have shown that our approach on the integration of Embree into ART accelerates the rendering process of most of the scenes on which it was tested.
-
-We do not claim that our approach is the only way to integrate Embree into ART, nor do we claim that our implementation is the best, with regard to e.g. performance and building times of interior data structures. And although our implementation was tested on a variety of scenes, we cannot completely rule out that bugs will arise during the rendering of different scenes. Therefore we ask you to, if you encounter any issues, to report them via an email to the ART development team (the email address can be found on their website, which is \href{https://cgg.mff.cuni.cz/ART/about/}{https://cgg.mff.cuni.cz/ART/about/}). Any feedback and critique is welcomed as well. Thank you very much in advance!
+Despite the overall positive results described in Chapter \ref{chap:results}, we cannot completely rule out that bugs will arise during the rendering of your own custom scenes. Therefore we kindly ask you to report any encountered issues via an email to the ART development team (the contact email address can be found on their website, which is \href{https://cgg.mff.cuni.cz/ART/about/}{https://cgg.mff.cuni.cz/ART/about/}). Any feedback and critique are welcomed as well. Thank you very much in advance!
 
 We sincerely hope that our work will be useful to you!
