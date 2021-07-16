@@ -1,0 +1,38 @@
+From b6e7d6a4bcd1fb4cf17d894bd97933970613e363 Mon Sep 17 00:00:00 2001
+From: Thomas Schimper <thomasschimper94@gmail.com>
+Date: Fri, 16 Jul 2021 12:32:33 +0200
+Subject: [PATCH] adding correct biblatex blocks
+
+---
+ thesis.tex | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/thesis.tex b/thesis.tex
+index f730dbf..05007cd 100644
+--- a/thesis.tex
++++ b/thesis.tex
+@@ -58,7 +58,7 @@
+ 
+ 
+ % alternative with alphanumeric citations (more informative than numbers):
+-\usepackage[backend=bibtex,natbib,style=alphabetic]{biblatex}
++\usepackage[backend=bibtex,natbib,style=alphabetic,block=ragged]{biblatex}
+ 
+ 
+ % alternatives that conform to iso690
+@@ -107,9 +107,10 @@
+ \usepackage{listings, lstautogobble}
+ 
+ % for clickable links in appendix
+-\usepackage{hyperref}
+-\usepackage{url}
+ 
++\usepackage{url}
++\def\UrlBreaks{\do\/\do-}
++\usepackage{hyperref}
+ % for tree structure in appendix
+ \usepackage{dirtree}
+ 
+-- 
+2.31.1
+

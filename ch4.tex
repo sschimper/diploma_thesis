@@ -11,7 +11,8 @@ The following experiments were conducted, if not stated otherwise, on a Asus N55
 
 \section{Ray tracing constructive solid geometries}
 \label{sec:results_csg}
-We tested our implementation of the CSG operations with Embree on six scenes, which were made publicly available by the developers behind ART \footnote{Most of the scenes shown in this chapter can be found in the \texttt{Gallery} folder of the ART repository, which is submitted together with this thesis as an electronic attachment. Scenes or 3D models that are not taken from this folder will be cited.}. All the scenes mentioned in this section contain an infinitie sphere, serving as a sky dome for illuminating the other scene geometry. 
+\todo{Evaluation for title?}
+We tested our implementation of the CSG operations with Embree on six scenes, which were made publicly available by the developers behind ART \footnote{Most of the scenes shown in this chapter can be found in the \texttt{Gallery} folder of the ART repository, which is submitted together with this thesis as an electronic attachment. Scenes or 3D models that are not taken from this folder will be cited.}. All the scenes mentioned in this section contain an infinite sphere, serving as a sky dome for illuminating the other scene geometry. 
 \\
 
 \noindent Here, we provide an overview of the scenes used for testing the CSG operations with Embree:
@@ -127,7 +128,7 @@ This section provides results of this final implementation.
 			Scene & \Verb!#!Geometry & Native ART & Embree & Speedup \\ 
 			\midrule
 			ColorChecker & 26 & 196.34 sec & 213.15 sec & \textcolor{red}{-8.56 \%} \\
-			Cornell Box & 20 & 485.60 sec & 284.27 sec & 41.46 \% \\
+			Cornell Box & 20 & 454.60 sec & 229.73 sec & 49.47 \% \\
 			Glowing spheres & 13 & 401.27 sec & 225.29 sec & 43.86 \%  \\
 			Exoplanet scene & 38 & 761.25 sec & 621.96 sec & 18.30 \% \\
 			\bottomrule
@@ -136,6 +137,7 @@ This section provides results of this final implementation.
 	\label{tab:scenes}
 \end{table}
 
+\todo{change image box values}
 
 \begin{figure}
 	\centering
@@ -156,9 +158,9 @@ This section provides results of this final implementation.
 \section{Performance of ray tracing triangle meshes}
 \label{sec:result_meshes}
 
-Since the rendering of large polygon meshes is the ideal use case for Embree, we tested our implementation on various scenes containing a triangle mesh in increasing size of the amount of triangles they are composed of.
+Since the rendering of triangle meshes composed of a large amount of triangles is the ideal use case for Embree, we tested our implementation on various scenes containing a triangle mesh in increasing size of the amount of triangles they are composed of.
 
-Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle serving as ground, an infinite sphere acting as a sky dome for illumination and a single triangle mesh, that are loaded from a PLY file. 
+Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle serving as ground, an infinite sphere acting as a sky dome for illumination and a single triangle mesh, that are loaded from a PLY file and having \todo{material blinn}. 
 \\
 
 \noindent The triangle meshes are \todo{rephrase}
@@ -173,11 +175,12 @@ Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle ser
 	\item \textbf{Lucy}, provided by the Stanford PLY repository \cite{plyRepo}, shown in Figure \ref{fig:mesh_lucy}
 \end{itemize}
 
+
 \begin{figure}
 	\centering
-	\subfloat[Utha teapot]{\includegraphics[width=.3\textwidth]{img/4 results/ply/teapotEmbree.png}\label{fig:mesh_teapot}}
+	\subfloat[Utha Teapot]{\includegraphics[width=.3\textwidth]{img/4 results/ply/teapotEmbree.png}\label{fig:mesh_teapot}}
 	\hfill
-	\subfloat[Stanford bunny]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bunnyEmbree.png}\label{fig:mesh_bunny}}
+	\subfloat[Stanford Bunny]{\includegraphics[width=.3\textwidth]{img/4 results/ply/bunnyEmbree.png}\label{fig:mesh_bunny}}
 	\hfill
 	\subfloat[Michelangel's David]{\includegraphics[width=.3\textwidth]{img/4 results/ply/michelangeloEmbree.png}\label{fig:mesh_mike}}
 	\\
@@ -191,6 +194,8 @@ Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle ser
 	\label{fig:mesh_scenes}
 \end{figure}
 
+\todo{subref}
+
 \begin{table}
 	\centering
 	{\footnotesize\sf
@@ -198,8 +203,8 @@ Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle ser
 			\toprule
 			Scene & \Verb!#!Triangles & Native ART & Embree & Speedup \\ 
 			\midrule
-			Utah teapot & 4,032 & 728.12 sec & 608.29 sec & 16.46 \% \\
-			Stanford bunny & 69,451 & 379.02 sec & 305.00 sec & 19.53 \% \\
+			Utah Teapot & 4,032 & 353.83 sec & 304.26 sec & 14.01 \% \\
+			Stanford Bunny & 69,451 & 379.02 sec & 305.00 sec & 19.53 \% \\
 			David & 366,011 & 302.52 sec & 254.03 sec & 16.03 \%  \\
 			\addlinespace % a nice non-intrusive separator of data groups (or final table sums)
 			Happy Buddha & 1,087,716 & 351.92 sec & 276.00 sec & 21.57 \% \\
