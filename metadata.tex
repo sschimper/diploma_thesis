@@ -55,7 +55,8 @@ Finally, I would like to thank my family, friends, and Monika for their love and
 }
 
 \def\AbstractEN{%
-\xxx{Abstracts are an abstract form of art. Use the most precise, shortest sentences that state what problem the thesis addresses, how it is approached, pinpoint the exact result achieved, and describe the applications and significance of the results. Highlight anything novel that was discovered or improved by the thesis. Maximum length is 200 words, but try to fit into 120. Abstracts are often used for deciding if a reviewer will be suitable for the thesis; a well-written abstract thus increases the probability of getting a reviewer who will like the thesis.}
+Modern High-Performance Ray Casting toolkits, such as the Intel Embree library, a de facto industry standard, are a cornerstone of the high-performance levels seen in current CPU rendering. The purpose of Embree is its integration into professional image synthesis environments to accelerate rendering scenes with complex geometry, usually being composed of a large number of primitives. Unfortunately, Embree does not offer support for rendering constructive solid geometry (CSG), solids composed of a manageable amount of primitive solids by using set operations. This is a significant drawback since CSG are an intuitive and powerful option for describing complex geometry.
+In this thesis, we describe the integration of Embree into the predictive rendering system ART and propose a method for rendering CSG by combining the traversal of Embree's and Art's internal ray acceleration data structures. The tests we conducted with virtual scenes containing CSG showed that our method is competitive with the original ART renderer and often even faster.
 % ABSTRACT IS NOT A COPY OF YOUR THESIS ASSIGNMENT!
 }
 
@@ -65,7 +66,7 @@ Finally, I would like to thank my family, friends, and Monika for their love and
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
 % Keywords are useful for indexing and searching for the theses by topic.
-\def\Keywords{{raycasting,} {CSG}}
+\def\Keywords{{Raycasting,} {CSG}, {Embree}}
 
 
 % If your abstracts are long and do not fit in the infopage, you can make the

@@ -37,7 +37,7 @@ Once the command line arguments of \texttt{artist} are evaluated, the \texttt{Ar
 
 Furthermore, if the singleton was initialized and set up, another global boolean variable, indicating whether Embree is enabled or not, is set to true. The value of this boolean can be retrieved by calling a class method called \texttt{embreeEnabled}. An example of this is given in Listing \ref{lst:check_embree}.
 
-\section{The \texttt{ArnEmbree} singleton class and the extension of the \texttt{RayCaster} object}
+\section{The \texttt{ArnEmbree} singleton class and the extension of ART's ray casting functionality}
 
 The \texttt{ArnEmbree} class is constructed the following way: Instance variables are provided to store a single \texttt{RTCDevice} and a single \texttt{RTCScene} for Embree. Although the instantiation of multiple scenes on a single device is possible with Embree, we are considering only single scenes containing all scene geometry, since ART does not support the instantiation of multiple scenes. 
 

@@ -3,13 +3,13 @@
 
 This thesis has shown how to integrate Intel's high-performance raycasting library Embree into the CSG rendering framework ART, whose internal structures and core mechanics diverge significantly from those of other common image synthesis systems, such as part or Mitsuba 2.
 
-We have described how to initialize different geometry types for Embree, namely shapes described by vertices and indices with Embree's own primitive types and analytical surfaces as user-defined geometry, and have outlined how intersection points can be calculated with the help of Embree. 
+We have described how to initialize different geometry types for Embree, namely shapes described by vertices and indices (such as triangle meshes) with Embree's own primitive types and analytical surfaces as user-defined geometry, and have outlined how intersection can be calculated with the help of Embree. 
 
-Despite Embree not directly supporting CSG rendering, we ensured this functionality in ART with Embree by initializing a given CSG, composed of multiple primitives, as a single user-defined geometry for Embree. Embree's internal BVH is traversed during the ray tracing process until it intersects the bounding box enclosing the CSG in question. From there, a subgraph of ART's internal scene graph is traversed to calculate the intersections with the CSG primitives. This procedure proved itself as a satisfactory compromise between ART and Embree's target application: The main advantage of using the Embree library, namely the acceleration of the ray tracing process, could be preserved for virtual scenes containing CSG that are not (at least partially) constructed from triangle meshes.
+Despite Embree not directly supporting CSG rendering, we ensured this functionality\todo{rephrase} in ART by initializing a given CSG, composed of multiple primitives, as a single user-defined geometry for Embree. Embree's internal BVH is traversed during the ray tracing process until it intersects the bounding box enclosing the CSG in question. From there, a subgraph of ART's internal scene graph, which is associated with the particular CSG, is traversed to calculate the intersections with the primitives of which the CSG is composed. This procedure proved itself as a satisfactory compromise between ART and Embree's target application: The main advantage of using the Embree library, namely the acceleration of the ray tracing process, could be preserved for virtual scenes containing CSG that are not (at least partially) constructed from triangle meshes.
 
+Another notable accomplishment of our implementation is that the time needed for constructing ART's internal acceleration data structures is drastically decreased for scenes containing triangle meshes with a high number of triangles. The reason for this is the omission of constructing internal KD trees for triangle meshes when initializing it with Embree's internal triangle primitives. 
 
-
-Despite all, our approach is not entirely free from flaws. These are addressed in the next section together with suggested ideas for their resolution.  
+However, we have to admit that our approach is not entirely free from flaws. These are addressed in the next section together with suggested ideas for their resolution.  
 
 
 \section*{Future work}
