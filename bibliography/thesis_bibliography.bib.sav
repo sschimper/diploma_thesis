@@ -1,0 +1,587 @@
+% Encoding: UTF-8
+
+@Article{wald2014embree,
+  author    = {Wald, Ingo and Woop, Sven and Benthin, Carsten and Johnson, Gregory S and Ernst, Manfred},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {Embree: a kernel framework for efficient CPU ray tracing},
+  year      = {2014},
+  number    = {4},
+  pages     = {1--8},
+  volume    = {33},
+  groups    = {Embree, Introduction},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{wilkie2013predicting,
+  author    = {Wilkie, Alexander and Ho{\v{s}}ek, Lukas},
+  booktitle = {Proceedings of the 29th Spring Conference on Computer Graphics},
+  title     = {Predicting sky dome appearance on earth-like extrasolar worlds},
+  year      = {2013},
+  pages     = {145--152},
+  groups    = {ART, Skydome appearance model, scenes},
+}
+
+@InProceedings{mojzik2018handling,
+  author       = {Mojz{\'\i}k, Michal and Fichet, Alban and Wilkie, Alexander},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Handling Fluorescence in a Uni-directional Spectral Path Tracer},
+  year         = {2018},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {77--94},
+  volume       = {37},
+  groups       = {ART},
+}
+
+@InProceedings{wilkie2014hero,
+  author       = {Wilkie, Alexander and Nawaz, Sehera and Droske, Marc and Weidlich, Andrea and Hanika, Johannes},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Hero wavelength spectral sampling},
+  year         = {2014},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {123--131},
+  volume       = {33},
+  groups       = {ART},
+}
+
+@InProceedings{wilkie2011physically,
+  author       = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle    = {Computer Graphics Forum},
+  title        = {A physically plausible model for light emission from glowing solid objects},
+  year         = {2011},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {1269--1276},
+  volume       = {30},
+  groups       = {ART},
+}
+
+@Book{glassner1989introduction,
+  author    = {Glassner, Andrew S},
+  publisher = {Morgan Kaufmann},
+  title     = {An introduction to ray tracing},
+  year      = {1989},
+  groups    = {Ray Tracing Technques},
+}
+
+@Online{arthandbook,
+  author  = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
+  groups  = {ART},
+  title   = {The ART Handbook},
+  url     = {https://cgg.mff.cuni.cz/ART/assets/ART_Handbook.pdf},
+  urldate = {2021-05-30},
+  year    = {n.d.},
+}
+
+@Online{artreferencemanual,
+  author  = {Wilkie, Alexander and Weidlich, Andrea and Fichet, Alban and Mojzik, Michal and Zotti, Georg},
+  groups  = {ART},
+  title   = {The ARM File Reference Manual},
+  url     = {https://cgg.mff.cuni.cz/ART/assets/ARM_Interface.pdf},
+  urldate = {2021-05-30},
+  year    = {n.d.},
+}
+
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
+}
+
+@Misc{embreeSlides,
+  author    = {Benthin, Carsten},
+  title     = {Embree Ray Tracing Kernels 3.X: Overview and Features},
+  year      = {2018},
+  groups    = {Embree},
+  timestamp = {Intel},
+}
+
+@InProceedings{whitted1979improved,
+  author    = {Whitted, Turner},
+  booktitle = {Proceedings of the 6th annual conference on Computer graphics and interactive techniques},
+  title     = {An improved illumination model for shaded display},
+  year      = {1979},
+  pages     = {14},
+  groups    = {Introduction, Ray Tracing Technques},
+}
+
+@Book{hughesDamEtAl13,
+  author    = {Hughes, John F. and van Dam, Andries and McGuire, Morgan and Sklar, David F. and Foley, James D. and Feiner, Steven and Akeley, Kurt},
+  publisher = {Addison-Wesley},
+  title     = {Computer Graphics: Principles and Practice},
+  year      = {2013},
+  address   = {Upper Saddle River, NJ},
+  edition   = {3},
+  isbn      = {978-0-321-39952-6},
+  abstract  = {The third edition remains the most authoritative introduction to the field. The first edition, the original 'Foley and van Dam', helped to define computer graphics and how it could be taught. The second edition became an even more comprehensive resource for practitioners and students alike. This third edition has been completely rewritten to provide detailed and up-to-date coverage of key concepts, algorithms, technologies, and applications. The authors explain the principles, as well as the mathematics, underlying computer graphics-knowledge that is essential for successful work both now and in the future. Early chapters show how to create 2D and 3D pictures right away, supporting experimentation. Later chapters, covering a broad range of topics, demonstrate more sophisticated approaches. Sections on current computer graphics practice show how to apply given principles in common situations, such as how to approximate an ideal solution on available hardware, or how to represent a data structure more efficiently. Topics are reinforced by exercises, programming problems, and hands-on projects.},
+  added-at  = {2017-06-18T09:18:32.000+0200},
+  biburl    = {https://www.bibsonomy.org/bibtex/2782c8b454e7bfe36ae74024906f999fd/flint63},
+  file      = {eBook:2013/HughesDamEtAl13.pdf:PDF;InformIT Product page:http\://www.informit.com/store/computer-graphics-principles-and-practice-9780321399526:URL;Amazon Search inside:http\://www.amazon.de/gp/reader/0321399528/:URL},
+  groups    = {public},
+  interhash = {eb128bd82b9b475b4a69a002ae18beb8},
+  intrahash = {782c8b454e7bfe36ae74024906f999fd},
+  keywords  = {01821 103 book computer graphics},
+  timestamp = {2018-04-16T11:55:50.000+0200},
+  username  = {flint63},
+}
+
+@Book{pharr2016physically,
+  author    = {Pharr, Matt and Jakob, Wenzel and Humphreys, Greg},
+  publisher = {Morgan Kaufmann},
+  title     = {Physically based rendering: From theory to implementation},
+  year      = {2016},
+  groups    = {Existing Renderers},
+}
+
+@Article{roth1982ray,
+  author    = {Roth, Scott D},
+  journal   = {Computer graphics and image processing},
+  title     = {Ray casting for modeling solids},
+  year      = {1982},
+  number    = {2},
+  pages     = {109--144},
+  volume    = {18},
+  groups    = {CSG},
+  publisher = {Elsevier},
+}
+
+@Online{embreeAward,
+  author  = {{Intel Newsroom}},
+  groups  = {Embree},
+  title   = {{Intel Embree Wins Academy Scientific and Technical Award}},
+  url     = {https://newsroom.intel.de/news/intel-embree-wins-academy-scientific-and-technical-award/#gs.2q50qi},
+  urldate = {2021-05-30},
+  year    = {2021},
+}
+
+@Online{artSoftware,
+  author  = {Computer Graphics Group, Charles University},
+  groups  = {ART},
+  title   = {{Advanced Rendering Toolkit}},
+  url     = {https://cgg.mff.cuni.cz/ART/},
+  urldate = {2021-05-30},
+  year    = {n.d.},
+}
+
+@Article{nimier2019mitsuba,
+  author    = {Nimier-David, Merlin and Vicini, Delio and Zeltner, Tizian and Jakob, Wenzel},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {Mitsuba 2: A retargetable forward and inverse renderer},
+  year      = {2019},
+  number    = {6},
+  pages     = {1--17},
+  volume    = {38},
+  groups    = {Existing Renderers},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{schmittler2002saarcor,
+  author    = {Schmittler, J{\"o}rg and Wald, Ingo and Slusallek, Philipp},
+  booktitle = {Proceedings of the ACM SIGGRAPH/EUROGRAPHICS conference on Graphics hardware},
+  title     = {Saarcor: a hardware architecture for ray tracing},
+  year      = {2002},
+  pages     = {27--36},
+  groups    = {Hardware},
+}
+
+@InProceedings{wald2001interactive,
+  author       = {Wald, Ingo and Slusallek, Philipp and Benthin, Carsten and Wagner, Markus},
+  booktitle    = {Computer graphics forum},
+  title        = {Interactive rendering with coherent ray tracing},
+  year         = {2001},
+  number       = {3},
+  organization = {Wiley Online Library},
+  pages        = {153--165},
+  volume       = {20},
+  groups       = {Hardware},
+}
+
+@Online{raytracingvideo,
+  author  = {NVIDIA},
+  groups  = {Other},
+  title   = {{The Compleat Angler – First demonstration of recursive ray tracing in computer graphics animation} YouTube video},
+  url     = {https://www.youtube.com/watch?v=0KrCh5qD9Ho},
+  urldate = {2021-05-30},
+  year    = {2018},
+}
+
+@InProceedings{appel1968some,
+  author    = {Appel, Arthur},
+  booktitle = {Proceedings of the April 30--May 2, 1968, spring joint computer conference},
+  title     = {Some techniques for shading machine renderings of solids},
+  year      = {1968},
+  pages     = {37--45},
+  groups    = {Introduction},
+}
+
+@Article{phong1975illumination,
+  author    = {Phong, Bui Tuong},
+  journal   = {Communications of the ACM},
+  title     = {Illumination for computer generated pictures},
+  year      = {1975},
+  number    = {6},
+  pages     = {311--317},
+  volume    = {18},
+  groups    = {Introduction},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Article{plunkett1985vectorization,
+  author    = {Plunkett, David and Bailey, Michael},
+  journal   = {IEEE Computer Graphics and Applications},
+  title     = {The vectorization of a ray-tracing algorithm for improved execution speed},
+  year      = {1985},
+  number    = {08},
+  pages     = {52--60},
+  volume    = {5},
+  groups    = {Hardware},
+  publisher = {IEEE Computer Society},
+}
+
+@InCollection{sung1992ray,
+  author    = {Sung, Kelvin and Shirley, Peter},
+  booktitle = {Graphics Gems III (IBM Version)},
+  publisher = {Elsevier},
+  title     = {Ray tracing with the BSP tree},
+  year      = {1992},
+  pages     = {271--274},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Online{embree2021Doc,
+  author  = {Intel},
+  groups  = {Embree},
+  title   = {Intel Embree High Performance Ray Tracing Kernels - User Documentation},
+  url     = {https://github.com/embree/embree/blob/master/readme.pdf},
+  urldate = {2021-05-30},
+  year    = {2021},
+}
+
+@Online{windowsSubsystem,
+  author  = {Tom Fenton},
+  groups  = {Appendix},
+  title   = {Running Graphical Programs on Windows Subsystem on Linux},
+  url     = {https://virtualizationreview.com/articles/2017/02/08/graphical-programs-on-windows-subsystem-on-linux.aspx},
+  urldate = {2021-06-13},
+  year    = {2017},
+}
+
+@Manual{blender2018,
+  title        = {Blender - a 3D modelling and rendering package},
+  address      = {Stichting Blender Foundation, Amsterdam},
+  author       = {{Blender Online Community}},
+  organization = {Blender Foundation},
+  year         = {2018},
+  groups       = {Other},
+  url          = {http://www.blender.org},
+}
+
+@InProceedings{newell1977progression,
+  author    = {Newell, Martin E and Blinn, James F},
+  booktitle = {Proceedings of the 1977 annual conference},
+  title     = {The progression of realism in computer generated images},
+  year      = {1977},
+  pages     = {444--448},
+  groups    = {Ray Tracing Technques},
+}
+
+@Online{csgtree,
+  author  = {Zottie},
+  comment = {Distributed on Wikimedia Commons.},
+  groups  = {exterior scenes},
+  title   = {Illustration of CSG tree. Created and rendered in POV-Ray.},
+  url     = {https://commons.wikimedia.org/wiki/File:Csg_tree.png},
+  urldate = {2021-06-22},
+  year    = {2021},
+}
+
+@Online{cg3,
+  author  = {Jaroslav Křivánek},
+  groups  = {Rendering Equation},
+  title   = {Computer Graphics III - Physically based rendering (NPGR010)},
+  url     = {https://cgg.mff.cuni.cz/~jaroslav/teaching/2019-npgr010/index.html},
+  urldate = {2021-06-24},
+  year    = {2019},
+}
+
+@Article{moller1997fast,
+  author    = {M{\"o}ller, Tomas and Trumbore, Ben},
+  journal   = {Journal of graphics tools},
+  title     = {Fast, minimum storage ray-triangle intersection},
+  year      = {1997},
+  number    = {1},
+  pages     = {21--28},
+  volume    = {2},
+  groups    = {solid representations},
+  publisher = {Taylor \& Francis},
+}
+
+@Article{goral1984modeling,
+  author    = {Goral, Cindy M and Torrance, Kenneth E and Greenberg, Donald P and Battaile, Bennett},
+  journal   = {ACM SIGGRAPH computer graphics},
+  title     = {Modeling the interaction of light between diffuse surfaces},
+  year      = {1984},
+  number    = {3},
+  pages     = {213--222},
+  volume    = {18},
+  groups    = {Rendering Equation},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{cook1984distributed,
+  author    = {Cook, Robert L and Porter, Thomas and Carpenter, Loren},
+  booktitle = {Proceedings of the 11th annual conference on Computer graphics and interactive techniques},
+  title     = {Distributed ray tracing},
+  year      = {1984},
+  pages     = {137--145},
+  groups    = {Rendering Equation},
+}
+
+@InProceedings{rubin19803,
+  author    = {Rubin, Steven M and Whitted, Turner},
+  booktitle = {Proceedings of the 7th annual conference on Computer graphics and interactive techniques},
+  title     = {A 3-dimensional representation for fast rendering of complex scenes},
+  year      = {1980},
+  pages     = {110--116},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Article{bentley1975multidimensional,
+  author    = {Bentley, Jon Louis},
+  journal   = {Communications of the ACM},
+  title     = {Multidimensional binary search trees used for associative searching},
+  year      = {1975},
+  number    = {9},
+  pages     = {509--517},
+  volume    = {18},
+  groups    = {Existing Ray Accelerator Structures},
+  publisher = {ACM New York, NY, USA},
+}
+
+@InProceedings{hapala2011kd,
+  author       = {Hapala, Michal and Havran, Vlastimil},
+  booktitle    = {Computer Graphics Forum},
+  title        = {Kd-tree traversal algorithms for ray tracing},
+  year         = {2011},
+  number       = {1},
+  organization = {Wiley Online Library},
+  pages        = {199--213},
+  volume       = {30},
+  groups       = {Existing Ray Accelerator Structures},
+}
+
+@InProceedings{wald2006building,
+  author       = {Wald, Ingo and Havran, Vlastimil},
+  booktitle    = {2006 IEEE Symposium on Interactive Ray Tracing},
+  title        = {On building fast kd-trees for ray tracing, and on doing that in O (N log N)},
+  year         = {2006},
+  organization = {IEEE},
+  pages        = {61--69},
+  groups       = {Existing Ray Accelerator Structures},
+}
+
+@InProceedings{wilkie2010standardised,
+  author    = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle = {Proceedings of the 26th Spring Conference on Computer Graphics},
+  title     = {A standardised polarisation visualisation for images},
+  year      = {2010},
+  pages     = {43--50},
+  groups    = {ART},
+}
+
+@InProceedings{wilkie2011physically,
+  author       = {Wilkie, Alexander and Weidlich, Andrea},
+  booktitle    = {Computer Graphics Forum},
+  title        = {A physically plausible model for light emission from glowing solid objects},
+  year         = {2011},
+  number       = {4},
+  organization = {Wiley Online Library},
+  pages        = {1269--1276},
+  volume       = {30},
+  groups       = {ART, scenes},
+}
+
+@Thesis{todova2021,
+  author = {Lucia Tódová},
+  groups = {ART},
+  title  = {Constrained Spectral Uplifting},
+  year   = {2021},
+}
+
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
+}
+
+@InCollection{wilkie2009predictive,
+  author    = {Wilkie, Alexander and Weidlich, Andrea and Magnor, Marcus and Chalmers, Alan},
+  booktitle = {ACM SIGGRAPH ASIA 2009 Courses},
+  title     = {Predictive rendering},
+  year      = {2009},
+  pages     = {1--428},
+  groups    = {ART},
+}
+
+@Article{hovsek2013adding,
+  author    = {Ho{\v{s}}ek, Luk{\'a}{\v{s}} and Wilkie, Alexander},
+  journal   = {IEEE computer graphics and applications},
+  title     = {Adding a solar-radiance function to the Ho{\v{s}}ek-Wilkie skylight model},
+  year      = {2013},
+  number    = {3},
+  pages     = {44--52},
+  volume    = {33},
+  groups    = {Introduction, Skydome appearance model},
+  publisher = {IEEE},
+}
+
+@Article{hosek2012analytic,
+  author    = {Ho{\v{s}}ek, Luk{\'a}{\v{s}} and Wilkie, Alexander},
+  journal   = {ACM Transactions on Graphics (TOG)},
+  title     = {An analytic model for full spectral sky-dome radiance},
+  year      = {2012},
+  number    = {4},
+  pages     = {1--9},
+  volume    = {31},
+  groups    = {Skydome appearance model},
+  publisher = {ACM New York, NY, USA},
+}
+
+@Misc{peddie2019ray,
+  author       = {Peddie, Jon},
+  howpublished = {\url{http://gts.sourceforge.net/}},
+  title        = {{GTS}: {GNU} {Triangulated} {Surface} library},
+  year         = {2000--2004},
+  groups       = {Introduction},
+  publisher    = {Springer},
+  volume       = {5},
+}
+
+@Article{fichet2021openexr,
+  author  = {Fichet, Alban and Pacanowski, Romain and Wilkie, Alexander},
+  journal = {Journal of Computer Graphics Techniques},
+  title   = {An OpenEXR Layout for Spectral Images},
+  year    = {2021},
+  groups  = {ART},
+}
+
+@Misc{rply2016,
+  author       = {Lars Kiesow and Nigel Stewart},
+  howpublished = {\url{https://github.com/lkiesow/librply}},
+  title        = {RPly},
+  year         = {2016},
+}
+
+@InProceedings{kajiya1986rendering,
+  author    = {Kajiya, James T},
+  booktitle = {Proceedings of the 13th annual conference on Computer graphics and interactive techniques},
+  title     = {The rendering equation},
+  year      = {1986},
+  pages     = {143--150},
+  groups    = {Rendering Equation},
+}
+
+@InProceedings{vinkler2014bounding,
+  author    = {Vinkler, Marek and Havran, Vlastimil and Bittner, Ji{\v{r}}{\'\i}},
+  booktitle = {Proceedings of the 30th Spring Conference on Computer Graphics},
+  title     = {Bounding volume hierarchies versus kd-trees on contemporary many-core architectures},
+  year      = {2014},
+  pages     = {29--36},
+  groups    = {Existing Ray Accelerator Structures},
+}
+
+@Online{plyRepo,
+  groups  = {Other, exterior scenes},
+  title   = {The Stanford 3D Scanning Repository},
+  url     = {http://graphics.stanford.edu/data/3Dscanrep/},
+  urldate = {2021-07-08},
+  year    = {2014},
+}
+
+@Article{karaffova2016,
+  author  = {Markéta Karaffová},
+  journal = {Master Thesis, CzechTechnical University in Prague},
+  title   = {Efficient Ray Tracing of CSG Models},
+  year    = {2016},
+  groups  = {CSG Embree},
+}
+
+@Book{peddie2019ray,
+  author    = {Peddie, Jon},
+  publisher = {Springer},
+  title     = {Ray Tracing: A tool for all},
+  year      = {2019},
+  volume    = {5},
+  groups    = {Introduction},
+}
+
+@Online{david,
+  author  = {Jerry Fisher},
+  groups  = {exterior scenes},
+  journal = {3D model published on Sketchfab},
+  title   = {David by Michelangelo},
+  url     = {https://sketchfab.com/3d-models/david-by-michelangelo-8f4827cf36964a17b90bad11f48298ac},
+  urldate = {2021-07-12},
+  year    = {2015},
+}
+
+@Online{teapot,
+  author  = {Ben Houston},
+  groups  = {exterior scenes},
+  journal = {3D model published on Clara.io},
+  title   = {Utah Teapot},
+  url     = {https://clara.io/view/8d9a8181-f1ce-4340-b24f-e36bbaf318f7#},
+  urldate = {2021-07-12},
+  year    = {n.d},
+}
+
+@InProceedings{oren1994generalization,
+  author    = {Oren, Michael and Nayar, Shree K},
+  booktitle = {Proceedings of the 21st annual conference on Computer graphics and interactive techniques},
+  title     = {Generalization of Lambert's reflectance model},
+  year      = {1994},
+  pages     = {239--246},
+  groups    = {scenes},
+}
+
+@Article{torrance1967theory,
+  author    = {Torrance, Kenneth E and Sparrow, Ephraim M},
+  journal   = {Josa},
+  title     = {Theory for off-specular reflection from roughened surfaces},
+  year      = {1967},
+  number    = {9},
+  pages     = {1105--1114},
+  volume    = {57},
+  groups    = {scenes},
+  publisher = {Optical Society of America},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
+
+@Comment{jabref-meta: grouping:
+0 AllEntriesGroup:;
+1 StaticGroup:Embree\;0\;0\;0x0000ffff\;\;\;;
+1 StaticGroup:ART\;0\;1\;0x008000ff\;\;\;;
+2 StaticGroup:Skydome appearance model\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Introduction\;0\;1\;0x804d80ff\;\;\;;
+2 StaticGroup:Hardware\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Existing Renderers\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Fundamentals\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Ray Tracing Technques\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Existing Ray Accelerator Structures\;0\;0\;0x8a8a8aff\;\;\;;
+2 StaticGroup:CSG\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:Rendering Equation\;0\;1\;0x8a8a8aff\;\;\;;
+2 StaticGroup:solid representations\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Other\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:Appendix\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:CSG Embree\;0\;1\;0x8a8a8aff\;\;\;;
+1 StaticGroup:exterior scenes\;0\;0\;0x8a8a8aff\;\;\;;
+1 StaticGroup:scenes\;0\;1\;0x8a8a8aff\;\;\;;
+}

@@ -2,17 +2,21 @@
 \chapter{Integration of Embree into ART}
 \label{chap:integration}
 
-The following section outlines our approach to the integration of Embree into ART. The language, in which the individual procedures are formulated is Objective-C, since the higher level functionality of ART has been written in this language, too. Embree itself is written in C and intended for the adaption to image synthesis environments being written in C/C++, which is the industry standard. However, due to Objective-C being a strict superset of C, these two languages can be intermixed seamlessly. Therefore, no issues concerning the cross-linking of C and Objective-C were discovered during the development.
+The following section outlines our approach to the integration of Embree into ART. The language in which the individual procedures are formulated is Objective-C since the higher-level functionality of ART has been written in this language, too. Embree itself is written in C and intended to be integrated into image synthesis environments written in C/C++, which is the industry standard. However, due to Objective-C being a strict superset of C, these two languages can be intermixed seamlessly. Therefore, no issues concerning the cross-linking of C and Objective-C were discovered during the development.
 
 \section{Design choices}
 
-One important design choice was to abstract functionality regarding Embree inside a single class, which we gave the name \texttt{ArnEmbree}, conform to the naming convention of Objective-C classes in ART. Classes of type "\texttt{Arn<name>}" belong to the category of so-called "Scene graph classes", to which, according to our own opinion, the \texttt{ArnEmbree} class belongs the closest to. The main tasks of this class are the creation and deletion of an Embree device and an Embree scene, the adding of different scene geometry, and performing the intersection calculations with Embree. This class should act as a singleton object. To quote from the ART handbook: "Apart from this struct, [the \texttt{art\_gv} global variable] there are no genuine global variables in ART, only global constants" \cite[Chapter 4.1.2]{arthandbook}. The singleton object obviously contradicts this statement. The main reason for this design is to keep the functionality regarding Embree separate form the functionality of what we will from now on refer to as \emph{native ART}, the original Advanced Rendering Toolkit without the integration of Embree. During the initial phase of this project, it was not clear whether both the research question of this thesis ("Can the CSG operations of ART be implemented using Embree?") and the question of whether Embree could be integrated into ART at all could be positively answered. In case of our work being unsuccessful, this separation would ease the process of reverse engineering ART to its initial state.
-In spite of this separation, an inclusion of the \texttt{ArnEmbree} singleton class to the \texttt{art\_gv} variable is possible and not too complicated.
+One important design choice was to abstract functionality regarding Embree inside a single class, which we gave the name \texttt{ArnEmbree}, conform to the naming convention of Objective-C classes in ART. Classes of type "\texttt{Arn<name>}" belong to the category of so-called "Scene graph classes", to which, according to our own opinion, the \texttt{ArnEmbree} class belongs the closest to.
 
-Another design decision was to enable support of Embree only when the user provided the parameter flag \texttt{-e} or \texttt{--embree} when invoking \texttt{artist}, like so:
+The main tasks of this class are the creation and deletion of an \texttt{RTCDevice} and an \texttt{RTCScene}, the adding of different scene geometry, and performing the intersection calculations with Embree. This class should act as a singleton object. To quote from the ART handbook: "Apart from this struct, [the \texttt{art\_gv} global variable] there are no genuine global variables in ART, only global constants" \cite[Chapter 4.1.2]{arthandbook}. The singleton object obviously contradicts this statement. The main reason for this design is to keep the functionality regarding Embree separate from the functionality of what we will from now on referring to as \emph{native ART}, the original Advanced Rendering Toolkit without the integration of Embree.
+
+During the beginning of our work, it was not clear whether both the research question of this thesis ("Can the CSG operations of ART be implemented using Embree?") and the question of whether Embree could be integrated into ART at all could be positively answered. In case our work is unsuccessful, this separation would ease reverse engineering ART to its initial state.
+In spite of this separation, an inclusion of the \texttt{ArnEmbree} singleton class to the \texttt{art\_gv} variable is a solvable problem.
+
+Another design decision was to enable support of Embree only when the user provided the parameter flag \texttt{-e} or \texttt{--embree} when invoking \texttt{artist}:
 
 \begin{Verbatim}
-artist foo_scene.arm -e
+$ artist foo_scene.arm -e
 \end{Verbatim}
 
 Initilally, the provision of a parameter flag was intended for easily switching Embree support on and off in order to draw comparisons between the performances of ART with and without the help of Embree. However, this turns out to be still valuable, because certain scenes will be rendered faster with Embree and some will not. We will turn to this circumstance in more depth when discussing the results in Chapter \ref{chap:results}. 
@@ -143,7 +147,7 @@ In the interior of the function \texttt{embree\_bbox}, the bounding box for a sh
 
 \todo{bullet lists}
 
-\section{Performing ray tracing with Embree}
+\section{Ray tracing with Embree in ART}
 \label{sec:embree_raycasting}
 
 Once the geometries contained in a virtual scene are initilialized for Embree, and Embree's internal BVH has been created, the scene can be ray cast with the help of Embree. If Embree support is enabled by the providing of the \texttt{-e} flag, a member function of the \texttt{RayCaster} class with the name \texttt{getIntersectionListWithEmbree} is called, which takes an empty \texttt{ArIntersectionList} struct \todo{explain} as an argument. In the body of this function, an \texttt{RTCIntersectContext} is set up and a \texttt{RTCRayHit} struct is declared and updated according to the \texttt{ArnRayCaster} object: The information with which the  \texttt{RTCRayHit} stuct is being updated contains the orientation and direction of the ray that is about to be cast into the scene, and the ID associated to the ray. The \texttt{tfar} value of is initialized with Objective-C's \texttt{INFINITY} macro and the \texttt{geomID} field of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}. 
@@ -153,7 +157,7 @@ Embree utilizes single precision floating point numbers for its internal calcula
 \begin{figure}[!tbp]
 	\centering
 	\subfloat[Rendering a simple scene without offsetting the \texttt{tnear} value.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact_2.png}}
-	\hfill
+	\hfil
 	\subfloat[Rendering a simple scene with offsetting the \texttt{tnear} value by $1e-3f$.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact.png}}
 	\caption{Artifacts due to the conversion of the hit distance of the ray from a double precision floating point number to a single precision floating point number.}
 	\label{fig:offset}
@@ -223,7 +227,7 @@ Given a ray, that first intersects the PLY mesh and afterwards the infinite sphe
 \begin{figure}[!tbp]
 	\centering
 	\subfloat[Scene rendered with native ART.]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyNormal.png}} 
-	\hfill
+	\hfil
 	\subfloat[Scene rendered with the approach outlined in the previous sections and subsections.]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyError.png} \label{fig:no_bunny_close}}
 	\caption{Virtual scene containing both non user defined geometry and user defined geometry.}
 	\label{fig:no_bunny}
