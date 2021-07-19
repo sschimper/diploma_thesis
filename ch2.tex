@@ -141,7 +141,7 @@ This \texttt{Shape} base class offers functions for calculating bounding boxes f
 The internal acyclic scene graph of ART diverges significantly from this design. Here, we provide an overview of different nodes in the scene graph and their functionality. The scene graph, which was assembled by ART to render the image displayed in Figure \ref{fig:csg_or}, is shown in Figure \ref{fig:scene_graph}. Table \ref{tab:nodes} displays its nodes and a brief description of their functionality and relation to other nodes. However, for reasons of brevity, we will only list nodes for which the comprehension of their functionality is important to follow the implementation described in the next chapter.
 On particularity of the scene graph is that it can be utilized by every application mentioned in the previous section.
 
-Throughout this thesis, we will refer to the subgraph rooted at the \emph{BSP Tree} node and resembling the scene geometry as \emph{Original scene graph}. The "BSP Tree" node is associated with another data structure, namely the KD tree, built over the scene geometry described by the original scene graph.  
+Throughout this thesis, we will refer to the subgraph rooted at the \emph{Bounding Box node}, which is a direct child of the \emph{BSP Tree node} and resembling the scene geometry as \emph{Original scene graph}. The BSP Tree node is associated with another data structure, namely the KD tree, built over the scene geometry described by the original scene graph.  
 
 Furthermore, in the scene graph shown in Figure \ref{fig:scene_graph}, from one particular node of type \emph{Combined Attributes}, arrows with dashed lines are pointing to other nodes associated, e.g., with the BRDF of the shape represented by the child node, or nodes associated with transformation information. All of the Combined Attributes nodes have these references. For reasons of clarity, these references are shown for only one Combined Attributes node in the figure.
 
@@ -187,24 +187,23 @@ Furthermore, in the scene graph shown in Figure \ref{fig:scene_graph}, from one 
 
 \subsection{Intersection calculation in ART}
 \label{sec:art_raytracing}
-The functionality redarding ray tracing in ART is abstracted in the \texttt{ArnRayCaster} class. This class is inherited from the \texttt{ArnGraphTraversal} class. 
 
-\todo{talk this over with Alban}
+A crucial part of rendering a scene in ART is the calculation of intersections between a cast ray and scene geometry and their subsequent evaluation. These intersections are calculated by traversing ART's internal KD tree.  Functionality for this traversal is abstracted in an Objective-C class called \texttt{ArnRayCaster}. Instance variables of this class store, among other information, the ray that is cast into the scene, a reference to an intersected shape, and a so-called \emph{traversal state}, which is a C struct containing references to, e.g., the surface and volume material of the intersected shape and its transformation information.
 
-\todo{talk about org scene graph rendering}
+The intersections calculated by the KD tree traversal are stored in \emph{intersection lists}. An intersection list, abstracted within ART with the C struct \texttt{ArIntersectionList}. This structure is essentially a linked list, storing the individual intersections. Such an individual intersection is represented in ART by the \texttt{ArcIntersection} class, whose instance variables are a double storing the distance from the ray origin to the intersection point and references, e.g., to the intersected shape. 
 
-\todo{talk about BUG! be very clear!!!!}
+There exists an alternative to the KD tree traversal in ART for calculating intersections: Namely through the traversal of the original scene graph. When considering Figure \ref{fig:scene_graph}, the original scene graph is rooted at the Bounding Box node that is a child of the BSP Tree node. The classes corresponding to the Bounding Boxes node, the CSG node, the Combined Attributes node, and the Shape node provide a function called \texttt{getIntersectionList}. When this function is called from the topmost Bounding Box node in Figure \ref{fig:scene_graph}, the function recursively calls the \texttt{getIntersectionList} functions of its children until the Shape nodes are reached, where the actual intersections are calculated. The \texttt{getIntersectionList} function of the CSG node first calls the \texttt{getIntersectionList} function of its left and right child, and then evaluates the found intersections according to the set operation this node represents.
+
 
 \begin{figure}[!tbp]
 	\centering
-	\subfloat[Image rendered by traversing the KD Tree.]{\includegraphics[width=.4\textwidth]{img/2 art/plane.png}}
+	\subfloat[Image rendered by traversing the KD Tree.]{\includegraphics[width=.4\textwidth]{img/2 art/plane.png}\label{fig:render_kd_tree}}
 	\hfil
-	\subfloat[Image renderd by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/2 art/planeArtifacts.png}}
+	\subfloat[Image renderd by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/2 art/planeArtifacts.png}\label{fig:render_org_scenegraph}}
 	\caption{Comparison of rendered images by traversing ART's internal KD tree and traversing the original scene graph.}
-	\label{fig:org_scenegraph}
+	\label{fig:org_scenegraph_comp}
 \end{figure}
 
-\todo{talk about intersection list}
-
+Although the calculation of the intersections between a ray and the scene geometry is significantly faster with this alternative procedure, since no actual acceleration data structure is traversed, traversing the original scene graph leads to visible artifacts in the resulting image. Figure \ref{fig:org_scenegraph_comp} shows a comparison between an image rendered by traversing ART's internal KD tree (Figure \ref{fig:render_kd_tree}), and the original scene graph (Figure \ref{fig:render_org_scenegraph}). The image rendered by the original scene graph traversal exhibits noticeable noise, and a black triangle is visible on the vertical stabilizer of the biplane in the image.
 
 
