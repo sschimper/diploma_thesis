@@ -2,36 +2,36 @@
 \chapter{Integration of Embree into ART}
 \label{chap:integration}
 
-The following section outlines our approach to the integration of Embree into ART. The language in which the individual procedures are formulated is Objective-C since the higher-level functionality of ART has been written in this language, too. Embree itself is written in C and intended to be integrated into image synthesis environments written in C/C++, which is the industry standard. However, due to Objective-C being a strict superset of C, these two languages can be intermixed seamlessly. Therefore, no issues concerning the cross-linking of C and Objective-C were discovered during the development.
+The following section outlines our approach to the integration of Embree into ART. The language in which the individual procedures are formulated is Objective-C since the higher-level functionality of ART has been written in this language. The Embree library itself is written in C and intended for the integration into image synthesis environments written in C/C++, which is the industry standard. However, due to Objective-C being a strict superset of C, these two languages can be intermixed seamlessly. Therefore, no issues concerning the cross-linking of C and Objective-C were discovered during the development.
 
 \section{Design choices}
 
-One important design choice was to abstract functionality regarding Embree inside a single class, which we gave the name \texttt{ArnEmbree}, conform to the naming convention of Objective-C classes in ART. Classes of type "\texttt{Arn<name>}" belong to the category of so-called "Scene graph classes", to which, according to our own opinion, the \texttt{ArnEmbree} class belongs the closest to.
+One important design choice was to abstract functionality regarding Embree in a single class, which we gave the name \texttt{ArnEmbree}, conform to the naming convention of Objective-C classes in ART. Classes of type "\texttt{Arn<name>}" belong to the category of so-called "Scene graph classes", to which, according to our own opinion, the \texttt{ArnEmbree} class belongs the closest to.
 
-The main tasks of this class are the creation and deletion of an \texttt{RTCDevice} and an \texttt{RTCScene}, the adding of different scene geometry, and performing the intersection calculations with Embree. This class should act as a singleton object. To quote from the ART handbook: "Apart from this struct, [the \texttt{art\_gv} global variable] there are no genuine global variables in ART, only global constants" \cite[Chapter 4.1.2]{arthandbook}. The singleton object obviously contradicts this statement. The main reason for this design is to keep the functionality regarding Embree separate from the functionality of what we will from now on referring to as \emph{native ART}, the original Advanced Rendering Toolkit without the integration of Embree.
+The main tasks of this class are the creation and deletion of an \texttt{RTCDevice} and an \texttt{RTCScene}, the adding of different scene geometry to the \texttt{RTCScene}, and performing the intersection calculations with Embree. This class will act as a singleton object. To quote from the ART handbook: "Apart from this struct, [the \texttt{art\_gv} global variable]\footnote{The \texttt{art\_gv} is a struct containing information that is globally accessible to the different class objects in ART. For more information on this, we refer to the ART Handbook.} there are no genuine global variables in ART, only global constants" \cite[Chapter 4.1.2]{arthandbook}. The singleton object obviously contradicts this statement. The main reason for this design is to keep the functionality regarding Embree separate from the functionality of what we will from now on referring to as \emph{Native ART}, the original Advanced Rendering Toolkit without Embree integration.
 
-During the beginning of our work, it was not clear whether both the research question of this thesis ("Can the CSG operations of ART be implemented using Embree?") and the question of whether Embree could be integrated into ART at all could be positively answered. In case our work is unsuccessful, this separation would ease reverse engineering ART to its initial state.
+At an early stage of the development of our approach, it was not obvious whether Embree could be integrated into ART at all. If our work on the integration were unsuccessful, this separation would at least ease reverse engineering ART to its original form.
 In spite of this separation, an inclusion of the \texttt{ArnEmbree} singleton class to the \texttt{art\_gv} variable is a solvable problem.
 
-Another design decision was to enable support of Embree only when the user provided the parameter flag \texttt{-e} or \texttt{--embree} when invoking \texttt{artist}:
+Another design decision was to enable support from Embree only when the user provided the parameter flag \texttt{-e} or \texttt{--embree} when invoking \texttt{artist}, like this:
 
 \begin{Verbatim}
 $ artist foo_scene.arm -e
 \end{Verbatim}
 
-Initilally, the provision of a parameter flag was intended for easily switching Embree support on and off in order to draw comparisons between the performances of ART with and without the help of Embree. However, this turns out to be still valuable, because certain scenes will be rendered faster with Embree and some will not. We will turn to this circumstance in more depth when discussing the results in Chapter \ref{chap:results}. 
+Initially, the provision of a parameter flag was intended for easily switching Embree support on and off to draw comparisons between the performances of ART with and without the help of Embree. However, we kept this functionality because there is one case (revolving around the rendering of CSG composed of triangle meshes) where ray tracing with Embree is inefficient. We will turn to this circumstance in more depth when discussing the results in Chapter \ref{chap:results}. 
 
-Once the command line arguments of \texttt{artist} are evaluated, the \texttt{ArnEmbree} singleton class object, which we call "\texttt{embreeManager}", is initialized and set up, if the parameter flag was provided. Otherwise, \texttt{embreeManager} is set to \texttt{NULL}. From this point on, the \text{ArnEmbree} singleton can be retireved from anywhere in the code and at any point of the action sequence by the instruction, shown in Listing \ref{lst:embree_manager}.
+Once the command line arguments of \texttt{artist} are evaluated, the \texttt{ArnEmbree} singleton class object, which we gave the name "\texttt{embreeManager}", is initialized and set up, if the parameter flag was set. Otherwise, \texttt{embreeManager} is set to \texttt{NULL}. From this point on, the \text{ArnEmbree} singleton can be retireved from anywhere in the code and at any point of the action sequence by the instruction, shown in Listing \ref{lst:embree_manager}.
 
 \begin{listing} 
-	\begin{lstlisting}[caption={Retrieving the \texttt{ArnEmbree} singleton.}, label={lst:embree_manager}]
+	\begin{lstlisting}[caption={Retrieval the \texttt{ArnEmbree} singleton object.}, label={lst:embree_manager}]
 	ArnEmbree * embree = [ArnEmbree embreeManager];
 	\end{lstlisting}
 \end{listing}
 
 
 \begin{listing}
-	\begin{lstlisting}[caption={Verifying if the \texttt{ArnEmbree} singleton was initialized.}, label={lst:check_embree}]
+	\begin{lstlisting}[caption={Verifying if Embree support was enables by the user.}, label={lst:check_embree}]
 	 if( [ArnEmbree embreeEnabled] ) 
 	 {
 	 		// ...
@@ -39,34 +39,39 @@ Once the command line arguments of \texttt{artist} are evaluated, the \texttt{Ar
 	\end{lstlisting}
 \end{listing}
 
-Furthermore, if the singleton was initialized and set up, another global boolean variable, indicating whether Embree is enabled or not, is set to true. The value of this boolean can be retrieved by calling a class method called \texttt{embreeEnabled}. An example of this is given in Listing \ref{lst:check_embree}.
+Furthermore, if the singleton was initialized and set up, another global Boolean variable, indicating whether Embree is enabled or not, is set to \texttt{true}. The value of this Boolean can be retrieved by calling the class method called \texttt{embreeEnabled}. An example of this is given in Listing \ref{lst:check_embree}.
 
-\section{The \texttt{ArnEmbree} singleton class and the extension of ART's ray casting functionality}
+\section{The \texttt{ArnEmbree} class and extension of the \texttt{ArnRayCaster} class}
 
-The \texttt{ArnEmbree} class is constructed the following way: Instance variables are provided to store a single \texttt{RTCDevice} and a single \texttt{RTCScene} for Embree. Although the instantiation of multiple scenes on a single device is possible with Embree, we are considering only single scenes containing all scene geometry, since ART does not support the instantiation of multiple scenes. 
+The \texttt{ArnEmbree} class is constructed the following way: Instance variables are provided to store a single \texttt{RTCDevice} and a single \texttt{RTCScene} for Embree. Although the instantiation of multiple scenes on a single device is possible with Embree, we consider only single scenes containing all scene geometry since ART does not support the instantiation of multiple scenes.
 
-Furthermore, class methods are defined for the initialization of different geometry types for Embree, their attachment to the \texttt{RTCScene}, and finally for commiting the \texttt{RTCScene}, which will trigger the build of Embree's internal spatial acceleration data structures. Due to these data structures, the creation of ART's internal KD tree is not necessary and can be discarded.
+Furthermore, class methods are defined for the initialization of different geometry types for Embree, their attachment to the \texttt{RTCScene}, and finally for committing the \texttt{RTCScene}, which will trigger the build of Embree's internal spatial acceleration data structures. Due to these data structures, the creation of ART's internal KD tree is not necessary and can be discarded.
 
-In order to perform the actual ray-primitve intersection testing with Embree, a class method was added to the \texttt{RayCaster} class, which we gave the name \texttt{getIntersectionListWithEmbree}. In case Embree support is enabled, this method is called. In this function, a given ray is converted to an \texttt{RTCRay} and Embree's internal function for intersection testing, \texttt{rtcIntersect1}, is invoced. Since ART only supports the cast of single rays, as opposed to ray packets, functionality for casting ray packets with Embree is not considered. After the intersection testing is performed, the \texttt{tfar} value is updated with the hit distance (which will remain being \texttt{INFINITY} if no intersection was found), and the UV coordinates, the surface normal at the hit point, and the shape associated with the hit geometry are stored in a \text{ArIntersectionList} \todo{explain} data structure. From this point, the ray tracing process continues as usual until the next ray ray is cast into the scene.
+In order to perform the actual ray-primitive intersection testing with Embree, an instance method was added to the \texttt{ArnRayCaster} class, which we gave the name \texttt{getIntersectionListWithEmbree}. If Embree support is enabled, instead of traversing ART's KD tree, this method is called. In this function, a given ray is converted to an \texttt{RTCRay} and Embree's internal function for intersection testing, \texttt{rtcIntersect1}, is invoked. Since ART only supports the cast of single rays, as opposed to ray packets, functionality for casting ray packets with Embree is not considered. After the intersection testing is performed, the \texttt{tfar} value is updated with the hit distance (which will remain being set to \texttt{INFINITY} if no intersection was found). The UV coordinates, the surface normal at the hit point, and the shape associated with the hit geometry are stored in an intersection list. From this point, the ray tracing process continues as usual until the next ray is cast into the scene.
 
 \section{Initializing shapes for Embree}
+\todo{bullet list}
+ART supports a variety of different geometrical shapes. An overview of these shapes can be found in the ART Scene File Reference Manual. The supported shapes are divided by ART into two categories: \emph{Analytic shapes} and \emph{Simple indexed shapes}. Analytic shapes are represented by ART as outlined in Section \ref{sec:quadrics}. Simple indexed shapes, on the other hand, are described by an array of vertices and indices associated with the shape in question (similar to the triangle primitives in \emph{OpenGL}). In ART, two shapes, namely triangles and quadrangles, are considered simple indexed shapes. Figure \ref{fig:shape_types} shows example shapes belonging to the two categories. 
+This section describes the initialization of these shape types for Embree.
 
-ART supports a variety of different geometrical shapes. An overview of these shapes can be found in the "ARM File Reference Manual" \cite{artreferencemanual}. The shapes are divided by ART into two categories: \emph{Analytic shapes} and \emph{Simple indexed shapes}. Analytic shapes in ART are represented as outlined in Section \ref{sec:quadrics} of Chapter \ref{chap:fundamentals}. Simple indexed shapes on the other side are described by an array of vertices (or points in three dimensional space) associated with it and an array of indices (very similar to the triangle primitves in \emph{OpenGL}). In ART, two shapes, namely triangles and quadrangles are considered simple indexed shapes. Figure \ref{fig:shape_types} gives an overview over the categories of shapes in ART. This section describes the initialization of these shape types for Embree. For now, we will not consider the initialization of constructive solid geometry (see Figure \ref{fig:art_csg}), since Section \ref{sec:embree_csg} is dedicated to the description and rendering of this type with Embree.
 
 \begin{figure}[!tbp]
 	\centering
 	\subfloat[An example of a simple indexed shape: a triangle.]{\includegraphics[width=.3\textwidth]{img/3 approach/triangle.png}\label{fig:art_triangle}}
-	\hfill
+	\hfil
 	\subfloat[An example of an alytical shape: a torus aligned on Y-axis.]{\includegraphics[width=.3\textwidth]{img/3 approach/torus.png}\label{fig:art_torus}}
-	\hfill
-	\subfloat[Constructive solid geometry: a grooved sphere.]{\includegraphics[width=.3\textwidth]{img/3 approach/csg_shape.png}\label{fig:art_groovedsphere}}
-	\caption{Types of shapes in ART.}
+	\caption{Shape types in ART.}
 	\label{fig:shape_types}
 \end{figure}
 
-Although it would be convenient to describe all shape types in ART as User defined geometry, we make the distinction between \emph{User defined geometry} and \emph{Non user defined geometry}. Into the first category will fall the analytically described shapes. Triangles and quadrangles will be regarded as Non-user defined geometry and represented by Embree's own primitive types \texttt{RTC\_GEOMETRY\_TYPE\_TRIANGLE} and \texttt{RTC\_GEOMETRY\_TYPE\_QUAD}. This division makes sense, since the rendering of these primitive types with Embree is more efficient than User defined geometries. Furthermore, all the information needed to set up these primitive types are the vertices and indices associated with the primitive. They can be easily transferred from ART to Embree. 
+Although it would be convenient to initialize all shapes in ART as user defined geometries for Embree, we make the distinction between \emph{user defined geometry} and \emph{non user defined geometry}.
 
-The initialization of geometries for Embree takes place during the assembly of the scene graph from the information that have been parsed from the ARM scene file. At this step, the \texttt{Combined Attributes} and \texttt{Shape} node associated with the geometry are created and inserted to the graph as leafs. Additionally to this insertion, a class method of \texttt{ArnEmbree}, \texttt{initEmbreeGeometry}, is called, and the shape object itself together with the newly created \texttt{Combined Attributes} node, the traversal state \todo{explain} of the RayCaster, the vertex set object containing the vertices of the shape, and finally, the transformation matrix are passed as funtion arguments. In this function, a new variable of the type \texttt{RTCGeometry} is being declared and initialized according to whether the shape is user-defined or not. The task of initializing geometries for Embree according to the category they belong to is performed by different class methods. After setting up a geometry for Embree, we are committing it, attaching it to Embree, and releasing it. When a geometry is successfully attached for Embree, a unique identifier is assigned to it. This identifier, and unsigned integer value, is refereed to as the \emph{Geometry ID}. We store this Geometry ID in an instance variable of the \texttt{Shape} and \texttt{Simple Indexed Shape} class. This identifier allows us, to retrieve the RTCGeometry from Embree and to perform alterations on it. However, the retrieving of \texttt{RTCGeometry} variables is only possible before committing the \texttt{RTCScene}. \footnote{We actually do not make use of this feature in the work this thesis describes, however, it may be useful to have for future work.}
+Into the first category will fall the analytically described shapes. Triangles and quadrangles will be regarded as non user defined geometry and represented by Embree's own primitive types \texttt{RTC\_GEOMETRY\_TYPE\_TRIANGLE} and \texttt{RTC\_GEOMETRY\_TYPE\_QUAD}. This division makes sense since the rendering of these primitive types with Embree is more efficient than the rendering user defined geometries. Furthermore, all the information needed to set up these primitive types is the vertices and indices associated with the shape. They can be easily transferred from ART to Embree. 
+
+The initialization of geometries for Embree takes place during the assembly of the scene graph from the information that has been parsed from the ARM scene file. To be precise, a particular shape is initialized for Embree when the Combined Attributes nodes and Shape nodes associated with it are created and inserted into the scene graph. After this insertion, an instance method of the \texttt{ArnEmbree} class, \texttt{initEmbreeGeometry}, is called. The shape object itself, together with the \texttt{Combined Attributes} object, and the transformation matrix, are passed as function arguments. 
+
+In the \texttt{initEmbreeGeometry} function, a new variable of the type \texttt{RTCGeometry} is being initialized. 
+After initializing a geometry for Embree, we are committing it via the function \texttt{rtcCommitGeometry}, attaching it to Embree by invoking the function \texttt{rtcAttachGeometry}, and releasing it by calling the function \texttt{rtcReleaseGeometry}. When a particular geometry is successfully attached to the \texttt{RTCScene}, a unique identifier is assigned to it. This identifier, an unsigned integer value, is referred to as the \emph{geometry ID}. We store this geometry ID in an instance variable of the \texttt{Shape} and \texttt{Simple Indexed Shape} class. This identifier allows us to retrieve the \texttt{RTCGeometry} from Embree and to perform alterations on it. However, the retrieving of \texttt{RTCGeometry} variables is only possible before committing the \texttt{RTCScene}. 
 
 \begin{listing} 
 	\begin{lstlisting}[caption={\texttt{C} struct associated with each initialized geometry.}, label={lst:geometry_data}]
@@ -78,7 +83,7 @@ The initialization of geometries for Embree takes place during the assembly of t
 	{
 		unsigned int _embreeGeomID; // geometry id of the shape
 		ArNode * _shape; // ART's shape representation in memory
-		ArTraversalState _traversalState; // state of the RayCaster
+		ArTraversalState _traversalState; // C struct storing, e.g., surface material
 		
 		ArNode<ArpRayCasting> * combinedAttributes; // node used for ray casting
 		BOOL _isUserGeometry; // determines if geometry is User-defined or Non-user-defined
@@ -87,12 +92,18 @@ The initialization of geometries for Embree takes place during the assembly of t
 	\end{lstlisting}
 \end{listing}
 
-Once a geometry is attached to Embree, a \texttt{C} struct associated with the geometry in \todo{and simple indexed geometries??} question is dynamically allocated and associated with the corresponding geometry via the function \texttt{rtcSetGeometryUserData}, regardless whether the geometry is user defined or not. 
-Afterwards, this struct is stored in a linked list, whose head is an instance variable of the \texttt{ArnEmbree} class. \texttt{GeometryData} structs can be extracted from this list by providing the associated Geometry ID as a key. The interior variables of this struct are shown in Listing \ref{lst:geometry_data}. They store the geometry id associated with the shape, ART's representation of the shape in memory, the traversal state of the \texttt{RayCaster} object when the shape was inserted as a leaf node into the scene graph, a \texttt{Combined Attributes} node which is used for performing the ray tracing, and a boolean variables indicating if the shape is user defined or not.
+Once a shape is successfully attached to the \texttt{RTCScene}, a C struct associated with it is dynamically allocated and initialized as a user data pointer for Embree via the function \texttt{rtcSetGeometryUserData}. This struct, which we call \texttt{GeometryData}, stores information that is needed for calculating the intersections between a ray and a user-defined geometry in ART. It is shown in Listing \ref{lst:geometry_data}.
 
+\texttt{GeometryData} structs store the geometry ID associated with the shape and issued by Embree, ART's representation of the shape in memory, a struct called  \texttt{ArTraversalState}, storing information such as the surface material of the shape, a \texttt{Combined Attributes} object, and a Boolean variable indicating if the shape is user-defined or not.
+
+
+As mentioned before, user data pointer are intended to retrieve shapes in the interior of a specified callback function for ray tracing user-defined geometry with Embree. We, on the other hand, associate every shape present in a scene with such a \texttt{GeometryData} struct, even for non-user-defined geometries, solely to differentiate between these two types of shapes.
+ 
+Subsequently, this struct is stored in a linked list, whose head is an instance variable of the \texttt{ArnEmbree} class. \texttt{GeometryData} structs can be extracted from this list by linear search. 
 
 \subsection{Initialization of simple indexed geometry}
-Simple index geometries are initialized the following way: Inside the \texttt{initEmbreeGeometry} function, another class method with the name \texttt{initEmbreeSimpleIndexedGeometry} is called, with the shape object the vertex set, and the transformation matrix being passed as arguments. 
+Simple index geometries are initialized the following way: Inside the \texttt{initEmbreeGeometry} function, another class method with the name \texttt{initEmbreeSimpleIndexedGeometry} is called, with the shape object, the vertex set containing the vertices that describe the shape, and the transformation matrix being passed as arguments. 
+\\
 
 \begin{listing} 
 	\begin{lstlisting}[caption={Setting up geometry buffers for the vertices and indices of a triangle shape.}, label={lst:geometry_buffer}]
@@ -130,76 +141,133 @@ Simple index geometries are initialized the following way: Inside the \texttt{in
 	\end{lstlisting}
 \end{listing}
 
-In the interior of this function, depending of the shape passed to it being a triangle or quadrange, the new RTCGeometry variable is initialized either with the geomtry type \texttt{RTC\_GEOMETRY\_TYPE\_TRIANGLE} or \texttt{RTC\_GEOMETRY\_TYPE\_QUAD}. Following this initialization is the creation and assignment of two so-called \emph{geometry buffers}, one for storing the vertices associated with the shape and one for storing its indices. Listing \ref{lst:geometry_buffer} shows how the function \text{rtcSetNewGeometryBuffer} is used to achieve that for a triangle shape. As input parameters this function takes the RTCGeometry to which the geometry buffer is associated to, the buffer type, a buffer slot number (here 0), the specified format for the buffer (RTC\_FORMAT\_FLOAT3 and RTC\_FORMAT\_UINT3 in Listing \ref{lst:geometry_buffer}), a byte stride argument and the number of items that shall be stored in the buffer. 
 
-The setup for the geometry buffers for quadrangle is almost identical, with the only exception being that the RTCGeometry is initialized with the geometry type \texttt{RTC\_GEOMETRY\_TYPE\_QUAD} and that the byte stride of the vertex buffer is four instead of three.
+In the interior of this function, the following steps take place:
 
-Once these buffers are initialized, the vertices stored in the vertex set and indices associated with the shape representation of ART are transfered to the slots of the vertex and index geometry buffers. In case the transformation matrix that was passed to the function is not \text{NULL}, the vertices, one by one, are multiplied with it before being transfered to the vertex buffer. Embree allows instancing of geometry, meaning that geometry in Embree can be translated, scaled, and rotated by refering to an instance stored in memory and applying these transformation to it. \todo{weird sentence} However, we decided to perform the transformation calculation for each vertex before the transfer to the vertex geometry buffer, because this is more intuitive and easier to facilitate.
-The initialization of a triangle mesh, beeing parsed from a PLY file with the help of the "RPly" library \cite{rply2016} follows the same outline described for triangles and quadrangles, although triangle meshes do not fall into the category of simple indexed shapes. The only difference is that the number of items for Embree's vertex geometry buffer is set to the number of total triangles in the mesh.
-After the setup of the geometry buffers, the newly created RTCGeometry is returned from this function and assigned to the RTCGeometry, created in the \text{initEmbreeGeometry} function, followed by the allocation of a \texttt{GeometryData} struct and the setup of its variables. The \text{isUserGeometry} boolean variable is set to false.
+\begin{itemize}
+	\setlength\itemsep{0.05em}
+	
+	\item \textbf{Initialization of the \texttt{RTCGeometry}}
+	\item[] Depending on whether the shape passed to it is a triangle or quadrangle, the new  variable is initialized either with the geometry type \texttt{RTC\_GEOMETRY\_TYPE\_TRIANGLE} or \texttt{RTC\_GEOMETRY\_TYPE\_QUAD}.
+	\\
+	
+	\item \textbf{Creation of \emph{geometry buffers}}
+	\item[] After this initialization is the creation and assignment of two so-called geometry buffers, one for storing the vertices and one for storing its indices that are both associated with the shape. Listing \ref{lst:geometry_buffer} shows how the function \texttt{rtcSetNewGeometryBuffer} is used to achieve that for a triangle shape.
+	
+	As input parameters, this function takes the \texttt{RTCGeometry} to which the geometry buffer will be linked, the buffer type, a buffer slot number, the specified format for the buffer (\texttt{RTC\_FORMAT\_FLOAT3} and \texttt{RTC\_FORMAT\_UINT3} in Listing \ref{lst:geometry_buffer}), a byte stride argument and the number of items that are about to be stored in the buffer. 
+	
+	The setup for the geometry buffers for quadrangles is almost identical. The only exception is that the \texttt{RTCGeometry} is initialized with the geometry type \texttt{RTC\_GEOMETRY\_TYPE\_QUAD} and that the byte stride of the vertex buffer is four instead of three.
+	
+	Once the geometry buffers are initialized, the vertices stored in the vertex set and indices associated with the shape are transferred to the vertex and index geometry buffers.
+	\\
+	\newpage % to make it look good	
+	
+	\item \textbf{Transformation of the vertices according to the transformation matrix}
+	\item[] In case the transformation matrix that was passed to the function is not \texttt{NULL}, the vertices, one by one, are transformed according to it before being transferred to the vertex buffer. Embree allows instancing of geometry, meaning that geometry in Embree can be translated, scaled, and rotated by referring to an instance stored in memory and applying this transformation to it. However, we decided to perform the transformation calculation for each vertex before transferring to the vertex geometry buffer because this is more intuitive and easier to facilitate.
+	
+\end{itemize}
 
-\subsection{Initialization of User defined geometry}
+The initialization of a triangle mesh, being parsed from a PLY file with the help of the "RPly" library \cite{rply2016}, follows the same outline described for triangles and quadrangles, although triangle meshes do not fall into the category of simple indexed shapes. The only difference is that the number of items for Embree's vertex geometry buffer is set to the number of total triangles in the mesh.
+
+After the setup of the geometry buffers, the newly created RTCGeometry is returned from this function and assigned to the RTCGeometry, created in the \texttt{initEmbreeGeometry} function, followed by the allocation of a \texttt{GeometryData} struct and the setup of its variables. The \texttt{isUserGeometry} boolean variable is set to \texttt{false}.
+
+\subsection{Initialization of user-defined geometry}
 \label{sec:init_user}
-Under this category fall any shape of ART other than trianlges, quadrangles and triangle meshes. These shapes shall be initialized with Embree's primitive type \texttt{RTC\_GEOMETRY\_TYPE\_USER}. For initializing this kind of geometry type, one needs to provide three functions that are used by Embree as callback functions: one for calculating the bounding box of the shape, one for performing the actual ray-primitive instersection testing and one for testing for occlusion. For the setup of these shapes, an RTCGeometry with the type \texttt{RTC\_GEOMETRY\_TYPE\_USER} is declared. Subsequent to this declaration, three plain \texttt{C} functions for calculating the bounding box, testing for intersection points and testing for occlusion are provied to Embree as callback functions.
-These functions have the name \texttt{embree\_bbox}, \texttt{embree\_intersect}, and \texttt{embree\_occluded}. For ray tracing purposes, only one function for inersection calculation and occlusion testing would be necessary since both operation are performed by ray casting. However, Embree strictly expects two speperate function, each with a predetermined arguments. In order to compensate for this, we use a strategy which was inspired by the source code of Mitsuba 2: We refractor the ray tracing functionality into a fourth function called \texttt{embree\_intersect\_geometry}, which is called from both the \texttt{embree\_intersect} and \texttt{embree\_occluded} function. 
-In the interior of the function \texttt{embree\_bbox}, the bounding box for a shape in question is calculated and passed to Embree. \texttt{embree\_bbox} will be called by Embree, once the RTCScene is committed. Based on the individual bounding boxes of the geometries in the scene, Embree will cunstruct its BVH. Once an intersection with such a bounding box is found during ray tracing, Embree will call the \texttt{embree\_intersect} function, which performs the intersection testing between the ray and the shape that is associated with that bounding box.
+Under this category fall any shape of ART other than triangles, quadrangles, and triangle meshes.
+\\
 
+For initializing this kind of geometry type for Embree, we do the following:
 
-\todo{bullet lists}
+\begin{itemize}
+	\setlength\itemsep{0.05em}
+	
+	\item \textbf{Initialization of the \texttt{RTCGeometry}}
+	\item[] For user-defined geometries, the corresponding \texttt{RTCGeometry} will be initialized with Embree's primitive type \texttt{RTC\_GEOMETRY\_TYPE\_USER}.
+	\\
+	
+	\item \textbf{Provision of a callback function for calculating the bounding box of the shape}
+	\item[] We created a function called \texttt{embree\_bbox}, which Embree will call before building its internal BVHs over the scene. In the interior of the function, we calculate the bounding box of the user-defined geometry and pass it to Embree. This callback function is passed to Embree via invocation of the function \texttt{rtcSetGeometryBoundsFunction}.
+	\\
+	
+	\item \textbf{Provision of a callback function for performing the intersection testing between a user-defined geometry and an \texttt{RTCRay}}
+	\item[] For this purpose we created a function called \texttt{embree\_intersect}. We will describe this function in more detail in Section \ref{sec:embree_raycasting}. This callback function is passed to Embree via the function \texttt{rtcSetGeometryIntersectFunction}.
+	\\
+	
+	\item \textbf{Provision of a callback function for performing the occlusion testing for a user-defined geometry}
+	\item[] For ray tracing purposes, only one function for intersection calculation and occlusion testing would be necessary since both operations are performed by ray casting. However, Embree strictly expects two separate functions, each with predetermined arguments. To compensate for this, we use a strategy which was inspired by the source code of Mitsuba 2: We refractor the ray tracing functionality into a fourth function called \texttt{embree\_intersect\_geometry}, which is called from both the \texttt{embree\_intersect} and \texttt{embree\_occluded} function. 
+	
+\end{itemize}
+
+Once an intersection with a bounding box enclosing a user-defined geometry is found during ray tracing, Embree will call the \texttt{embree\_intersect} function, which performs the intersection testing between the ray and the shape that is associated with that bounding box.
+
 
 \section{Ray tracing with Embree in ART}
 \label{sec:embree_raycasting}
 
-Once the geometries contained in a virtual scene are initilialized for Embree, and Embree's internal BVH has been created, the scene can be ray cast with the help of Embree. If Embree support is enabled by the providing of the \texttt{-e} flag, a member function of the \texttt{RayCaster} class with the name \texttt{getIntersectionListWithEmbree} is called, which takes an empty \texttt{ArIntersectionList} struct \todo{explain} as an argument. In the body of this function, an \texttt{RTCIntersectContext} is set up and a \texttt{RTCRayHit} struct is declared and updated according to the \texttt{ArnRayCaster} object: The information with which the  \texttt{RTCRayHit} stuct is being updated contains the orientation and direction of the ray that is about to be cast into the scene, and the ID associated to the ray. The \texttt{tfar} value of is initialized with Objective-C's \texttt{INFINITY} macro and the \texttt{geomID} field of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}. 
+Once the geometries contained in a virtual scene are initialized for Embree and Embree's internal BVH has been created, the scene can be ray cast with the help of Embree. If Embree support is enabled by provision of the \texttt{-e} flag, an instance function of the \texttt{ArnRayCaster} class with the name \texttt{getIntersectionListWithEmbree} is called, which takes an empty \texttt{ArIntersectionList} struct as an argument.
 
-Embree utilizes single precision floating point numbers for its internal calculations, whereas ART uses double precision floating point numbers. To compensate for visual artifacts in the final image, we do not intitialize the \texttt{tnear} value of the \texttt{RTCHit} with zero, we instead give it a little offset, to prevent intersection between a secondary ray and the same shape that was already hit. We found the value $1e-3f$ to be reliable. A comparision of an image, rendered with and without this offset is given by Figure \ref{fig:offset}.
+In the body of this function, an \texttt{RTCIntersectContext} is set up and a \texttt{RTCRayHit} struct is declared and updated according to the state of the \texttt{ArnRayCaster} object: The information with which the \texttt{RTCRayHit} stuct is being updated contains the orientation and direction of the ray that is stored as an instance variable of the \texttt{ArnRayCaster} object, and the ID associated to the ray. The \texttt{tfar} value of is initialized with Objective-C's \texttt{INFINITY} macro and the \texttt{geomID} field of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}. 
+
+Embree utilizes single-precision floating-point numbers for its internal calculations, whereas ART uses double-precision floating-point numbers. To compensate for visual artifacts in the final image, we do not initialize the \texttt{tnear} value of the \texttt{RTCRay} with zero. Instead, we give it a little offset to prevent calculating an intersection between a secondary ray and the same shape that was already hit. We found the value $1e-3f$ to be reliable. A comparison of an image rendered with and without this offset is given by Figure \ref{fig:offset}.
 
 \begin{figure}[!tbp]
 	\centering
-	\subfloat[Rendering a simple scene without offsetting the \texttt{tnear} value.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact_2.png}}
+	\subfloat[Result of rendering a simple scene when the \texttt{tnear} value of the \texttt{RTCRay} is set to zero.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact_2.png}}
 	\hfil
-	\subfloat[Rendering a simple scene with offsetting the \texttt{tnear} value by $1e-3f$.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact.png}}
-	\caption{Artifacts due to the conversion of the hit distance of the ray from a double precision floating point number to a single precision floating point number.}
+	\subfloat[Result of rendering a simple scene when the \texttt{tnear} of the \texttt{RTCRay} is given an offset of $1e-3f$.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact.png}}
+	\caption{Artifact caused by the conversion of the hit distance of the ray from a double-precision floating-point number to a single-precision floating-point number. Due to an imprecise calculation of the intersection point, a secondary ray might intersect the same shape again.}
 	\label{fig:offset}
 \end{figure}
 
-After the update of the \texttt{RTCRayHit} struct, the actual ray tracing is performed by the invocation of the \texttt{rtcIntersect1} function. Depending on whether a bounding box of a User geometry or Non-User geometry in Embree's internal BVH was hit with the \texttt{RTCRay}, either the provided callback function for intersecting user defined geometries, \texttt{embree\_intersect\_geometry} or Embree performs the intersection testing with its own functionality. \todo{rephrase}
+After the update of the \texttt{RTCRayHit} struct, the actual ray tracing is performed by the invocation of the \texttt{rtcIntersect1} function. Depending on whether a bounding box of a user-defined geometry or non-user-defined geometry in Embree's internal BVH was intersected by the \texttt{RTCRay}, either our custom callback function \texttt{embree\_intersect\_geometry} is called by Embree, or Embree performs the intersection testing with its proprietary functionality.
 
-Once the rendering job successfully completed, a "clean-up" is performed. The \texttt{GeometryData} structs associated with the scene are released, followed by the release of the \texttt{RTCScene} via the function \texttt{rtcReleaseScene} and the release of the \texttt{RTCDevice} via \texttt{rtcReleaseDevice}. As a final step, the \texttt{ArnEmbree} object \texttt{embreeManager} itself is released.
+Once the overall rendering job successfully completed, a "clean-up" is performed. The \texttt{GeometryData} structs associated with the scene are released, followed by the release of the \texttt{RTCScene} via the function \texttt{rtcReleaseScene} and the release of the \texttt{RTCDevice} via \texttt{rtcReleaseDevice}. As a final step, the \texttt{ArnEmbree} object \texttt{embreeManager} itself is released.
 
 
 \subsection{Intersecting user defined geometry}
 \label{subsec:instersect}
 
-In case a bounding box of a user defined geometry is intersected with a ray by Embree, the provided callback function \texttt{embree\_intersect\_geometry} is invoked. In its interor, the \texttt{Geometry Data} struct associated with the geometry in question is retrieved from the geometry user pointer. Subsequently, an empty \texttt{ArIntersectionList} \todo{explain} struct is declared and the intersection calulation with the ray and the shape is performed via calling the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object, which takes the empty \texttt{ArIntersectionList} as input, as well as the \texttt{RayCaster} object. This function will call the \texttt{getIntersectionList} function of the \texttt{Shape} object, which in return will calculate the intersection points on the shape and update the \texttt{ArIntersectionList} struct accordingly. The reason why this function is called on the higher level \texttt{Combined Attributes} object rather than directly on the \texttt{Shape} object is that by doing so, the transformation information of the shape will be taken into account.
-If no intersection was found, we return immediately from the \texttt{embree\_intersect\_geometry} function. Otherwise, we will update the \texttt{tfar} value of the \texttt{RTCRay} with the hit distance and the geometry ID of the \texttt{RTCHit} struct with the geometry ID associated with the intersected shape. 
-The resulting \texttt{ArIntersectionList} is then stored in a linked list. 
+In case a bounding box of a user-defined geometry is intersected with an \texttt{RTCRay}, the callback function \texttt{embree\_intersect\_geometry} is invoked by Embree. In its interior, the \texttt{Geometry Data} struct associated with the geometry in question is retrieved via the geometry user data pointer. 
 
-After the invocation of the \texttt{rtcIntersect1} function in the interor of the function \texttt{getIntersectionListWithEmbree}, the geometry ID of the \texttt{RTCHit} is evaluated. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, we conclude that no intersection was found and we return an empty \texttt{ArIntersectionList}. Otherwise, with the geometry ID we retrieve the \texttt{RTCGeometry} that has been hit, which in return is used for the retrieval of the \texttt{GeometryData} struct (shown in Listing \ref{lst:geometry_data}) via the user data pointer \todo{for all geometries?}. On the basis of the boolean variable \texttt{\_isUserGeometry}, we check whether the intersected shape is a user defined geometry or a simple indexed geometry. For the later case, we initialize the empty \texttt{ArIntersectionList} with the updated \texttt{tfar} value of the \texttt{RTCRay}, the \texttt{\_shape} object of the \texttt{GeometryData} struct, and the \texttt{ArnRayCaster} object itself. This newly initialized \texttt{ArIntersectionList} is then returned from the \texttt{getIntersectionListWithEmbree}.
-In case the intersected geometry is a user defined geometry, the linked list, in which the \texttt{ArIntersectionList}s where placed during the intersection testing with the callback function \texttt{embree\_intersect\_geometry}, must contain at least one \texttt{ArIntersectionList} struct. We locate the \texttt{ArIntersectionList}, whose head has the minimal hit distance, via linear search. We then extract it and release all other \texttt{ArIntersectionList}s stored in the linked list. The extracted list is then assigned assigned to the initially empty \texttt{ArIntersectionList} that was passed to the \texttt{getIntersectionListWithEmbree} function, and ART proceeds as ususal until the next ray is cast.
+Subsequently, an empty \texttt{ArIntersectionList} struct is declared and the intersection calculation with the ray and the shape is performed via calling the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object, which takes a reference to the empty \texttt{ArIntersectionList}, as well a reference to the \texttt{ArnRayCaster} object as input.
+This function will calculate the intersection points on the shape and update the \texttt{ArIntersectionList} struct accordingly. The reason why the \texttt{getIntersectionList} instance method of the \texttt{Combined Attributes} object is called, rather than the \texttt{getIntersectionList} instance method of the shape object, is that by doing so, the transformation information of the shape will be taken into account.
+
+If no intersection was found, we return immediately from the \texttt{embree\_intersect\_geometry} function. Otherwise, we will update the \texttt{tfar} value of the \texttt{RTCRay} with the hit distance and the geometry ID of the \texttt{RTCHit} struct with the geometry ID associated with the intersected shape.
+The resulting \texttt{ArIntersectionList} is then stored in a linked list.
+
+After the invocation of the \texttt{rtcIntersect1} function in the interor of the  \texttt{getIntersectionListWithEmbree} function, the geometry ID of the \texttt{RTCHit} is evaluated. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, we conclude that no intersection was found and we return an empty \texttt{ArIntersectionList}. Otherwise, we retrieve the \texttt{RTCGeometry} that has been intersected with the geometry ID.
+
+This \texttt{RTCGeometry} is used for the retrieval of the associated \texttt{GeometryData} struct via the user data pointer. Based on the Boolean variable \texttt{\_isUserGeometry}, we check whether the intersected shape is a user-defined geometry or a simple indexed geometry.
+
+For the latter, we initialize the empty \texttt{ArIntersectionList}, that was passed to the \texttt{getIntersectionListWithEmbree} function "from scratch" with the updated \texttt{tfar} value of the \texttt{RTCRay}, the shape object of the \texttt{GeometryData} struct, and the \texttt{ArnRayCaster} object itself. This newly initialized \texttt{ArIntersectionList} is then returned from the \texttt{getIntersectionListWithEmbree}.
+
+In case the intersected geometry is a user-defined geometry, the linked list, in which the calculated \texttt{ArIntersectionList}s where placed during the intersection testing, must contain at least one \texttt{ArIntersectionList} struct. We locate the \texttt{ArIntersectionList}, whose head has the minimal hit distance, by linear search. When this \texttt{ArIntersectionList} is located, we extract it from the linked list and release all other \texttt{ArIntersectionList}s stored in it. The extracted list is then assigned to the initially empty \texttt{ArIntersectionList} that was passed to the \texttt{getIntersectionListWithEmbree} function, and ART proceeds as usual until the next ray is cast.
 
 
 \subsection{Resolving of encountered issues}
 \label{sec:issues_user}
-The following chapter outlines two major issues encountered with the approach described by the last sections. We furthermore give a description of how these issues can be resolved.
+The following subsection outlines two major issues encountered with the approach described in the last sections. We furthermore describe how these issues can be resolved.
 
 \subsubsection{Multi-threaded intersection testing for user defined geometry}
-As briefly mentioned in Chapter \ref{chap:art}, ART supports ray tracing with multiple cores.
-Before the ray tracing procesure is initiated by ART, copies of the \texttt{ArnRayCaster} object are created. To each copy, a copy of the scene graph is assigned to ensure lock free parallelism.
+As briefly mentioned in Chapter \ref{chap:art}, ART supports ray tracing with multiple threads.
+Before the ray tracing procedure is initiated by ART, copies of the \texttt{ArnRayCaster} object are created for each thread. A copy of the scene graph and the KD tree is assigned to each copy of the \texttt{ArnRayCaster} object to ensure lock-free parallelism.
 
-However, the implementation of the \texttt{embree\_intersect\_geometry} callback function for intersecting user defined geometry is not thread safe. This is due to the \texttt{ArnRayCaster} object that needs to be passed as an argument to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object associated with the user defined geometry.
+However, the implementation of the \texttt{embree\_intersect\_geometry} callback function for intersecting user-defined geometry is not thread safe. This is due to the \texttt{ArnRayCaster} object that needs to be passed as an argument to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object in the interior of the \texttt{embree\_intersect\_geometry} function.
 
-For an easy retrieval of the \texttt{ArnRayCaster} inside our custonized intersection callback function, a static pointer pointing to it was initialized. This works fine when performing rendering jobs with only a single core. If multiple cores are involved in the ray tracing computations, the procedure outlined in Subsection \ref{subsec:instersect} is prone to errors, since multiple \texttt{ArnRayCaster}s are accessing a single copy of the scene graph. \todo{can I put it like that?}
+For an uncomplicated retrieval of the \texttt{ArnRayCaster} inside our custom intersection callback function, a static reference to it was originally initialized. This works fine when performing rendering jobs with only a single thread. If multiple threads are involved in the intersection computations, the procedure outlined in Subsection \ref{subsec:instersect} is prone to errors since multiple \texttt{ArnRayCaster} objects are traversing and altering a single copy of the scene graph.
 
-In order to archieve lock free parallelism, we need to retrieve the "right" \texttt{ArnRayCaster} copy associated to the current thread in the interior of the interesction callback function. However, we cannot assign the \texttt{ArnRayCaster} copy to the user data pointer, since the user data pointer are associated with the scene geometry which can be intersected by multiple rays belonging to different \texttt{ArnRayCaster} objects at the same time.
-We attemped to solve this problem in the following way: An empty array of pointers to the \texttt{ArnRayCaster} copies is initialized with an initial capacity \footnote{We chose an initial capacity of 25.} This array is stored as an instance variable of the \texttt{ArnEmbree} class. We will refer to this array as the \emph{ray caster array} \todo{is that good?}. Furthermore, a variable for counting the \texttt{ArnRayCaster} copies is declared and initially set to zero. Whenever a new copy of the \texttt{ArnRayCaster} gets created by ART, this counter is increased.
-For the placement of an \texttt{ArnRayCaster} to and for the retrieval of an \texttt{ArnRayCaster} from the ray caster array, we use an identifier of the thread associated with the \texttt{ArnRayCaster}. We optain the thread ID via invocation of the \texttt{gettid} function, provided in the \texttt{unistd} header \todo{can I say it like this?}. The reason we chose the function \texttt{gettid} over the function \texttt{pthread\_self}, is that for $n$ cores involved for rendering, \texttt{gettid}, called from $n$ different threads, will return $n$ strictly \todo{strictly?} consecutive integer values. With the help of these values we can write a fairly simple "hash" function for placing \texttt{ArnRayCaster} pointers in the ray caster array and later retreiving them from it in our intersection callback function: The index of the particualar \texttt{ArnRayCaster} pointer will be the thread ID received by the \texttt{gettid} function taken modulo with the counter variable.
-During the beginning of the ray tracing procedure, the \texttt{ArnRayCaster} pointer on the current thread is added to the ray caster array as explained, if this has not been already done, retrieved in the interior of the intersection callback function in constant time and passed to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} component, associated with the shape. The head of the linked list, in which the collected intersection lists are stored, is made an instance variable of the \texttt{ArnRayCaster} class, which allows for an easy retrieval of these intersection lists outside the intersect callback function. 
+To archive lock-free parallelism, we need to retrieve the "right" \texttt{ArnRayCaster} copy associated with the current thread in the interior of the intersection callback function. However, we cannot utilize the user data pointer for this since the user data pointer is associated with the scene geometry, which can be intersected by multiple rays belonging to different \texttt{ArnRayCaster} objects on different threads at the same time.
 
-\subsubsection{Issues regarding infinite spheres}
+For the placement of an \texttt{ArnRayCaster} into and for the retrieval of an \texttt{ArnRayCaster} from the ray caster array, we use an identifier of the thread associated with it. We obtain the thread ID via invocation of the \texttt{gettid} function, provided with the \texttt{unistd} header file, for accessing the POSIX operating system API. The reason we chose the function \texttt{gettid} over the function \texttt{pthread\_self}, is that for $n$ cores involved for rendering, \texttt{gettid}, called from $n$ different threads, will return $n$ strictly consecutive integer values. With the help of these values we can write a fairly simple "hash" function for placing \texttt{ArnRayCaster} pointers in the ray caster array and for retrieving them from it in our intersection callback function: The index of the particualar \texttt{ArnRayCaster} pointer will be the thread ID received by the \texttt{gettid} function taken modulo with the counter variable.
+
+During the beginning of the ray tracing procedure, a reference to the  \texttt{ArnRayCaster} object associated with the current thread is added to the ray caster array, if not already been done, retrieved in the interior of the intersection callback function in constant time, and passed to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object. 
+
+The head of the linked list, in which the collected intersection lists are stored, is made an instance variable of the \texttt{ArnRayCaster} class, which allows for an uncomplicated retrieval of these intersection lists outside the intersect callback function. 
+
+\subsubsection{Intersecting infinite spheres}
 
 A specific type of geometry supported by ART is a sphere with an infinite radius. These \emph{infinite spheres} are used in a virtual scene for environment lighting.
-Since the infite sphere's radius is infinity, the edge lenght of the bounding box that encloses it is twice the radius of the sphere. Generally speaking, axis aligned bounding boxes can be described by two vertices in Euclidean space, being connected via the body diagonal of the box \todo{Is that right?}. The two vertices describing the bounding box for the infinite sphere  In ART, infinity is represented by a double called \texttt{MATH\_HUGE\_DOUBLE}.
+Since the infinite sphere's radius is infinitely large, the edge length of the bounding box that encloses it is twice the radius of the sphere. Generally speaking, axis aligned bounding boxes can be described by two vertices in Euclidean space, being connected via the body diagonal of the box \todo{Is that right?}. The two vertices describing the bounding box for the infinite sphere  In ART, infinity is represented by a double called \texttt{MATH\_HUGE\_DOUBLE}.
 
 \begin{listing} 
 	\begin{lstlisting}[caption={Casting of a double precision floating point number to a single precision floating point number by explicit conversion.}, label={lst:casting}]
@@ -213,34 +281,36 @@ Since the infite sphere's radius is infinity, the edge lenght of the bounding bo
 	\end{lstlisting}
 \end{listing}
 
-As mentioned in Subsection \ref{sec:embree_raytracing}, Embree makes use of single precision floating point numbers for its internal calculation, while ART on the other hand uses double precision floating point numbers. Therefore, when calculating the double values describing the bounding box, we cast them to float values via the explicit conversion operator in \texttt{C/C++} before being passed to Embree, as shown in Listing \ref{lst:casting}.  
-When during ray tracing the \texttt{tfar} value of the \texttt{RTCRay} is set to the representation of infinity by Objective-C, the macro \texttt{INFINITY}, the bounding box is never intersected. This is due to intersection testing being only performed in the interval $[0,\infty]$ and Objective-C's representation of inifity is "smaller" than the value \texttt{MATH\_HUGE\_DOUBLE}. 
+As mentioned in Subsection \ref{sec:embree_raytracing}, Embree uses single-precision floating-point numbers for its internal calculations. ART, on the other hand, uses double-precision floating-point numbers. Therefore, when calculating the double values describing the bounding box, we cast them to float values via the explicit conversion operator in \texttt{C/C++} before passing them to Embree, as shown in Listing \ref{lst:casting}.  
+When, during ray tracing, the \texttt{tfar} value of the \texttt{RTCRay} is set to the representation of infinity by Objective-C, the macro \texttt{INFINITY}, the bounding box is never intersected. This is due to intersection testing being only performed in the interval $[0,\infty]$ and Objective-C's representation of infinity is "smaller" than the value \texttt{MATH\_HUGE\_DOUBLE}.
 
-Fortunately, ART provides a representation for infinity as a single precision number as well, \texttt{MATH\_HUGE\_FLOAT}. Therefore, we can resolve this issue by checking in the \texttt{embree\_bbox} function whether the two vertices of the calculated bounding box have the value \texttt{MATH\_HUGE\_DOUBLE} (and resp. \texttt{-MATH\_HUGE\_DOUBLE}) as value for their coordinates and updating them with the value \texttt{MATH\_HUGE\_FLOAT} (and resp. \texttt{-MATH\_HUGE\_FLOAT}). By doing so, Embree is being able to detect intersections between an \texttt{RTCRay} and the bounding box of the infinite sphere and the intersection with the sphere itself can be calculated.
+Fortunately, ART provides a representation for infinity as a single-precision number as well, \texttt{MATH\_HUGE\_FLOAT}. Therefore, we can resolve this issue by checking in the \texttt{embree\_bbox} function whether the two vertices of the calculated bounding box have the value \texttt{MATH\_HUGE\_DOUBLE} (and resp. \texttt{-MATH\_HUGE\_DOUBLE}) as values for their coordinates and updating them with the value \texttt{MATH\_HUGE\_FLOAT} (and resp. \texttt{-MATH\_HUGE\_FLOAT}). By doing so, Embree can detect intersections between an \texttt{RTCRay} and the bounding box of the infinite sphere, and the intersection with the sphere itself can be calculated.
 
-\subsubsection{Consecutive intersection of user defined and non-user defined geometry}
+\subsubsection{Consecutive intersection of user-defined and non-user-defined geometry}
 
-With the approach described in Section \ref{subsec:instersect}, an issue arises when ray tracing virtual scenes which contain both user defined and non user defined geometry. In such scenes, a cast ray could consecutively intersect first a non user defined geometry and subsequently a user defined geometry. To give an example, this is the case for the virtual scene displayed in \ref{fig:no_bunny}. This scene is composed of a quadrangle serving as the ground plane, a triangle mesh representing the Stanford bunny, which was provided by the Stanford 3D Scanning Repository \cite{plyRepo} \todo{cite correctly}, and an infinite sphere for environment lighting.
-Given a ray, that first intersects the PLY mesh and afterwards the infinite sphere, we noticed that through the invocation of the function \texttt{rtcIntersect1}, Embree internally calculates the intersections between the ray and the triangle mesh first and then calls the \texttt{embree\_intersect} callback function to calculate the intersection point with the infinite sphere.
+With the approach described in Section \ref{subsec:instersect}, an issue arises when ray tracing virtual scenes which contain both user-defined and non-user-defined geometry. In such scenes, a cast ray could consecutively intersect a non-user-defined geometry and a user-defined geometry. To give an example, this is the case for the virtual scene displayed in \ref{fig:no_bunny}. This scene is composed of a quadrangle serving as the ground plane, the Stanford Bunny triangle mesh, which was provided by the Stanford 3D Scanning Repository \cite{plyRepo}, and an infinite sphere for environment lighting.
+
+Given a ray that first intersects the PLY mesh and subsequently the infinite sphere, we noticed that through the invocation of the \texttt{rtcIntersect1} function, Embree internally calculates the intersections between the ray and the triangle mesh first and then calls the \texttt{embree\_intersect} callback function to calculate the intersection point with the infinite sphere.
 
 
 \begin{figure}[!tbp]
 	\centering
-	\subfloat[Scene rendered with native ART.]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyNormal.png}} 
+	\subfloat[Scene rendered with Native ART.]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyNormal.png}} 
 	\hfil
-	\subfloat[Scene rendered with the approach outlined in the previous sections and subsections.]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyError.png} \label{fig:no_bunny_close}}
-	\caption{Virtual scene containing both non user defined geometry and user defined geometry.}
+	\subfloat[Scene rendered with the approach outlined in Section \ref{sec:embree_raycasting}]{\includegraphics[width=.4\textwidth]{img/3 approach/bunnyError.png} \label{fig:no_bunny_close}}
+	\caption{Rendered images of a scene containing a non-user-defined triangle mesh and quadrangle, and a user-defined user-defined infinite sphere, illuminating the rest of the sphere.}
 	\label{fig:no_bunny}
 \end{figure}
 
-The problem, that arises here is that the \texttt{tfar} value of the \texttt{RTCRay} as well as the variables of the \texttt{RTCHit}, which have been updated by Embree during the intersection calculations with the triangle mesh, are getting updated with the intersection information regarding the infinite sphere. When the \texttt{RTCRay} and the \texttt{RTCHit} structures are evaluated after the invocation of \texttt{rtcIntersect1}, the information regarding the intersections between the ray and the non user defined geometry are lost and only the \texttt{ArIntersectionList} describing the intersection with the infinite sphere is present in the linked list, storing the collected intersections. A result of this behavior can be seen in Figure \ref{fig:no_bunny_close}. 
 
-In order to resolve this issue, we make use of a slight "hack": In the interior of the \texttt{embree\_intersect} callback function, before performing the intersection calculation between a ray and a user defined geometry, we check whether the value of the geometry ID of the \texttt{RTCHit} struct remains being set to \texttt{RTC\_INVALID\_GEOMETRY\_ID}. If this is not the case, and furthermore, if the head of the linked list storing the collected hit points is \texttt{NULL}, we conclude that an intersection with a non user defined geometry must have already been calculated. We assume that is intersection already obtains the closest distance to the ray origin. With the help of the geometry ID (not having the value \texttt{RTC\_INVALID\_GEOMETRY\_ID}), we retrieve the associated \texttt{GeometryData} struct  for the geometry in question from the linked list storing all the \texttt{GeometryData} structs linked to the scene geometry \todo{explain this}. With the information stored in this \texttt{GeometryData} struct, we initialize a \texttt{ArIntersectionList} and add it to the linked list for storing the collected intersections.
+The problem, which arises here, is that the values of the \texttt{RTCRayHit} struct, e.g., the \texttt{tfar} value of the \texttt{RTCRay}, are updated with information corresponding to the intersection with the triangle mesh first. Afterward, the user-defined infinite sphere is intersected, and the intersection calculation is performed by our custom function \texttt{embree\_intersect\_geometry} function. In the interior, we overwrite the values of the \texttt{RTCRayHit} struct that has been previously calculated while the triangle mesh was intersected. Therefore, the information regarding the intersections between the \texttt{RTCRay} and the triangle mesh is lost, and only the \texttt{ArIntersectionList} storing the intersections with the infinite sphere is present in the linked list. A result of this behavior can be seen in Figure \ref{fig:no_bunny_close}.
 
-With this approach, the scenes on which our implementation was tested (which will be discussed in more detail in Chapter \ref{chap:results}) could be rendered without further problems.
+To resolve this issue, we make use of a slight hack: In the interior of the \texttt{embree\_intersect\_geometry} callback function, before performing the actual intersection calculation between a ray and a user-defined geometry, we check whether the value of the geometry ID of the \texttt{RTCHit} struct remains being set to \texttt{RTC\_INVALID\_GEOMETRY\_ID}. If this is not the case, and if the head of the linked list storing the collected intersections is not \texttt{NULL}, we conclude that an intersection with a non-user-defined geometry must have already been calculated. We assume that is intersection already obtains the closest distance to the ray origin. With the help of the geometry ID, we retrieve the associated \texttt{GeometryData} struct for the geometry in question from the linked list storing all the \texttt{GeometryData} structs linked to the scene geometry. With the information stored in this \texttt{GeometryData} struct, we initialize a \texttt{ArIntersectionList} "from scratch" and add it to the linked list storing the collected intersections.
+
+With this approach, all the scenes on which our implementation was tested (which will be introduced in Chapter \ref{chap:results}) could be rendered without further problems.
 
 
-\section{Implementation of CSG operations}
+\section{Rendering CSG with Embree}
 \label{sec:embree_csg}
 
 Unfortunately, Embree does not support rendering of constructive solid geometry direct. However, this does not mean that ray tracing CSG with Embree is completely impossible \todo{maybe reformulate}. The following section outlines three different approaches for ray tracing virtual scenes containing constructive solid geometry with the help of Embree. We then describe our final implementation of the CSG operators in ART as a combination of these approaches.
@@ -250,7 +320,7 @@ Since Embree is an open-source framework, one could consider rigging Embree itse
 We therefore consider Embree as a "black box" for which we provide information such as a ray origin and direction, and receive in turn information such as the hit distance an the surface normal at the hit point.
 
 
-\subsection{Approach 1: Evaluation of collected intersections according to the scene graph}
+\subsection{Evaluation of collected intersections according to the scene graph}
 \label{subsec:apprach1}
 
 In the past, an attempt for the implementation of CSG rendering with Embree was conducted by Karaffová and described in her master thesis \cite{karaffova2016}. Her approach consists in the collection of intersections between the scene geometry and a ray that are calculated by Embree, and their subsequent evaluation and arrangement according to a provided CSG tree. The difference between this work and the work of this thesis is that instead of integrating Embree into a target application that supports CSG rendering,  \todo{later}.
@@ -305,7 +375,7 @@ This approach is error prone to non user defined geometries due to the issues re
 The results of \cite{karaffova2016} showed that
 
 
-\subsection{Approach 2: Initializing the complete CSG as user defined geometry}
+\subsection{Initializing the complete CSG as user-defined geometry}
 \label{subsec:apprach2}
 
 The increased render times that resulted from the previous approach served as a motivation for the development of superior procedures for ray tracing CSG with Embree. 
@@ -369,6 +439,6 @@ However, there exists some limitations with this approach. One issue was encount
 \end{figure}
 
 
-\subsection{Approach 3: Creation of KD trees for constructive solid geometries}
+\subsection{Creation of KD trees for constructive solid geometries}
 \label{subsec:apprach3}
 bla blub
