@@ -67,12 +67,23 @@ Such trees are created and traversed for every pixel of the image plane. This pr
 
 \subsection{The Rendering Equation}
 
-In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the total reflected radiance towards an observer as the "sum" (or integral) of all light contributions over a hemisphere at a point on a surface. With this mathematical model, high realism is achieved by taking direct illumination (light from light sources) and indirect illumination (light being reflected off other surfaces in the scene) into account. \todo{change}
+\begin{figure}
+	\centering
+	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_direct.png}\label{fig:cb_local}}
+	\hfil
+	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_global.png}\label{fig:cb_global}}
+	\caption{The Cornell Box scene with direct illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}). Both scenes were rendered by a simple ray tracing program that was implemented by students attending the course \citetitle{cg3}, held at Charles University in Prague \cite{cg3}.}
+\end{figure}
+
+Figure \ref{fig:cb_local} shows an image of the Cornell Box. The scene's appearance results from shooting a ray into the scene, calculating a possible intersection point, and then generating a second ray in the direction of the light source. However, the appearance of the Cornell Box is not physically realistic because the ceiling is not illuminated. This is since, with this approach, no light rays that interact with surface points on the ceiling can directly reach the emissive area of the light source. The degree of realism of the scene shown in Figure \ref{fig:cb_local} can be significantly improved by considering global illumination effects. 
+
+In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the total reflected radiance towards an observer as the "sum" (or integral) of all light contributions over a hemisphere at a point on a surface. This mathematical model takes direct illumination (light from light sources) and indirect illumination (light being reflected off other surfaces in the scene) into account.
+\\
 
 The so-called \emph{Rendering Equation} is given by
 
 \begin{equation}\label{eq:renderingeq}
-L(x, \omega_{o}) = L_{e}(x, \omega_{o}) \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
+L(x, \omega_{o}) = L_{e}(x, \omega_{o}) + \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
 \end{equation}
 
 \noindent where
@@ -94,7 +105,7 @@ The information provided by these subsections are collated from the lecture note
 We define the \emph{radiance} of a source, sometimes informally referred to as "brightness", as the power per unit area $\partial A$ perpendicular to the ray in the direction $\omega_{o}$ and per unit solid angle that is propagated along with it (see Figure \ref{fig:radiance}). The following equation describes this:
 
 \begin{equation}
-L(\omega_{o}) = \frac{\partial^2\phi}{\partial\omega_{o}\partial A\cos\theta}
+L(\omega_{o}) = \frac{\partial^2\phi}{\partial\omega_{o}\partial A\cos\theta} [\mathrm{W}\cdot \mathrm{sr}^{-1}\cdot \mathrm{m}^{-2}]
 \end{equation}
 
 \noindent where
@@ -121,7 +132,7 @@ The \emph{Bidirectional Reflectance Distribution Function (BRDF)} is a mathemati
 The BRDF model is defined by:
 
 \begin{equation} \label{eq:brdf}
-f_{r}(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{i}(\omega_{i})\cos\theta\partial\omega_{i}}
+f_{r}(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{i}(\omega_{i})\cos\theta\partial\omega_{i}} [\mathrm{sr}^{-1}]
 \end{equation}
 
 \noindent where
@@ -131,12 +142,12 @@ f_{r}(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{
 	\item  $L_{i}(\omega_{i})$ is the incident light energy arriving at the surface point from direction $\omega_{i}$ 
 \end{itemize}
 
-Properties of BRDFs are the conservation of energy and the Helmholtz reciprocity, which considers the incident and reflected light intensities in Equation \ref{eq:brdf} as interchangeable without affecting the result. There exist different types of BRDFs: empirical BRDFs, physically based BRDFs, \todo{cite brdf models} and BRDFs being an approximation of measured data.
+Properties of BRDFs are the conservation of energy and the Helmholtz reciprocity, which considers the incident and reflected light intensities in Equation \ref{eq:brdf} as interchangeable without affecting the result. There exist different types of BRDFs: empirical BRDFs, physically based BRDFs, and BRDFs being an approximation of measured data.
 BRDFs are a crucial component when calculating direct illumination with the \emph{local reflection equation}.
 
-\subsubsection{Local Reflection Equation}
+\subsubsection{Reflection Equation}
 
-The \emph{Local Reflection Equation} describes how much total light is reflected from a surface point $x$ towards an observer along a given direction $\omega_{o}$, taking the light intensities arriving at $x$ from all incident directions into account. It is given by:
+The \emph{Reflection Equation} describes how much total light is reflected from a surface point $x$ towards an observer along a given direction $\omega_{o}$, taking the light intensities arriving at $x$ from all incident directions into account. It is given by:
 
 \begin{equation}\label{eq:local}
 L_{r}(x, \omega_{o}) = \int_{H(x)} L_{i}(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
@@ -148,29 +159,18 @@ L_{r}(x, \omega_{o}) = \int_{H(x)} L_{i}(x, \omega_{i})f_{r}(\omega_{i} \rightar
 	\item $H(x)$ is a hemisphere over the surface point $x$.
 \end{itemize}
 The total amount of reflected energy is calculated by integrating all contributions of incident radiance over the hemisphere $H(x)$. The BRDF serves as a weight in this equation because only the energy reflected along $\omega_{o}$ is considered.
-Figure \ref{fig:cb_local} shows the Cornell Box, where for each pixel Equation \ref{eq:local} was evaluated. The scene's appearance results from shooting a ray into the scene, calculating a possible intersection point, and then generating a second ray in the direction of the light source. However, the appearance of the Cornell Box is not physically realistic because the ceiling is not illuminated. This is since, with this approach, no light rays that interact with surface points on the ceiling can directly reach the emissive area of the light source. The degree of realism of the scene shown in Figure \ref{fig:cb_local} can be significantly improved by considering global illumination effects. This is where the rendering equation is of use.
-The Cornell Box shown in Figure \ref{fig:cb_global} was rendered by evaluating the rendering equation for each pixel.
  
 \subsubsection{The Rendering Equation revisited}
 
 The rendering equation, which for reasons of convenience is shown again in Equation \ref{eq:renderingeq2} can be arguably regarded as an extension of the local reflection equation.
 
 \begin{equation}\label{eq:renderingeq2}
-L(x, \omega_{o}) = L_{e}(x, \omega_{o}) \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
+L(x, \omega_{o}) = L_{e}(x, \omega_{o}) + \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
 \end{equation}
 
 Essentially, it describes the total reflection of energy towards direction $\omega_{o}$ from a surface point $x$ as the "sum" or integral of all the light intensity, incident to all directions over a hemisphere over the point $x$, together with the intensity emitted from point $x$, if $x$ is located on an emissive material. The unknown variable $L$ is present on both sides of this equation.
 
 This function is a higher-order integral which is difficult to solve analytically. The most common approach to solving this integral equation is the utilization of Monte Carlo methods. Monte Carlo methods numerically approximate a given integral by drawing random samples. The convergence speed of this procedure is independent of the dimension of the integral. Most of today's image synthesis algorithms implement Monte Carlo methods to approximate the rendering equation's solution.
-\\
-
-\begin{figure}
-	\centering
-	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_direct.png}\label{fig:cb_local}}
-	\hfil
-	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_global.png}\label{fig:cb_global}}
-	\caption{The Cornell Box scene with direct illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}). Both scenes were rendered by a simple ray tracing program that was implemented by students attending the course \citetitle{cg3}, held at Charles University in Prague \cite{cg3}.}
-\end{figure}
 
 
 
@@ -201,12 +201,12 @@ To approximate an integral part of the rendering equation, numerous paths are ge
 
 Concerning path tracing, we can re-write the rendering equation shown in \ref{eq:renderingeq} in the following way:
 \begin{equation}\label{eq:renderingeq_update}
-L(x, \omega_{o}) = L_{e}(x, \omega_{o}) \int_{H(x)} L(ray(x, \omega_{i}), -\omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
+L(x, \omega_{o}) = L_{e}(x, \omega_{o}) + \int_{H(x)} L(ray(x, \omega_{i}), -\omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
 \end{equation}
 
 The term $ray(x, \omega_{i})$ is a function for recursively calculating all incoming radiance arriving at the point $x$.
 
-In comparison of the ray tracing method of \cite{whitted1979improved}, path tracing is capable of simulating advanced optical effects such as soft shadows and diffuse interreflection.
+In comparison to the ray tracing method of \cite{whitted1979improved}, path tracing is capable of simulating advanced optical effects such as soft shadows and diffuse interreflection. An example of this can be seen in Figure \ref{fig:cb_global}.
 
 \section{Solid representations in 3D space}
 
@@ -246,7 +246,7 @@ R(t) = P + t\omega
 	\setlength\itemsep{0.05em}
 	\item  $P$ is the origin of ray $R$, a point in Euclidean space,
 	\item  $t$ a scalar, and
-	\item  $\omega$ the direction vector of $R$.
+	\item  $\omega$ is a normalized vector.
 \end{itemize}
 
 To obtain the two intersection points, the parametric equation defining $R$ is substituted into the implicit equation defining $S$:
@@ -258,7 +258,7 @@ Once the two resulting values $t_{0}$ and $t_{1}$ are obtained, the two intersec
 
 \subsection{Polygon meshes}
 
-Polygon meshes represent shapes as a composition of multiple smaller polygons connected via shared edges. The higher the number of such polygons the mesh exhibits, the higher the accuracy of the approximation of the represented shape. The most common types of polygons used to form a mesh are triangles and quadrangles. An example of a representation of a shape as a triangle mesh can be seen in Figure \ref{fig:poly_mesh}. The polygons are usually composed of vertices, edges connecting these vertices, and a face, which is the area bounded by the vertices and edges. This information is sufficient to describe a polygon in 3D space. Triangles are the most commonly used polygons to form meshes due to their efficient storage in memory and the property that the vertices of a triangle cannot be co-planar.
+Polygon meshes represent shapes as a composition of multiple smaller polygons connected via shared edges. The higher the number of such polygons the mesh exhibits, the higher the accuracy of the approximation of the represented shape. The most common types of polygons used to form a mesh are triangles and quadrangles. An example of a representation of a shape as a triangle mesh can be seen in Figure \ref{fig:poly_mesh}. The polygons are usually composed of vertices, edges connecting these vertices, and a face, which is the area bounded by the vertices and edges. This information is sufficient to describe a polygon in 3D space. Triangles are commonly used polygons to form meshes due to their efficient storage in memory and the property that the vertices of a triangle cannot be co-planar.
 
 \begin{figure}
 	\centering
@@ -270,7 +270,7 @@ Polygon meshes represent shapes as a composition of multiple smaller polygons co
 Various ray primitive intersection algorithms exist, for example, the Möller-Trumbore intersection algorithm \cite{moller1997fast} for intersecting triangles. To test a given ray for intersection with a polygon mesh, in theory, all polygons contained in the mesh in question must be tested for intersection. This is, of course, a naive and costly approach since the number of intersection tests that need to be performed is linear in the number of polygons. As such, polygon meshes are often composed of several thousand polygons, and testing them all for intersection has a decisive influence on the performance of the rendering process. Section \ref{sec:acceleration} introduces acceleration data structures, aiming at the minimization of those intersection tests.
 
 \subsection{Constructive Solid Geometry (CSG)}
-\todo{rewrite this whole fucking section}
+\todo{rewrite this whole section}
 The core idea behind \emph{constructive solid geometry (CSG)} is the representation of more complex geometry by the application of Boolean set operations to a manageable amount of geometric primitives. The boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted as \texttt{SUB}-operator).
 Primitives are usually analytically described surfaces such as spheres, cones, and cylinders. However, polygon meshes can be used as primitives for CSG, too. Figure \ref{fig:csg} shows the application of each Boolean operator to two sphere primitives. Multiple applications of set operations with geometric primitives can be hierarchically ordered in a binary tree structure, called the CSG tree.   
 
@@ -286,8 +286,6 @@ Primitives are usually analytically described surfaces such as spheres, cones, a
 \end{figure}
 
 One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leaves are associated with the geometry primitives, its interior nodes with a set operation. Due to the possibility that two primitives can be translated, rotated, or scaled before a Boolean operator is applied to them, the edges of the tree can be associated with transformation information (this is indicated in Figure \ref{fig:csg_tree} with the matrix icon) if a transformation is applied to the primitives \todo{reformulate}
-
-\todo{advantages}
 
 \begin{figure}
 	\centering

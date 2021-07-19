@@ -1,7 +1,7 @@
 \chapwithtoc{Introduction}
 \label{chap:intro}
 
-Ray tracing is a powerful image synthesis technique used in 3D computer graphics, capable of simulating optical effects, such as reflection, refraction, and scattering, with a high degree of visual realism. For this reason, it offers a variety of applications: It is used in the entertainment industry, for product design, visual prototyping, and for creating visualizations in scientific research \cite [91-128]{peddie2019ray}. Reasons for the popularity of ray tracing algorithms are the physical plausibility of its generated images as well as their simplicity and "elegance". 
+Ray tracing is a powerful image synthesis technique used in 3D computer graphics, capable of simulating optical effects, such as reflection, refraction, and scattering, with a high degree of visual realism. For this reason, it offers a variety of applications. It is used in the entertainment industry, for product design, visual prototyping, and for creating visualizations in scientific research \cite [91-128]{peddie2019ray}. Reasons for the popularity of ray tracing algorithms are the physical plausibility of its generated images as well as their simplicity and "elegance". 
 
 The origins of ray tracing can be traced back as far as 1968. At that time, a method was invented to shade wire-framed solids by shooting random light rays from virtual light sources to the scene geometry and, if an intersection would be found, placing a symbol at the intersection point \cite{appel1968some}. If enough rays were generated, there would be a high concentration of these symbols at regions with high light intensity, which would approximate physical realism. A decade later, an elaboration of this idea to a shading model that takes global information into account for calculating light intensities  \cite{whitted1979improved}, would revolutionize the computer graphics field.
 
@@ -27,7 +27,7 @@ The Advanced Rendering Toolkit will be referred to with its abbreviation \emph{A
 
 ART offers innovative features, such as efficient spectral rendering (by implementing the "Hero Wavelength Spectral Sampling" technique \cite{wilkie2014hero}), proper handling of bi-spectral materials (e.g., fluorescent surfaces) \cite{mojzik2018handling} and a physically plausible sky dome lighting model \cite{wilkie2013predicting}. Until the release of Mitsuba 2 \cite{nimier2019mitsuba}, ART was, to our best knowledge, the only rendering system that would support rendering polarization effects, and remains the sole open source rendering system to support bi-spectral reflectances. These features make ART an interesting environment for computer graphics researchers interested in the field of Predictive Rendering.
 
-To ensure this features, ART relies on its proprietary internal data structures that diverge to a significant degree from those present in other popular rendering systems (e.g., pbrt \cite{pharr2016physically} or Mitsuba 2). Therefore, Embree's integration into ART is a non-trivial task, although Embree was developed with the intention of it being "used in existing renderers with minimal programmer effort" \cite[1]{wald2014embree}. Furthermore, Embree unfortunately does not directly support rendering CSG.
+To ensure this features, ART relies on its proprietary internal data structures that diverge to a significant degree from those present in other popular rendering systems (e.g., PBRT \cite{pharr2016physically} or Mitsuba 2). Therefore, Embree's integration into ART is a non-trivial task, although Embree was developed with the intention of it being "used in existing renderers with minimal programmer effort" \cite[1]{wald2014embree}. Furthermore, Embree unfortunately does not directly support rendering CSG.
 
 If a successful integration of Embree into ART could be achieved, a complex image synthesis system with unique predictive rendering features would be adapted to the industry standard of ray tracing. 
 
@@ -38,13 +38,13 @@ This thesis is structured as follows:
 \begin{itemize}
 	\setlength\itemsep{0.05em}
 	
-	\item \textbf{Chapter \ref{chap:fundamentals}} will provide fundamental background information, including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and a brief overview of the functionality of the Embree framework.
+	\item \textbf{Chapter \ref{chap:fundamentals}} provides fundamental background information, including a brief introduction to the ray tracing technique, explanations of the most common ray acceleration structures, and a brief overview of the functionality of the Embree framework.
 	
-	\item In \textbf{Chapter \ref{chap:technical_overview}} provides a description of Embree can be used for ray tracing and a brief introduction to ART, in which Embree will be integrated into.
+	\item \textbf{Chapter \ref{chap:technical_overview}} provides a description of Embree can be used for ray tracing and a brief introduction to ART, in which Embree will be integrated into.
 	
 	\item \textbf{Chapter \ref{chap:integration}} is dedicated to the description of our approach on the integration of Embree into ART, as well as the implementation of the CSG operations with Embree.
 	
-	\item Results obtained by testing our implementation on various virtual scenes are presented and evaluated in \textbf{Chapter \ref{chap:results}}.
+	\item \textbf{Chapter \ref{chap:results}} shows the results obtained by testing our implementation on various virtual scenes.
 	
 	\item Lastly, \textbf{Appendix \ref{sec:embree_app}} provides a user guide for compiling ART with Embree support.
 	
