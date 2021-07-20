@@ -15,6 +15,4 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {lstlisting}{\numberline {3.5}Casting of a double precision floating point number to a single precision floating point number by explicit conversion.}{51}{lstlisting.3.5}%
 \defcounter {refsection}{0}\relax 
-\contentsline {lstlisting}{\numberline {3.6}Updated \texttt {GeometryData} struct for CSG rendering.}{55}{lstlisting.3.6}%
-\defcounter {refsection}{0}\relax 
-\contentsline {lstlisting}{\numberline {3.7}Updated \texttt {GeometryData} struct for CSG rendering.}{57}{lstlisting.3.7}%
+\contentsline {lstlisting}{\numberline {3.6}Updated \texttt {GeometryData} struct for CSG rendering.}{57}{lstlisting.3.6}%

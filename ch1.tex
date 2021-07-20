@@ -270,7 +270,7 @@ Polygon meshes represent shapes as a composition of multiple smaller polygons co
 Various ray primitive intersection algorithms exist, for example, the Möller-Trumbore intersection algorithm \cite{moller1997fast} for intersecting triangles. To test a given ray for intersection with a polygon mesh, in theory, all polygons contained in the mesh in question must be tested for intersection. This is, of course, a naive and costly approach since the number of intersection tests that need to be performed is linear in the number of polygons. As such, polygon meshes are often composed of several thousand polygons, and testing them all for intersection has a decisive influence on the performance of the rendering process. Section \ref{sec:acceleration} introduces acceleration data structures, aiming at the minimization of those intersection tests.
 
 \subsection{Constructive solid geometry (CSG)}
-
+\label{subsec:csg_into}
 The idea behind \emph{constructive solid geometry (CSG)} is the representation of more complex geometry by the application of Boolean set operations to a manageable amount of geometric primitives. The Boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted as \texttt{SUB}-operator).
 The geometric primitives of which CSG are composed are usually analytically described surfaces such as spheres, cones, and cylinders. However, polygon meshes can be treated as such primitives, too.   
 

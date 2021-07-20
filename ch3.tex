@@ -175,7 +175,7 @@ In the interior of this function, the following steps are executed:
 	\\
 	
 	\item \textbf{Transformation of the vertices according to the transformation matrix}
-	\item[] In case the transformation matrix that was passed to the function is not \texttt{NULL}, the vertices, one by one, are transformed according to it before being transferred to the vertex buffer. Embree allows instancing of geometry, meaning that geometry in Embree can be translated, scaled, and rotated by referring to an instance stored in memory and applying this transformation to it. However, we decided to perform the transformation calculation for each vertex before transferring to the vertex geometry buffer because this is more intuitive and easier to facilitate.
+	\item[] In case the transformation matrix that was passed to the function is not \texttt{NULL}, the vertices, one by one, are transformed according to it before being transferred to the vertex buffer. Embree allows instancing of geometry, meaning that geometry in Embree can be translated, scaled, and rotated by referring to an instance stored in memory and applying this transformation to it. However, we decided to perform the transformation calculation for each vertex before transferring to the vertex geometry buffer because this is more intuitive and easier to perform.
 	
 \end{itemize}
 
@@ -198,7 +198,7 @@ For initializing this kind of geometry type for Embree, we do the following:
 	\\
 	
 	\item \textbf{Provision of a callback function for calculating the bounding box of the shape}
-	\item[] We created a function called \texttt{embree\_bbox}, which Embree will call before building its internal BVHs over the scene. In the interior of the function, we calculate the bounding box of the user-defined geometry and pass it to Embree. This callback function is passed to Embree via invocation of the function \texttt{rtcSetGeometryBoundsFunction}.
+	\item[] We created a function called \texttt{embree\_bbox}, which Embree will call before building its internal BVHs over the scene. In the function, we calculate the bounding box of the user-defined geometry and pass it to Embree. This callback function is passed to Embree via invocation of the function \texttt{rtcSetGeometryBoundsFunction}.
 	\\
 	
 	\item \textbf{Provision of a callback function for performing the intersection testing between a user-defined geometry and an \texttt{RTCRay}}
@@ -222,18 +222,18 @@ Once the geometries contained in a virtual scene are initialized for Embree and 
 
 In the body of this function, an \texttt{RTCIntersectContext} is set up and a \texttt{RTCRayHit} struct is declared and updated according to the state of the \texttt{ArnRayCaster} object: The information with which the \texttt{RTCRayHit} stuct is being updated contains the orientation and direction of the ray that is stored as an instance variable of the \texttt{ArnRayCaster} object, and the ID associated to the ray. The \texttt{tfar} value of is initialized with Objective-C's \texttt{INFINITY} macro and the \texttt{geomID} field of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}. 
 
-Embree utilizes single-precision floating-point numbers for its internal calculations, whereas ART uses double-precision floating-point numbers. To compensate for visual artifacts in the final image, we do not initialize the \texttt{tnear} value of the \texttt{RTCRay} with zero. Instead, we give it a little offset to prevent calculating an intersection between a secondary ray and the same shape that was already hit. We found the value $1e-3f$ to be reliable. A comparison of an image rendered with and without this offset is given by Figure \ref{fig:offset}.
+Embree utilizes single-precision floating-point numbers for its internal calculations, whereas ART uses double-precision floating-point numbers. To compensate for visual artifacts in the final image, we do not initialize the \texttt{tnear} value of the \texttt{RTCRay} with zero. Instead, we give it a little offset to prevent calculating an intersection between a secondary ray and the same shape that was already hit. We found the value $1\cdot 10^{-3}$ to be reliable. A comparison of an image rendered with and without this offset is given by Figure \ref{fig:offset}.
 
 \begin{figure}[!tbp]
 	\centering
 	\subfloat[Result of rendering a simple scene when the \texttt{tnear} value of the \texttt{RTCRay} is set to zero.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact_2.png}}
 	\hfil
-	\subfloat[Result of rendering a simple scene when the \texttt{tnear} of the \texttt{RTCRay} is given an offset of $1e-3f$.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact.png}}
+	\subfloat[Result of rendering a simple scene when the \texttt{tnear} of the \texttt{RTCRay} is given an offset of $1\cdot 10^{-3}$.]{\includegraphics[width=.4\textwidth]{img/3 approach/artifact.png}}
 	\caption{Artifact caused by the conversion of the hit distance of the ray from a double-precision floating-point number to a single-precision floating-point number. Due to an imprecise calculation of the intersection point, a secondary ray might intersect the same shape again.}
 	\label{fig:offset}
 \end{figure}
 
-After the update of the \texttt{RTCRayHit} struct, the actual ray tracing is performed by the invocation of the \texttt{rtcIntersect1} function. Depending on whether a bounding box of a user-defined geometry or non-user-defined geometry in Embree's internal BVH was intersected by the \texttt{RTCRay}, either our custom callback function \texttt{embree\_intersect\_geometry} is called by Embree, or Embree performs the intersection testing with its proprietary functionality.
+After the update of the \texttt{RTCRayHit} struct, the actual ray tracing is performed by the invocation of the \texttt{rtcIntersect1} function. Depending on whether a bounding box of a user-defined geometry or non-user-defined geometry in Embree's internal BVH was intersected by the \texttt{RTCRay}, either our custom callback function \texttt{embree\_intersect\_geometry} is called by Embree, or Embree performs the intersection testing with its built-in functionality.
 
 Once the overall rendering job successfully completed, a "clean-up" is performed. The \texttt{GeometryData} structs associated with the scene are released, followed by the release of the \texttt{RTCScene} via the function \texttt{rtcReleaseScene} and the release of the \texttt{RTCDevice} via \texttt{rtcReleaseDevice}. As a final step, the \texttt{ArnEmbree} object \texttt{embreeManager} itself is released.
 
@@ -249,7 +249,7 @@ This function will calculate the intersection points on the shape and update the
 If no intersection was found, we return immediately from the \texttt{embree\_intersect\_geometry} function. Otherwise, we will update the \texttt{tfar} value of the \texttt{RTCRay} with the hit distance and the geometry ID of the \texttt{RTCHit} struct with the geometry ID associated with the intersected shape.
 The resulting \texttt{ArIntersectionList} is then stored in a linked list.
 
-After the invocation of the \texttt{rtcIntersect1} function in the interor of the  \texttt{getIntersectionListWithEmbree} function, the geometry ID of the \texttt{RTCHit} is evaluated. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, we conclude that no intersection was found and we return an empty \texttt{ArIntersectionList}. Otherwise, we retrieve the \texttt{RTCGeometry} that has been intersected with the geometry ID.
+After the invocation of the \texttt{rtcIntersect1} function in the body of the  \texttt{getIntersectionListWithEmbree} function, the geometry ID of the \texttt{RTCHit} is evaluated. If the value of this variable remains \texttt{RTC\_INVALID\_GEOMETRY\_ID}, we conclude that no intersection was found and we return an empty \texttt{ArIntersectionList}. Otherwise, we retrieve the \texttt{RTCGeometry} that has been intersected with the geometry ID.
 
 This \texttt{RTCGeometry} is used for the retrieval of the associated \texttt{GeometryData} struct via the user data pointer. Based on the Boolean variable \texttt{\_isUserGeometry}, we check whether the intersected shape is a user-defined geometry or a simple indexed geometry.
 
@@ -266,9 +266,9 @@ The following subsection outlines two major issues encountered with the approach
 As briefly mentioned in Chapter \ref{chap:art}, ART supports ray tracing with multiple threads.
 Before the ray tracing procedure is initiated by ART, copies of the \texttt{ArnRayCaster} object are created for each thread. A copy of the scene graph and the KD tree is assigned to each copy of the \texttt{ArnRayCaster} object to ensure lock-free parallelism.
 
-However, the implementation of the \texttt{embree\_intersect\_geometry} callback function for intersecting user-defined geometry is not thread safe. This is due to the \texttt{ArnRayCaster} object that needs to be passed as an argument to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object in the interior of the \texttt{embree\_intersect\_geometry} function.
+However, the implementation of the \texttt{embree\_intersect\_geometry} callback function for intersecting user-defined geometry is not thread safe. This is due to the \texttt{ArnRayCaster} object that needs to be passed as an argument to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object inside the \texttt{embree\_intersect\_geometry} function.
 
-For an uncomplicated retrieval of the \texttt{ArnRayCaster} inside our custom intersection callback function, a static reference to it was originally initialized. This works fine when performing rendering jobs with only a single thread. If multiple threads are involved in the intersection computations, the procedure outlined in Subsection \ref{subsec:instersect} is prone to errors since multiple \texttt{ArnRayCaster} objects are traversing and altering a single copy of the scene graph.
+For a simple retrieval of the \texttt{ArnRayCaster} inside our custom intersection callback function, a static reference to it was originally initialized. This works fine when performing rendering jobs with only a single thread. If multiple threads are involved in the intersection computations, the procedure outlined in Subsection \ref{subsec:instersect} is prone to errors since multiple \texttt{ArnRayCaster} objects are traversing and altering a single copy of the scene graph.
 
 To archive lock-free parallelism, we need to retrieve the "right" \texttt{ArnRayCaster} copy associated with the current thread in the interior of the intersection callback function. However, we cannot utilize the user data pointer for this since the user data pointer is associated with the scene geometry, which can be intersected by multiple rays belonging to different \texttt{ArnRayCaster} objects on different threads at the same time.
 
@@ -276,7 +276,7 @@ For the placement of an \texttt{ArnRayCaster} into and for the retrieval of an \
 
 During the beginning of the ray tracing procedure, a reference to the  \texttt{ArnRayCaster} object associated with the current thread is added to the ray caster array, if not already been done, retrieved in the interior of the intersection callback function in constant time, and passed to the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object. 
 
-The head of the linked list, in which the collected intersection lists are stored, is made an instance variable of the \texttt{ArnRayCaster} class, which allows for an uncomplicated retrieval of these intersection lists outside the intersect callback function. 
+The head of the linked list, in which the collected intersection lists are stored, is made an instance variable of the \texttt{ArnRayCaster} class, which allows for a simple retrieval of these intersection lists outside the intersect callback function. 
 
 \subsubsection{Intersecting infinite spheres}
 
@@ -299,7 +299,7 @@ In ART, all three coordinates of the upper point are set to a huge value, repres
 \end{listing}
 
 As mentioned in Subsection \ref{sec:embree_raytracing}, Embree uses single-precision floating-point numbers for its internal calculations. ART, on the other hand, uses double-precision floating-point numbers. Therefore, after calculating the double values describing the bounding box, we cast them to float values via the explicit conversion operator in \texttt{C/C++} before passing them to Embree, as shown in Listing \ref{lst:casting}.  
-When, during ray tracing, the \texttt{tfar} value of the \texttt{RTCRay} is set to the single-precision representation of infinity by Objective-C, the bounding box is never intersected. This is due to intersection testing being only performed in the interval $[1e-3f,\infty]$ and Objective-C's representation of infinity is "smaller" than the value \texttt{MATH\_HUGE\_DOUBLE}. The bounding box enclosing the infinite sphere is never intersected by an \texttt{RTCRay}.
+When, during ray tracing, the \texttt{tfar} value of the \texttt{RTCRay} is set to the single-precision representation of infinity by Objective-C, the bounding box is never intersected. This is due to intersection testing being only performed in the interval $[1\cdot 10^{-3},\infty]$ and Objective-C's representation of infinity is "smaller" than the value \texttt{MATH\_HUGE\_DOUBLE}. The bounding box enclosing the infinite sphere is never intersected by an \texttt{RTCRay}.
 
 Fortunately, ART provides a representation for infinity as a single-precision number as well, \texttt{MATH\_HUGE\_FLOAT}. Therefore, we can resolve this issue by checking in the \texttt{embree\_bbox} callback function whether the two vertices of the calculated bounding box have the coordinates \texttt{MATH\_HUGE\_DOUBLE} (and resp. \texttt{-MATH\_HUGE\_DOUBLE}) and updating them with the value \texttt{MATH\_HUGE\_FLOAT} (and resp. \texttt{-MATH\_HUGE\_FLOAT}). By doing so, Embree can detect intersections between an \texttt{RTCRay} and the bounding box of the infinite sphere, and the intersection with the sphere itself can be calculated.
 
@@ -322,9 +322,9 @@ Given a ray that first intersects the PLY mesh and subsequently the infinite sph
 \end{figure}
 
 
-The problem, which arises here, is that the values of the \texttt{RTCRayHit} struct, e.g., the \texttt{tfar} value of the \texttt{RTCRay}, are updated with information corresponding to the intersection with the triangle mesh first. Afterward, the user-defined infinite sphere is intersected, and the intersection calculation is performed by our custom function \texttt{embree\_intersect\_geometry} function. In the interior, we overwrite the values of the \texttt{RTCRayHit} struct that has been previously calculated while the triangle mesh was intersected. Therefore, the information regarding the intersections between the \texttt{RTCRay} and the triangle mesh is lost, and only the \texttt{ArIntersectionList} storing the intersections with the infinite sphere is present in the linked list. A result of this behavior can be seen in Figure \ref{fig:no_bunny_close}.
+The problem, which arises here, is that the values of the \texttt{RTCRayHit} struct, e.g., the \texttt{tfar} value of the \texttt{RTCRay}, are updated with information corresponding to the intersection with the triangle mesh first. Afterward, the user-defined infinite sphere is intersected, and the intersection calculation is performed by our custom \texttt{embree\_intersect\_geometry} function. In this function, we overwrite the values of the \texttt{RTCRayHit} struct that has been previously calculated while the triangle mesh was intersected. Therefore, the information regarding the intersections between the \texttt{RTCRay} and the triangle mesh is lost, and only the \texttt{ArIntersectionList} storing the intersections with the infinite sphere is present in the linked list. A result of this behavior can be seen in Figure \ref{fig:no_bunny_close}.
 
-To resolve this issue, we make use of a slight hack: In the interior of the \texttt{embree\_intersect\_geometry} callback function, before performing the actual intersection calculation between a ray and a user-defined geometry, we check whether the value of the geometry ID of the \texttt{RTCHit} struct remains being set to \texttt{RTC\_INVALID\_GEOMETRY\_ID}. If this is not the case, and if the head of the linked list storing the collected intersections is not \texttt{NULL}, we conclude that an intersection with a non-user-defined geometry must have already been calculated. We assume that is intersection already obtains the closest distance to the ray origin. With the help of the geometry ID, we retrieve the associated \texttt{GeometryData} struct for the geometry in question from the linked list storing all the \texttt{GeometryData} structs linked to the scene geometry. With the information stored in this \texttt{GeometryData} struct, we initialize a \texttt{ArIntersectionList} "from scratch" and add it to the linked list storing the collected intersections.
+To resolve this issue, we make use of a slight modification: In the \todo{use algorithm} \texttt{embree\_intersect\_geometry} callback function, before performing the actual intersection calculation between a ray and a user-defined geometry, we check whether the value of the geometry ID of the \texttt{RTCHit} struct remains being set to \texttt{RTC\_INVALID\_GEOMETRY\_ID}. If this is not the case, and if the head of the linked list storing the collected intersections is not \texttt{NULL}, we conclude that an intersection with a non-user-defined geometry must have already been calculated. We assume that is intersection already contains the closest distance to the ray origin. With the help of the geometry ID, we retrieve the associated \texttt{GeometryData} struct for the geometry in question from the linked list storing all the \texttt{GeometryData} structs linked to the scene geometry. With the information stored in this \texttt{GeometryData} struct, we initialize a \texttt{ArIntersectionList} "from scratch" and add it to the linked list storing the collected intersections.
 
 With this approach, all the scenes on which our implementation was tested (which will be introduced in Chapter \ref{chap:results}) could be rendered without further problems.
 
@@ -332,79 +332,63 @@ With this approach, all the scenes on which our implementation was tested (which
 \section{Rendering CSG with Embree}
 \label{sec:embree_csg}
 
-Unfortunately, Embree does not support rendering of constructive solid geometry direct. However, this does not mean that ray tracing CSG with Embree is completely impossible \todo{maybe reformulate}. The following section outlines three different approaches for ray tracing virtual scenes containing constructive solid geometry with the help of Embree. We then describe our final implementation of the CSG operators in ART as a combination of these approaches.
+Unfortunately, Embree does not support rendering of constructive solid geometry direct. However, this does not mean that ray tracing CSG with Embree is completely impossible. The following section outlines three different approaches for ray tracing virtual scenes containing constructive solid geometry in ART with the help of Embree.
 
-Since Embree is an open-source framework, one could consider rigging Embree itself for suitable CSG rendering. Nevertheless, we refrained from such an undertaking due to two reasons: On one hand, it is possible that the altering of the Embree framework would exceed the scope of this thesis. On the other hand, we want our integration to be compatible with the original Embree framework in its current and future versions. 
+Since Embree is an open-source framework, one could consider rigging Embree itself for suitable CSG rendering. Nevertheless, we refrained from such an undertaking because of two reasons: On one hand, it is possible that the altering of the Embree framework would exceed the scope of this thesis. On the other hand, we want our integration to be compatible with the original Embree framework in its current and future versions.
 
-We therefore consider Embree as a "black box" for which we provide information such as a ray origin and direction, and receive in turn information such as the hit distance an the surface normal at the hit point.
+We, therefore, consider Embree as a "black box" for which we provide information such as a ray origin and direction and receive in turn information concerning intersections with the scene geometry such as the hit distance and the surface normal at the hit point.
 
 
 \subsection{Evaluation of collected intersections according to the scene graph}
 \label{subsec:apprach1}
 
-In the past, an attempt for the implementation of CSG rendering with Embree was conducted by Karaffová and described in her master thesis \cite{karaffova2016}. Her approach consists in the collection of intersections between the scene geometry and a ray that are calculated by Embree, and their subsequent evaluation and arrangement according to a provided CSG tree. The difference between this work and the work of this thesis is that instead of integrating Embree into a target application that supports CSG rendering,  \todo{later}.
-With the approach outlined in this subsection, we adapt the procedures described in \cite{karaffova2016} for ART, which serves as the target application. 
+In the past, an attempt for the implementation of CSG rendering with Embree was conducted by Markéta Karaffová and described in her master thesis \cite{karaffova2016}. Her approach consists of the collection of intersections between the scene geometry and a ray that Embree calculates and their subsequent evaluation according to a provided CSG tree as described in Subsection \ref{subsec:csg_into}.
+With the approach outlined in this subsection, we adapt the approach described in \cite{karaffova2016} for ART. We were not intimidated by the increased rendering times that result from the implementation described in \cite{karaffova2016} since we believed we would be able to improve it for ART.
 
-For the moment, we will not consider the constructive solid geometry that is (at least partially) constructed from simple indexed shapes. An explanation for this will follow later.
+For our approach outlined in this subsection, we will only consider CSG that are composed of user-defined geometry.
 
-The intersections between a ray and user defined scene geometry can be collected via storing the corresponding \texttt{ArIntersectionLists} in a linked list as described in subsection \ref{subsec:instersect}. One advantage of maintaining such a "list of intersection lists" as opposed to the merging of the various intersection lists into one large list, is that due to the fact that each intersection list is associated with an individual geometry, we can separate the lists according to their shapes. This is convenient since ART provides functions for evaluating two given \texttt{ArIntersectionList} structs according to the binary operators \texttt{OR}, \texttt{AND} and \texttt{SUB} (the name of these functions are \texttt{arintersectionlist\_or}, \texttt{arintersectionlist\_and} and \texttt{arintersectionlist\_sub}, each taking two \texttt{ArIntersectionList} structs as input and returning a merged \texttt{ArIntersectionList} struct).
+The intersections between a ray and user-defined scene geometry can be collected via storing the corresponding \texttt{ArIntersectionLists} in a linked list as described in subsection \ref{subsec:instersect}. One advantage of maintaining such a "list of intersection lists" as opposed to the merging the individual \texttt{ArIntersectionList}s into a single larger \texttt{ArIntersectionList}, is having the \texttt{ArIntersectionList} separated according to the shape associated with them. This is convenient since ART provides functions for evaluating two given \texttt{ArIntersectionList} structs according to the binary operators \texttt{OR}, \texttt{AND} and \texttt{SUB} as described in Subsection \ref{subsec:csg_into}. To avoid confusion, we will refer to the \texttt{ArIntersectionList} struct as \emph{intersection list} and to the linked list, which stores individual \texttt{ArIntersectionList} structs as \emph{intersection linked list}.
 
-For our approach on the implementation of CSG operations with Embree, 
+The ray tracing of the geometric primitives proceeds as outlined in Subsection \ref{subsec:instersect}
+Once the intersection calculation with Embree has finished, we retrieve the associated \texttt{GeometryData} struct of the intersected geometry. We then evaluate the collected intersections stored in the intersection linked list according to the original scene graph.
 
-\begin{listing} 
-	\begin{lstlisting}[caption={Updated \texttt{GeometryData} struct for CSG rendering.}, label={lst:geometry_data_update1}]
-	// each geometry in the scene is associated with
-	// this stuct, it is needed for embree to
-	// perform user defined geometry intersection
-	// calculations
-	typedef struct GeometryData 
-	{
-		unsigned int _embreeGeomID; // geometry id of the shape
-		ArNode * _shape; // ART's shape representation in memory
-		ArTraversalState _traversalState; // state of the RayCaster
-		
-		ArNode<ArpRayCasting> * combinedAttributes; // node used for ray casting
-		BOOL _isUserGeometry; // determines if geometry is User-defined or Non-user-defined
-		BOOL _isCSGPrimitive; // determines if geometry is a part of a CSG
-		
-		ArNode<ArpRayCasting> * topmostCSGNode; // reference to the topmost CSG node 
-	}
-	GeometryData;
-	\end{lstlisting}
-\end{listing}
+During the evaluation, the subgraph rooted at the Bounding Box node that is a direct child of the BSP Tree node (compare Figure \ref{fig:scene_graph}) is traversed until the leaves representing the shape are reached. Due to the reason that intersections between the ray and some shapes have already been calculated previously by Embree, we first check whether an intersection list associated with the shape in question is already present in the intersection linked list. If this is the case, the corresponding intersection list is located in the intersection linked list by linear search, extracted from it, later evaluated according to the CSG tree, which is, in our case, the original scene graph.
 
-The sub tree of the scene graph rooted at such a topmost CSG node will serve as the CSG tree according to which the collected intersection will be evaluated and rearranged.
+Since ART supports instancing of geometry, meaning that multiple instances of the shape with different associated Combined Attributes nodes exist in the scene, we use the Combined Attributes node as a unique identifier to retrieve the right intersection list from the intersection linked list.
+Therefore, we add a reference to the \texttt{Combined Attributes} object of a shape to the \texttt{ArIntersectionList}. This \texttt{Combined Attributes} object is associated with the shape whose intersections with a ray are stored in the \texttt{ArIntersectionList} struct.
 
 
-Once a rendering pass with Embree has finished, we retrieve the associated \texttt{GeometryData} struct of the most recently intersected geometry. If the geometry in question is not a part of a CSG, we proceed as usual. Otherwise, we evaluate the collected intersections stored in the linked list according to the sub tree rooted at the top most CSG node. 
+After the evaluation, the intersection list, whose head intersection has the minimal distance to the ray origin, is extracted from the intersection linked list, and the ray tracing procedure precedes as usual.
 
-During the evaluation, the sub tree rooted at the topmost CSG node is traversed, the intersections with the two geometries represented by the children of the node are calculated and then re-arranged according to the binary operator associated with the topmost CSG node. Due to the reason that some intersections have already been calculated previously by Embree, we first check whether an \texttt{ArIntersectionList} struct associated with the underlying geometry is already present in the linked list. If this is the case, the corresponding \texttt{ArIntersectionList} structs are located in the linked list by linear search, extracted from it, later evaluated according to the CSG operation and finally, the resulting \texttt{ArIntersectionList} is placed into the linked list.
+\subsubsection{Limitations of this approach}
 
+Although it is possible to render CSG with the approach outlined in this subsection, we are aware that it is still far from being optimal. We have not implemented this functionality for non-user-defined geometry. When Embree calculates the intersections between a ray and a non-user-defined geometry, it returns only one intersection, either the closest or an arbitrary one \footnote{However, \cite{karaffova2016} describes a method of how all encountered intersections can be retrieved from Embree.}.
 
-Subsequently, when the nodes representing the individual geometric primitives are added as leaves to the sub tree rooted at the topmost CSG node, and the flag was activated, a boolean indicating that the shape in question is a primitive of a CSG is stored in the \texttt{GeometryData} struct. Furthermore, the reference to the top most CSG node is transferred from the instance variable of the \texttt{ArnEmbree} class to the \texttt{GeometryData} struct. The updated \texttt{GeometryData} struct is shown in Listing \ref{lst:geometry_data_update1}.
+The whole original scene graph is traversed to evaluate the intersections between a ray and a CSG represented by only a subgraph. Theoretically, only this subgraph would need traversing. However, even those subgraphs representing a particular CSG in the scene graph can be large and complex. To give an example, Figure \ref{fig:rotonda_intro} shows a rendered image of the "Villa Rotonda". The entire villa comprises only two CSG, which are constructed from a total number of 1,256 primitives.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=.5\linewidth]{img/3 approach/villaRotondaNormal.png}
+	\caption{Rendered image of the Villa Rotonda model.}
+	\label{fig:rotonda_intro}
+\end{figure}
 
-Since ART supports instancing of geometry, we use the \texttt{Combined Attributes} node as a unique identifier for the retrieval of the \texttt{ArIntersectionList} associated with the intersected geometry from the various \texttt{ArIntersectionList} structs that are stored in the linked list.
-Therefore we add a reference to the \texttt{Combined Attributes} object of a shape to the struct that is defining the node for the intersection collection linked list. This struct is shown in Listing 
+Even evaluating the found intersections according to the subgraph associated with only one of the two CSG would be time-consuming. We realized the following: Even if we worked on optimizing the procedure outlined in this subsection, the lead we gained through Embree over Native ART would be compensated for by the subsequent scene graph traversal. It even could be that the performance of the overall ray tracing procedure of ART would be decreased for complex scenes, such as the Villa Rotonda scene in Figure \ref{fig:rotonda_intro}.
 
-After the evaluation, the intersection list, whose head intersection has the shortest distance to the ray origin is extracted from the linked list, and the ray tracing procedure is carried on as usual.
-
-This approach is error prone to non user defined geometries due to the issues related of the consecutive intersection calculations on user defined and non user defined geometry, described in Subsection \ref{sec:issues_user} \todo{definitely rephrase}. However, this issue can be resolved by the instantiation of simple indexed geometry as user defined geometry.
-
-The results of \cite{karaffova2016} showed that
+Since the motivation behind the goal of this thesis, namely the integration of Embree into the CSG rendering framework ART, was the acceleration of ART's ray tracing procedure, we decided that further optimizations of this approach would not be profitable.
 
 
 \subsection{Initializing the complete CSG as user-defined geometry}
 \label{subsec:apprach2}
 
-The increased render times that resulted from the previous approach served as a motivation for the development of superior procedures for ray tracing CSG with Embree. 
+The increased render times that resulted from the previous approach served as a motivation for developing different procedures for ray tracing CSG with Embree. We want to avoid a subsequent scene graph traversal and at the same time still treat Embree as a black box.
 
-The core idea of the approach outlined in this Subsection lies in the initialization of the whole constructive solid geometry as a user defined geometry as opposed to its geometric primitives. If a bounding box enclosing a particular CSG would be stored in Embree's internal BVHs, and if one such bounding box is intersected by an \texttt{RTCRay}, the intersection calculation of the individual primitives would be carried on by ART's internal ray acceleration data structures. Since Embree does not directly support the ray tracing of constructive solid geometry, and we do not want to alter the Embree framework itself for reasons mentioned earlier, this undertaking seems like a satisfactory compromise between ART and Embree.
+The idea of the approach described in this subsection lies in the initialization of the whole constructive solid geometry as a user-defined geometry instead of the geometric primitives it is composed of. The bounding box for such a CSG will be calculated with a function provided by ART and passed to Embree.
+If this bounding box would be stored in Embree's internal BVHs, intersected by an \texttt{RTCRay} during the ray casting procedure, ART's internal structures would be used for the continuative traversal to calculate the intersections with the geometric primitives. This undertaking seems like a satisfactory compromise between ART and Embree.
+ 
+For our new approach, we define the \emph{topmost CSG node} in the scene graph as the root node of the subgraph that represents the CSG. The geometric primitives represented by the leaf nodes of this subgraph are the geometric primitives of which the CSG is composed. For example, when considering the scene graph, assembled by ART to render the scene shown in Figure \ref{fig:csg_or}, which itself is shown in Figure \ref{fig:scene_graph}, the topmost CSG node of the CSG is the "\texttt{OR}-node". The single leaf of the subgraph rooted at that node is the shape node that represents a sphere object.
 
-For our new approach, we define the \emph{topmost CSG node} in the scene graph as the root node of the subgraph, representing the CSG in question. The geometric primitives represented by the leaf nodes of this subgraph construct the entire CSG. For example, when considering the scene graph the CSG shown in Figure \ref{fig:csg_or}, which itself is shown in Figure \ref{fig:scene_graph}, the topmost CSG node of the CSG would be the "\texttt{OR}-node", having two instances of the singleton sphere (indicated through the "\texttt{Bounding Box}-" and "\texttt{Combined Attribute}-nodes") for its children.
-
-When during the initial assembly of ART's internal scene graph such a topmost CSG node is encountered, a class method of the \texttt{ArnEmbree} class, \texttt{initEmbreeCSGGeometry}, is called, which initialized a new \texttt{RTCGeometry} of type \texttt{RTC\_GEOMETRY\_TYPE\_USER}. 
-Callback functions for intersection and occlusion testing, as well as for calculating the bounding box of the CSG are provided as outlined in Subsection \ref{sec:init_user}. 
+When during the initial assembly of ART's internal scene graph such a topmost CSG node is encountered, a class method of the \texttt{ArnEmbree} class, \texttt{initEmbreeCSGGeometry}, is called, which initializes  a CSG as a user-defined geometry for Embree according to procedures explained in Subsection \ref{sec:init_user}. 
 
 
 \begin{listing} 
@@ -420,23 +404,28 @@ Callback functions for intersection and occlusion testing, as well as for calcul
 		ArTraversalState _traversalState; // state of the RayCaster
 		
 		ArNode<ArpRayCasting> * _combinedAttributes_or_csg_node; // node used for ray casting
-		BOOL _isUserGeometry; // determines if geometry is User-defined or Non-user-defined
+		BOOL _isUserGeometry; // determines if geometry is user-defined or non-user-defined
 	}
 	GeometryData;
 	\end{lstlisting}
 \end{listing}
 
-Subsequently, a \texttt{GeometryData} struct is created. The struct itself was slightly adapted for CSG rendering. As can be seen in Listing \ref{lst:geometry_data_final}, we renamed the variable storing a reference to the \texttt{Combined Attribute} node to \texttt{\_combinedAttributes\_or\_csg\_node}. Both the \texttt{Combined Attributes} node object and the topmost CSG node derive from the \texttt{ArNode} base class, and through the implementation of the \texttt{ArpRayCasting} protocol, they provide functionality for calculating the bounding box enclosing their children and performing intersection testing.
-When a CSG is getting initialized as a user defined geometry, a reference to the topmost CSG node is assigned to the
-\texttt{\_combinedAttributes\_or\_csg\_node} variable.
+\texttt{GeometryData} structs are created for CSG, too. The struct itself was slightly adapted for CSG rendering. As can be seen in Listing \ref{lst:geometry_data_final}, we renamed the variable storing a reference to the \texttt{Combined Attribute} node to \texttt{\_combinedAttributes\_or\_csg\_node}. Both the Combined Attributes node object and the topmost CSG node derive from the \texttt{ArNode} base class, and through the implementation of the \texttt{ArpRayCasting} protocol, they provide functionality for calculating bounding boxes and performing intersection testing.
+When a CSG is getting initialized as a user-defined geometry, a reference to the topmost CSG node is assigned to the
+\texttt{\_combinedAttributes\_or\_csg\_node} variable instead of a reference to the \texttt{Combined Attributes} object.
 
-A flag gets activated after a successful initialization of a constructive solid geometry during the scene graph assembly. When the traversal of a scene graph continues to the leaf nodes representing the geometric primitives of the CSG, they do not get initialized as user defined geometry when this flag is activated.
+A flag gets activated after a successful initialization of a CSG for Embree during the scene graph assembly. When the traversal of the scene graph continues to the leaf nodes representing the geometric primitives of the CSG, they do not get initialized as user-defined geometry if this flag is activated.
 
-During the intersection calculation by the \texttt{embree\_intersect} callback function during the rendering, the \texttt{getIntersectionList} function of the \texttt{\_combinedAttributes\_or\_csg\_node} object is called. Depending of this node being a \texttt{Combined Attributes} node or a topmost CSG node, the rendering procedure diverges: For a \texttt{Combined Attributes} node, the intersections are calculated directly on the shape, taking transformation information into account. For a topmost CSG node, the intersections with the underlying primitives are calculated by traversing the sub scene graph rooted at that node, as outlined in Section \ref{sec:art_raytracing}. 
+During the intersection calculation by the \texttt{embree\_intersect} callback function, the \texttt{getIntersectionList} function associated with the \texttt{\_combinedAttributes\_or\_csg\_node} object is called. Depending on this node being a \texttt{Combined Attributes} node or a topmost CSG node, the rendering procedure diverges: For a \texttt{Combined Attributes} node, the intersections are calculated directly on the shape, taking transformation information into account. For a topmost CSG node, the intersections with the underlying primitives are calculated by traversing the sub scene graph rooted at that node, as outlined in Section \ref{sec:art_raytracing}, only with the difference that with this approach, only a subgraph of the original scene graph is traversed.
 
-With this approach, scenes containing constructive solid geometries can be successfully rendered and the performance of the ray tracing process increased compared to the previous approach.  A detailed comparison of these two approaches can be found in Chapter \ref{chap:results}. Furthermore, the artifacts that result from rendering a scene in native ART by traversal of the "original scene graph", as described in Subsection \ref{sec:art_raytracing} are not present in images rendered with this approach, although the same "original scene graph" is partially traversed.
+With this approach, scenes containing constructive solid geometries can be successfully rendered, and the performance of the ray tracing process increased noticeably compared to the previous approach. Furthermore, the artifacts that result from rendering a scene ART by traversing of the original scene graph, as described in Subsection \ref{sec:art_raytracing}, such as the visible noise, are not present in images rendered with this approach. We cannot give a definite answer on why these artifacts are disappearing when rendering scenes with this approach. However, we believe this resolution must be related to the only partial traversal of the original scene graph.
 
-However, there exists some limitations with this approach. One issue was encountered when rendering a specific CSG scene: The Villa Rotonda scene, shown in Figure \ref{fig:rotonda}. Figure \ref{fig:rotonda_embree} shows the final image, rendered by the described approach. The figure shows the villa with its roof missing. At this point, we have to admit that we were not able to resolve this issue \todo{rephrase?}. However, due to the fact that rendering the scene with native ART by traversal of the original scene graph had the same outcome (apart from the visible noise), and due to the fact that we did not encounter this issue with other scene files containing CSG, we assume that this is a bug of the target platform ART. \todo{rephrase}
+\subsubsection{Limitations of this approach}
+
+A limitation of this approach is that \todo{tomorrow}
+
+
+One issue was encountered when rendering a specific CSG scene: The Villa Rotonda scene, shown in Figure \ref{fig:rotonda_intro}. Figure \ref{fig:rotonda_embree} shows the final image, rendered by the described approach. The figure shows the villa with its roof missing. At this point, we have to admit that we were not able to resolve this issue \todo{rephrase?}. However, due to the fact that rendering the scene with native ART by traversal of the original scene graph had the same outcome (apart from the visible noise), and due to the fact that we did not encounter this issue with other scene files containing CSG, we assume that this is a bug of the target platform ART. \todo{rephrase}
 
 \todo{or infsphere}
 
@@ -448,13 +437,20 @@ However, there exists some limitations with this approach. One issue was encount
 
 \begin{figure}
 	\centering
-	\subfloat[Villa Rotonda scene rendered with native ART by traversing the interlan KD tree.]{\includegraphics[width=.3\textwidth]{img/3 approach/villaRotondaNormal.png}\label{fig:rotonda_normal}}
-	\hfill
-	\subfloat[Villa Rotonda scene rendered with Embree.]{\includegraphics[width=.3\textwidth]{img/3 approach/villaRotondaEmbree.png}\label{fig:rotonda_embree}}
-	\hfill
-	\subfloat[Villa Rotonda scene rendered with native ART by traversing the original scene graph.]{\includegraphics[width=.3\textwidth]{img/3 approach/villaRotondaOrgScenegraph.png}\label{fig:rotonda_orgscenegraph}}
+	\subfloat[Villa Rotonda scene rendered with Embree.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaEmbree.png}\label{fig:rotonda_embree}}
+	\hfil
+	\subfloat[Villa Rotonda scene rendered with native ART by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaOrgScenegraph.png}\label{fig:rotonda_orgscenegraph}}
 	\caption{Artifact in the Villa Rotonda scene: The villa is missing its roof.}
 	\label{fig:rotonda}
+\end{figure}
+
+
+\begin{figure}
+	\centering
+	\subfloat[Villa Rotonda scene rendered with native ART by traversing the interlan KD tree.]{\includegraphics[width=.4\textwidth]{img/3 approach/spheresEmbree.png}\label{fig:csg_mesh_intro_normal}}
+	\hfil
+	\subfloat[Villa Rotonda scene rendered with Embree.]{\includegraphics[width=.4\textwidth]{img/3 approach/EmbreeOrgScenegraph.png}\label{fig:csg_mesh_intro_embree}}
+	\label{fig:csg_mesh_intro}
 \end{figure}
 
 
