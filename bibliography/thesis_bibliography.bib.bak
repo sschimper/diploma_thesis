@@ -454,15 +454,6 @@
   publisher = {ACM New York, NY, USA},
 }
 
-@Online{moana2021,
-  author  = {{Walt Disney Animation Studios}},
-  groups  = {Other},
-  title   = {{Moana Island Scene}},
-  url     = {https://www.disneyanimation.com/resources/moana-island-scene/},
-  urldate = {2021-07-01},
-  year    = {2021},
-}
-
 @Misc{peddie2019ray,
   author       = {Peddie, Jon},
   howpublished = {\url{http://gts.sourceforge.net/}},
@@ -514,12 +505,13 @@
   year    = {2014},
 }
 
-@Article{karaffova2016,
-  author  = {Markéta Karaffová},
-  journal = {Master Thesis, CzechTechnical University in Prague},
-  title   = {Efficient Ray Tracing of CSG Models},
-  year    = {2016},
-  groups  = {CSG Embree},
+@MastersThesis{karaffova2016,
+  author      = {Karaffová, Markéta},
+  school      = {Faculty of Electrical Engineering},
+  title       = {Efficient Ray Tracing of CSG Models},
+  year        = {2016},
+  groups      = {CSG Embree},
+  institution = {Czech Technical University in Prague},
 }
 
 @Book{peddie2019ray,
@@ -570,6 +562,25 @@
   volume    = {57},
   groups    = {scenes},
   publisher = {Optical Society of America},
+}
+
+@MastersThesis{zajicek2012,
+  author      = {Zaji{\v{c}}ek, Petr},
+  school      = {Faculty of Mathematics and Physics},
+  title       = {Acceleration of Ray-Casting for CSG scenes},
+  year        = {2012},
+  groups      = {CSG Embree},
+  institution = {Charles University in Prague},
+}
+
+@Article{ullmann2011bit,
+  author    = {Ullmann, Julian R},
+  journal   = {Journal of Experimental Algorithmics (JEA)},
+  title     = {Bit-vector algorithms for binary constraint satisfaction and subgraph isomorphism},
+  year      = {2011},
+  pages     = {1--1},
+  volume    = {15},
+  publisher = {ACM New York, NY, USA},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}

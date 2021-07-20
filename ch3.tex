@@ -50,7 +50,7 @@ Furthermore, class methods are defined for the initialization of different geome
 In order to perform the actual ray-primitive intersection testing with Embree, an instance method was added to the \texttt{ArnRayCaster} class, which we gave the name \texttt{getIntersectionListWithEmbree}. If Embree support is enabled, instead of traversing ART's KD tree, this method is called. In this function, a given ray is converted to an \texttt{RTCRay} and Embree's internal function for intersection testing, \texttt{rtcIntersect1}, is invoked. Since ART only supports the cast of single rays, as opposed to ray packets, functionality for casting ray packets with Embree is not considered. After the intersection testing is performed, the \texttt{tfar} value is updated with the hit distance (which will remain being set to \texttt{INFINITY} if no intersection was found). The UV coordinates, the surface normal at the hit point, and the shape associated with the hit geometry are stored in an intersection list. From this point, the ray tracing process continues as usual until the next ray is cast into the scene.
 
 \section{Initializing shapes for Embree}
-\todo{bullet list}
+
 ART supports a variety of different geometrical shapes. An overview of these shapes can be found in the ART Scene File Reference Manual. The supported shapes are divided by ART into two categories: \emph{Analytic shapes} and \emph{Simple indexed shapes}. Analytic shapes are represented by ART as outlined in Section \ref{sec:quadrics}. Simple indexed shapes, on the other hand, are described by an array of vertices and indices associated with the shape in question (similar to the triangle primitives in \emph{OpenGL}). In ART, two shapes, namely triangles and quadrangles, are considered simple indexed shapes. Figure \ref{fig:shape_types} shows example shapes belonging to the two categories. 
 This section describes the initialization of these shape types for Embree.
 
@@ -113,8 +113,8 @@ Subsequently, this struct is stored in a linked list, whose head is an instance 
 	\end{lstlisting}
 \end{listing} 
 
-\subsection{Initialization of simple indexed geometry}
-Simple index geometries are initialized the following way: Inside the \texttt{initEmbreeGeometry} function, another class method with the name \texttt{initEmbreeSimpleIndexedGeometry} is called, with the shape object, the vertex set containing the vertices that describe the shape, and the transformation matrix being passed as arguments. 
+\subsection{Initialization of non-user-defined geometry}
+Simple index geometries and triangle meshes are initialized the following way: Inside the \texttt{initEmbreeGeometry} function, another class method with the name \texttt{initEmbreeSimpleIndexedGeometry} is called, with the shape object, the vertex set containing the vertices that describe the shape, and the transformation matrix being passed as arguments. 
 \\
 \\
 
@@ -179,13 +179,13 @@ In the interior of this function, the following steps are executed:
 	
 \end{itemize}
 
-The initialization of a triangle mesh, being parsed from a PLY file with the help of the "RPly" library \cite{rply2016}, follows the same outline described for triangles and quadrangles, although triangle meshes do not fall into the category of simple indexed shapes. The only difference is that the number of items for Embree's vertex geometry buffer is set to the number of total triangles in the mesh.
+The initialization of a triangle mesh, being parsed from a PLY file with the help of the "RPly" library \cite{rply2016}, follows the same outline described for triangles and quadrangles, although triangle meshes do not fall into the category of simple indexed shapes. The only difference is that the size of Embree's geometry buffers is set according to the number of total triangles in the mesh. ART originally creates internal KD trees for triangle meshes. Their creation can be omitted when initializing a triangle mesh for Embree. For large triangle meshes, this omission will drastically reduce the time needed to prepare the ray tracing procedure.
 
 After the setup of the geometry buffers, the newly created RTCGeometry is returned from this function and assigned to the RTCGeometry, created in the \texttt{initEmbreeGeometry} function, followed by the allocation of a \texttt{GeometryData} struct and the setup of its variables. The \texttt{isUserGeometry} boolean variable is set to \texttt{false}.
 
 \subsection{Initialization of user-defined geometry}
 \label{sec:init_user}
-Under this category fall any shape of ART other than triangles, quadrangles, and triangle meshes.
+Under this category fall any shape of ART other than triangles, quadrangles, and triangle meshes. One particular geometry that is supported by ART is a cube, which one can create by the \texttt{CUBE} macro in the ARM scene file. Although this cube geometry can be described by six quadrangles or twelve triangles, for simplicity, we treat such a cube as a user-defined geometry as well. 
 \\
 
 For initializing this kind of geometry type for Embree, we do the following:
@@ -211,6 +211,8 @@ For initializing this kind of geometry type for Embree, we do the following:
 \end{itemize}
 
 Once an intersection with a bounding box enclosing a user-defined geometry is found during ray tracing, Embree will call the \texttt{embree\_intersect} function, which performs the intersection testing between the ray and the shape that is associated with that bounding box.
+
+
 
 
 \section{Ray tracing with Embree in ART}
@@ -458,4 +460,5 @@ However, there exists some limitations with this approach. One issue was encount
 
 \subsection{Creation of KD trees for constructive solid geometries}
 \label{subsec:apprach3}
-bla blub
+
+\cite{zajicek2012}

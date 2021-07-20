@@ -65,7 +65,7 @@ The transmission and specular component rays at that intersection point are then
 To prevent a branch of the tree from growing infinitely large, it is truncated as soon as an attempt is made to access more storage than was previously made available for it. After such a tree is created, it is traversed recursively in order to calculate the light intensity at each node, finally resulting in the calculation of the total light intensity that is reflected towards the $Eye Point$. Between two nodes, the intensity is attenuated according to a distance function between the intersection points, associated with the node and the node's parent node. 
 Such trees are created and traversed for every pixel of the image plane. This procedure allows for the convincing display of a variety of optical effects with the help of a single model.
 
-\subsection{The Rendering Equation}
+\subsection{The rendering equation}
 
 \begin{figure}
 	\centering
@@ -80,7 +80,7 @@ Figure \ref{fig:cb_local} shows an image of the Cornell Box. The scene's appeara
 In 1986, an integral equation was developed by Kajiya \cite{kajiya1986rendering}, that would describe the total reflected radiance towards an observer as the "sum" (or integral) of all light contributions over a hemisphere at a point on a surface. This mathematical model takes direct illumination (light from light sources) and indirect illumination (light being reflected off other surfaces in the scene) into account.
 \\
 
-The so-called \emph{Rendering Equation} is given by
+The so-called \emph{rendering equation} is given by
 
 \begin{equation}\label{eq:renderingeq}
 L(x, \omega_{o}) = L_{e}(x, \omega_{o}) + \int_{H(x)} L(x, \omega_{i})f_{r}(\omega_{i} \rightarrow \omega_{o})\cos\theta\partial\omega_{i}
@@ -145,7 +145,7 @@ f_{r}(\omega_{i} \rightarrow \omega_{o}) = \frac{\partial L_{r}(\omega_{o})}{L_{
 Properties of BRDFs are the conservation of energy and the Helmholtz reciprocity, which considers the incident and reflected light intensities in Equation \ref{eq:brdf} as interchangeable without affecting the result. There exist different types of BRDFs: empirical BRDFs, physically based BRDFs, and BRDFs being an approximation of measured data.
 BRDFs are a crucial component when calculating direct illumination with the \emph{local reflection equation}.
 
-\subsubsection{Reflection Equation}
+\subsubsection{Reflection equation}
 
 The \emph{Reflection Equation} describes how much total light is reflected from a surface point $x$ towards an observer along a given direction $\omega_{o}$, taking the light intensities arriving at $x$ from all incident directions into account. It is given by:
 
@@ -160,7 +160,7 @@ L_{r}(x, \omega_{o}) = \int_{H(x)} L_{i}(x, \omega_{i})f_{r}(\omega_{i} \rightar
 \end{itemize}
 The total amount of reflected energy is calculated by integrating all contributions of incident radiance over the hemisphere $H(x)$. The BRDF serves as a weight in this equation because only the energy reflected along $\omega_{o}$ is considered.
  
-\subsubsection{The Rendering Equation revisited}
+\subsubsection{The rendering equation revisited}
 
 The rendering equation, which for reasons of convenience is shown again in Equation \ref{eq:renderingeq2} can be arguably regarded as an extension of the local reflection equation.
 
@@ -269,10 +269,12 @@ Polygon meshes represent shapes as a composition of multiple smaller polygons co
 
 Various ray primitive intersection algorithms exist, for example, the Möller-Trumbore intersection algorithm \cite{moller1997fast} for intersecting triangles. To test a given ray for intersection with a polygon mesh, in theory, all polygons contained in the mesh in question must be tested for intersection. This is, of course, a naive and costly approach since the number of intersection tests that need to be performed is linear in the number of polygons. As such, polygon meshes are often composed of several thousand polygons, and testing them all for intersection has a decisive influence on the performance of the rendering process. Section \ref{sec:acceleration} introduces acceleration data structures, aiming at the minimization of those intersection tests.
 
-\subsection{Constructive Solid Geometry (CSG)}
-\todo{rewrite this whole section}
-The core idea behind \emph{constructive solid geometry (CSG)} is the representation of more complex geometry by the application of Boolean set operations to a manageable amount of geometric primitives. The boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted as \texttt{SUB}-operator).
-Primitives are usually analytically described surfaces such as spheres, cones, and cylinders. However, polygon meshes can be used as primitives for CSG, too. Figure \ref{fig:csg} shows the application of each Boolean operator to two sphere primitives. Multiple applications of set operations with geometric primitives can be hierarchically ordered in a binary tree structure, called the CSG tree.   
+\subsection{Constructive solid geometry (CSG)}
+
+The idea behind \emph{constructive solid geometry (CSG)} is the representation of more complex geometry by the application of Boolean set operations to a manageable amount of geometric primitives. The Boolean set operators are union (logical \texttt{OR}), intersection (logical \texttt{AND}) and difference (denoted as \texttt{SUB}-operator).
+The geometric primitives of which CSG are composed are usually analytically described surfaces such as spheres, cones, and cylinders. However, polygon meshes can be treated as such primitives, too.   
+
+The representation of solids as constructive solid geometry offers one significant advantage: Complex geometry can be expressed via the composition of a manageable amount of primitive shapes instead of large numbers of polygons in a polygon mesh. Because testing whether a point lies inside or outside a primitive is easy, as noted in Section \ref{sec:quadrics}. Since the number of primitives of a composed CSG is usually lower than the number of polygons in a polygon mesh, the number of intersection tests in each render pass is comparatively low and computationally cheap.
 
 \begin{figure} 
 	\centering
@@ -281,93 +283,92 @@ Primitives are usually analytically described surfaces such as spheres, cones, a
 	\subfloat[Intersection of two spheres (\texttt{AND} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/and.png}\label{fig:csg_and}}
 	\hfill
 	\subfloat[Left sphere with the right sphere "subtracted" from it (\texttt{SUB} operator).]{\includegraphics[width=.3\textwidth]{img/1 fundamentals/sub.png}\label{fig:csg_sub}}
-	\caption{Boolean operators Union (\ref{fig:csg_or}), Intersection (\ref{fig:csg_and}) and Difference (\ref{fig:csg_sub}) applied to two sphere objects.}
+	\caption{Boolean operators union (\ref{fig:csg_or}), intersection (\ref{fig:csg_and}) and difference (\ref{fig:csg_sub}) applied to two sphere objects.}
 	\label{fig:csg}
 \end{figure}
 
-One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leaves are associated with the geometry primitives, its interior nodes with a set operation. Due to the possibility that two primitives can be translated, rotated, or scaled before a Boolean operator is applied to them, the edges of the tree can be associated with transformation information (this is indicated in Figure \ref{fig:csg_tree} with the matrix icon) if a transformation is applied to the primitives \todo{reformulate}
+\begin{figure} 
+	\centering
+	\subfloat[In total, the ray intersects both spheres at four points.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGall.png}\label{fig:csg_all_rc}}
+	\hfil
+	\subfloat[When applying a union set operation to the two spheres, the two intersection points that lie in the interior or boundary of both spheres are disregarded.]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGor.png}\label{fig:csg_or_rc}}
+	\\
+	\subfloat[Complementary to the union, the intersection set operation disregards the two intersection points that do not lie in the interior or boundary of both spheres. ]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGand.png}\label{fig:csg_and_rc}}
+	\hfil
+	\subfloat[When a difference set operation is applied to "subtract" the right sphere from the left sphere, only the intersection points that lie in the interior or boundary of the left sphere are considered. ]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGsub.png}\label{fig:csg_sub_rc}}
+	\caption{Selection of calculated intersection points between a ray and two spheres according to the Boolean set operations. The horizontal line illustrates the ray, and the red circles depict the intersection points.}
+	\label{fig:csg_rc}
+\end{figure}
+
+Figure \ref{fig:csg} shows the results of the application of each Boolean set operator to two sphere primitives. The resulting shapes come about by evaluating the intersections between a ray and the spheres, that have been calculated during the ray tracing procedure, according to the respective set operation. Figure \ref{fig:csg_rc} provides a visual depiction of this.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=.9\linewidth]{img/1 fundamentals/csg_tree.png}
 	\caption{Visualization of a CSG tree hierarchy, originally created by \cite{csgtree} and updated
-	with a matrix icon symbolizing affine transformations of geometries.}
+		with a matrix icon symbolizing affine transformations of geometries.}
 	\label{fig:csg_tree}
 \end{figure}
 
-\subsubsection{Ray tracing with CSG}
+Multiple such applications of set operations with geometric primitives can be hierarchically ordered in a binary tree, which we will call the \emph{CSG tree}. One example of such CSG tree is provided in Figure \ref{fig:csg_tree}. Its leaves are associated with the geometry primitives, its interior nodes with set operations. Due to the possibility that two primitives can be translated, rotated, or scaled before a Boolean operator is applied to them, the corresponding edges of the tree can be associated with transformation information (this is indicated in Figure \ref{fig:csg_tree} with the matrix icon).
 
-\begin{figure} 
-	\centering
-	\subfloat[Union of two spheres (\texttt{OR} operator).]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGall.png}\label{fig:csg_all_rc}}
-	\hfil
-	\subfloat[Intersection of two spheres (\texttt{AND} operator).]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGor.png}\label{fig:csg_or_rc}}
-	\\
-	\subfloat[Left sphere with the right sphere "subtracted" from it (\texttt{SUB} operator).]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGand.png}\label{fig:csg_and_rc}}
-	\hfil
-	\subfloat[Left sphere with the right sphere "subtracted" from it (\texttt{SUB} operator).]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGsub.png}\label{fig:csg_sub_rc}}
-	\caption{I will think of a caption later...}
-	\label{fig:csg_rc}
-\end{figure}
+The CSG tree is utilized during ray casting for calculating the intersections between a ray and the CSG. The tree is traversed recursively. When visiting a node's child node, the ray is transformed according to the transformation associated with the edge between node and child node. If the visited node is a leaf node, we calculate the intersection points between the ray and the solid represented by that node. If the visited node is an internal node representing a Boolean set operation, we determine two sets of intersections by recursively applying the procedure to the node's two child nodes and subsequently evaluating them according to the set operation.
 
-The ray tracing of CSG was pioneered by \cite{roth1982ray}. In the algorithm described in this \todo{do}, the intersection calculation for a given ray during the ray tracing process is straightforward: 
-All the primitives associated with the leaves of the CSG tree are tested for intersection. If an intersection test with a quadric shape for instance has a positive result, usually two intersection points are calculated: one point when the ray enters the primitive and one point when it exits it (there is the edge case that there exists infinitely many intersection points between a ray and a primitive when the ray is tangent to the primitive, however, this is seldom the case and can be safely ignored). \todo{fucking fix this sentence}Then the CSG tree is traversed bottom up, and each time an interior node, representing a boolean set operator, is encountered, the intersection points of the ray with the primitives associated with the child nodes are evaluated and re-arranged. For example, when considering the \texttt{OR} operator in Figure \ref{fig:csg_or}, and given that a single ray would intersect both spheres, there would be four intersection points: One entering the first sphere, followed by one entering the second sphere, then one exiting the first sphere, and finally one intersection point exiting the second sphere. The \texttt{OR} operator would treat the two spheres as one single object and therefore discard the interior intersection points. Similarly, the \texttt{AND} operator in Figure \ref{fig:csg_and} would discard the two intersections at the exterior of the spheres and keep the two intersections contained in both spheres.
-And finally, the \texttt{SUB} operator in Figure \ref{fig:csg_sub} discards every intersection point on the sphere (exterior or interior) that is "subtracted" from the sphere on the left.
-\todo{fucking fix this explanation}
-
-The representation of CSG offers one significant advantage: Complex geometry can be expressed via the composition of a manageable amount of primitive shapes, as opposed to large numbers of polygons in a polygon mesh. Because testing whether a point lies inside or outside a primitive is easy, as noted in Section \ref{sec:quadrics}, and since the number of primitives of a composed CSG is usually lower than the amount of polygons in a polygon mesh, the number of intersection tests in each render pass is comparatively low.
-
-Although the CSG modeling technique is several years old, it is still used in practice today, e.g. for computer-aided design.
+The first algorithm for ray tracing CSG was developed by \cite{roth1982ray}. 
 
 
-\section{Spacial acceleration data structures} \label{sec:acceleration}
+\section{Acceleration data structures} \label{sec:acceleration}
 The computational cost associated with ray tracing and path tracing algorithms has always been regarded as a "necessary evil" one faces when desiring highly realistic images. An often-cited fact is Whitted's observation that, for complex scenes, 95 percent of the time used by his algorithm is spent on intersection calculations \cite[p 349]{whitted1979improved}. To give an example, the image displayed in Figure \ref{fig:kajiya_figure} was rendered via path tracing on an IBM 3081 machine during 1221 minutes \cite[p 149]{kajiya1986rendering}. The image had a resolution of 512 by 512 pixels and was rendered with 40 paths per pixel.
 
-It was only a logical consequence that new ideas were introduced over time, aiming at accelerating the ray tracing process. Be it through the minimization of the number of rays cast into the scene, the development of faster intersection testing algorithms, or the minimization of ray-primitive intersection tests. \emph{Acceleration data structures} are intended to reduce the number of unnecessary intersection calculations. By utilizing these structures, one essentially trades a decrease of the time needed to perform intersection testing to increase storage space. The following section focuses on two popular acceleration data structures commonly used: Bounding volume hierarchies and KD trees.
+It was only a logical consequence that new ideas were introduced over time, aiming at accelerating the ray tracing process. Be it through the minimization of the number of rays cast into the scene, the development of faster intersection testing algorithms, or the minimization of ray-primitive intersection tests. \emph{Acceleration data structures} are intended to address the latter. By utilizing these structures, one essentially trades a decrease of performance time for increased storage space. The following subsections focus on two popular acceleration data structures commonly used: Bounding volume hierarchies and KD trees.
 
-\subsection{Bounding Volume Hierarchies}
+\subsection{Bounding volume hierarchies}
 
-\emph{Bounding Volume Hierarchies (BVHs)} are hierarchical structures of so-called \emph{bounding volumes}, aiming at the reduction of unnecessary intersection tests. Bounding volumes enclose geometries with an analytical shape, such as a sphere, a cylinder, or a box. As previously discussed in Section \ref{sec:quadrics}, testing for an intersection between a given ray and one such analytical shape is easy. If no intersection with such volume is found, it is logical that an intersection between the ray and the enclosed geometry is not possible. Therefore, the intersection calculation between the ray and the enclosed geometry can be safely disregarded. 
+\emph{Bounding volume hierarchies (BVHs)} are hierarchical structures of \emph{bounding volumes}, aiming at the reduction of unnecessary intersection tests. Bounding volumes enclose geometries with an analytical shape, such as a sphere, a cylinder, or a box. As previously discussed in Section \ref{sec:quadrics}, testing for an intersection between a given ray and one such analytical shape is easy. If no intersection with such volume is found, it is logical that an intersection between the ray and the enclosed geometry is not possible. Therefore, the intersection calculation between the ray and the enclosed geometry can be safely disregarded. 
 
 \begin{figure}
 	\centering
 	\includegraphics[width=.7\linewidth]{img/1 fundamentals/bvh.png}
-	\caption{2D example of a bounding volume hierarchy, taken from \cite{pharr2016physically}. (a) represents the scene, consiting of simple shapes and their axis aligned bounding boxes and (b) the BVH tree structure associated with the scene from (a).}
+	\caption{Example of a bounding volume hierarchy, published in \cite{pharr2016physically}. (a) represents a 2D scene, consisting of shapes enclosed with axis-aligned bounding boxes (indicated by the rectangles with dashed edges). Further bounding boxes enclose the bounding boxes of the two shapes in the bottom left and the whole scene. (b) shows the associated BVH tree structure.}
 	\label{fig:bvh}
 \end{figure}
 
-Bounding volumes should ideally be chosen to fit the underlying geometry as close as possible to reduce the number of unnecessary intersection tests further. However, a most commonly used volume is an \emph{axis aligned bounding box}, a hyperrectangle whose sides are parallel to the axis of the coordinate system. Such boxes might not enclose the geometry as tightly as possible. On the other side, testing for intersections becomes computationally cheap, and not much memory is needed to store them.
+Bounding volumes should ideally be chosen to fit the enclosing geometry as tight as possible to reduce the number of unnecessary intersection tests further. However, a most commonly used volume is an \emph{axis aligned bounding box}, a hyperrectangle whose sides are parallel to the axis of the coordinate system. Such boxes might not enclose the geometry as tight as possible. On the other side, testing for intersections becomes computationally cheap, and not much memory is needed to store them.
 
-Again, these bounding volumes can be enclosed in a bounding volume, and thus, complex hierarchies of bounding volumes can be formed.
-A BVH then is a hierarchy of multiple of such bounding volumes stored in a tree structure. The leaves of the tree represent the bounding boxes of the geometry contained in the scene, and the interior nodes are associated with bounding volumes enclosing the node's children. The bounding box associated with the tree root encloses the entire scene. An example of such a tree structure is given by Figure \ref{fig:bvh}.
-
-Binary BVHs exhibit some convenient properties: \todo{fucking, check this dude! could be plain wrong} Every geometrical primitive is present in exactly one bounding box, and these bounding boxes do not overlap with each other. Thus, no primitive is possibly tested for intersection twice (unlike with KD trees, which are the subject of the next section). Furthermore, the amount of memory needed for storing a binary BVH is bounded. 
+These bounding volumes can be again enclosed in a bounding volume, and thus, complex hierarchies of bounding volumes can be formed.
+A BVH is a hierarchy of multiple of such bounding volumes stored in a tree structure. The leaves of the tree represent the bounding boxes of the geometry contained in the scene, and the interior nodes are associated with bounding volumes enclosing the node's children. The bounding box associated with the tree root encloses the entire scene. An example of such a tree structure is given by Figure \ref{fig:bvh}.
 
 A BVH that is build over $n$ primitives obtains $2n-1$ total nodes, $n$ leave nodes and $n-1$ interior nodes, as noted in \cite{pharr2016physically}.
 
-During ray tracing, the BVH is traversed, and a cast ray is tested for intersections between a bounding box associated with the current tree node. If an intersection is found, the traversal continues in the node's children, otherwise traversing the subtree rooted at that node is disregarded.
+During ray tracing, the BVH is traversed, and a cast ray is tested for intersections between the bounding box associated with the current tree node. If an intersection is found, the traversal continues in the node's children, otherwise traversing the subtree rooted at that node is disregarded.
 
 
-\subsection{KD Trees}
+\subsection{KD trees}
 
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{img/1 fundamentals/kd_tree.png}
-	\caption{Partition of a 2D scene in sub spaces A, B, C, and D with planes 0, 1, and 2. This figure is taken from \cite{hapala2011kd}.}
+	\caption{Partition of a 2D scene in subspaces A, B, C, and D with one-dimensional lines 0, 1, and 2, subdividing the scene. This figure was originally published in \cite{hapala2011kd}.}
 	\label{fig:kdtree}
 \end{figure}
 
-\emph{K-dimensional trees} (or KD trees), which were introduced by \cite{bentley1975multidimensional}, belong to the group of \emph{binary space partitioning trees (BSP trees)}. BSP trees recursively subdivide $k$ dimensional space with $k-1$ dimensional hyperplanes. One subdivision of space occurs when the number of geometric primitives contained in it is greater than a specified threshold. When one such subdivision takes place, space is divided into two smaller half-spaces. This procedure is repeated for each of the two half-spaces until the number of primitives contained in a subdivided area is smaller or equal to the threshold. The hyperplanes that partition space are stored in a tree structure. The root of the tree is associated with the hyperplane splitting the bounding volume of the entire scene. Its children to the left are the hyper-planes and primitives in one half-space, and the children to the right are the planes and primitives located in the other half-space. The leaf nodes correspond to a list of primitives located in the area bounded by the hyper-planes associated with their parent nodes in the tree.
+\emph{K-dimensional trees} (or \emph{KD trees}), which were introduced by \cite{bentley1975multidimensional}, belong to the group of \emph{binary space partitioning trees (BSP trees)}. BSP trees recursively subdivide $k$ dimensional space with $k-1$ dimensional hyperplanes. One subdivision of space occurs when the number of geometric primitives contained in it is greater than a specified threshold. When one such subdivision takes place, space is divided into two smaller half-spaces. This procedure is repeated for each of the two half-spaces until the number of primitives in a subdivided area is smaller or equal to the threshold. The hyperplanes that partition space are stored in a tree structure. The root of the tree is associated with the hyperplane splitting the bounding volume of the entire scene. Its children to the left are the hyper-planes and geometric objects in one half-space, and the children to the right are the planes and objects located in the other half-space. The leaf nodes correspond to a list of geometries located in the area bounded by the hyper-planes associated with their parent nodes in the tree.
 
-KD trees are a specialized case where the split-planes are perpendicular to one of the coordinate axis. During the recursive splitting, the axis to which the current plane is perpendicular to, is alternated. This allows for KD trees being efficiently constructed. However, \todo{check this too!} unlike with BVHs, primitives can be located in overlapping sub spaces, therefore intersection points may be calculated twice during ray tracing. 
+KD trees are a specialized case where the split-planes are perpendicular to one of the coordinate axes. In this subsection, we will only consider the subdivision of three-dimensional space with KD trees. During the recursive splitting, the axis to which the current plane is perpendicular is alternated. The tree's root represents the plane subdividing the bounding box enclosing the entire scene.
 
-Construction methods taking $O(n\log n)$ time exists \cite{wald2001interactive}.) \todo{re-write}
+The traversal of the KD tree for calculating intersections between a ray and the scene geometry is almost similar to the traversal of bounding volume hierarchies. The crucial difference lies in the calculation of volumes bounded by split planes, as opposed to axis-aligned bounding boxes, before testing the contained geometry for intersections.
+
+When a given ray does not intersect the box containing the entire scene geometry, there is no need to traverse the KD tree. Otherwise, we test for intersections between the ray and the two volumes bounding the half-spaces, separated by the split plane, represented by the tree root. These two half-spaces are associated with the children to the left and the right of the root node. If the ray does not intersect one such half-space, bounded by the scene bounding box and the split plane, the corresponding subtree is not further traversed. Otherwise, the same procedure is recursively applied to the interior nodes until a leaf node is reached. In this case, the geometries in the list corresponding to the leaf node are tested for intersection.
+
+A variety of construction and traversal algorithms exists for KD trees, for example the algorithm described in \cite{wald2006building}.
+
 
 \section{Intel's Embree framework}
 Despite the effect of various ray acceleration data structures and hardware optimizations, exploiting the full capabilities of modern CPUs, which exhibit different architectures and instruction sets and support different algorithms and data structures, remains challenging for ray tracing applications.
 
 Embree is a high performance rendering framework written in C99 which addresses this problem. It offers a collection of vectorized kernels optimized for communication with CPUs that support SSE, AVX, AVX2, AVX-512, and instruction sets. The provided kernels offer a variety of components, e.g., different types of BVHs, traversal algorithms, and intersection algorithms, Figure \ref{fig:embree} provides an overview.
 During a rendering process, Embree will decide on which components to use for building the acceleration structure and traversing it based on information provided by the user and on the target CPU architecture. The latter is performed by the "Ray Tracing Kernel Selection" layer of the hierarchy shown in Figure \ref{fig:embree}.
+\\
 
 Interesting features of Embree are:
 \begin{itemize}
