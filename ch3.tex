@@ -364,7 +364,7 @@ After the evaluation, the intersection list, whose head intersection has the min
 
 Although it is possible to render CSG with the approach outlined in this subsection, we are aware that it is still far from being optimal. We have not implemented this functionality for non-user-defined geometry. When Embree calculates the intersections between a ray and a non-user-defined geometry, it returns only one intersection, either the closest or an arbitrary one \footnote{However, \cite{karaffova2016} describes a method of how all encountered intersections can be retrieved from Embree.}.
 
-The whole original scene graph is traversed to evaluate the intersections between a ray and a CSG represented by only a subgraph. Theoretically, only this subgraph would need traversing. However, even those subgraphs representing a particular CSG in the scene graph can be large and complex. To give an example, Figure \ref{fig:rotonda_intro} shows a rendered image of the "Villa Rotonda". The entire villa comprises only two CSG, which are constructed from a total number of 1,256 primitives.
+The whole original scene graph is traversed to evaluate the intersections between a ray and a CSG represented by only a subgraph. Theoretically, only this subgraph would need traversing. However, even those subgraphs representing a particular CSG in the scene graph can be large and complex. To give an example, Figure \ref{fig:rotonda_intro} shows a rendered image of the "Villa Rotonda". The entire villa comprises only two CSG, which are constructed from a total number of 1,255 primitives.
 
 \begin{figure}
 	\centering

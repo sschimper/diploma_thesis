@@ -582,6 +582,7 @@
   organization = {Wiley Online Library},
   pages        = {683--712},
   volume       = {40},
+  groups       = {Existing Ray Accelerator Structures},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
