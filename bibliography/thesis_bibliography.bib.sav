@@ -573,6 +573,18 @@
   institution = {Charles University in Prague},
 }
 
+@InProceedings{meister2021survey,
+  author       = {Meister, Daniel and Ogaki, Shinji and Benthin, Carsten and Doyle, Michael J and Guthe, Michael and Bittner, Ji{\v{r}}{\'\i}},
+  booktitle    = {Computer Graphics Forum},
+  title        = {A Survey on Bounding Volume Hierarchies for Ray Tracing},
+  year         = {2021},
+  number       = {2},
+  organization = {Wiley Online Library},
+  pages        = {683--712},
+  volume       = {40},
+  groups       = {Existing Ray Accelerator Structures},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
 
 @Comment{jabref-meta: grouping:

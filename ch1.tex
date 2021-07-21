@@ -73,6 +73,7 @@ Such trees are created and traversed for every pixel of the image plane. This pr
 	\hfil
 	\subfloat[]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/cb_global.png}\label{fig:cb_global}}
 	\caption{The Cornell Box scene with direct illumination (Figure \ref{fig:cb_local}) and global illumination (Figure \ref{fig:cb_global}). Both scenes were rendered by a simple ray tracing program that was implemented by students attending the course \citetitle{cg3}, held at Charles University in Prague \cite{cg3}.}
+	\label{fig:cb}
 \end{figure}
 
 Figure \ref{fig:cb_local} shows an image of the Cornell Box. The scene's appearance results from shooting a ray into the scene, calculating a possible intersection point, and then generating a second ray in the direction of the light source. However, the appearance of the Cornell Box is not physically realistic because the ceiling is not illuminated. This is since, with this approach, no light rays that interact with surface points on the ceiling can directly reach the emissive area of the light source. The degree of realism of the scene shown in Figure \ref{fig:cb_local} can be significantly improved by considering global illumination effects. 
@@ -296,7 +297,7 @@ The representation of solids as constructive solid geometry offers one significa
 	\subfloat[Complementary to the union, the intersection set operation disregards the two intersection points that do not lie in the interior or boundary of both spheres. ]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGand.png}\label{fig:csg_and_rc}}
 	\hfil
 	\subfloat[When a difference set operation is applied to "subtract" the right sphere from the left sphere, only the intersection points that lie in the interior or boundary of the left sphere are considered. ]{\includegraphics[width=.4\textwidth]{img/1 fundamentals/CSGsub.png}\label{fig:csg_sub_rc}}
-	\caption{Selection of calculated intersection points between a ray and two spheres according to the Boolean set operations. The horizontal line illustrates the ray, and the red circles depict the intersection points.}
+	\caption{Selection of calculated intersection points between a ray and two spheres according to the Boolean set operations. The horizontal line illustrates the ray, and the red circles depict the intersection points. The outlines of the two spheres depict a cross-section of the 3D objects.}
 	\label{fig:csg_rc}
 \end{figure}
 
@@ -318,13 +319,13 @@ The first algorithm for ray tracing CSG was developed by \cite{roth1982ray}.
 
 
 \section{Acceleration data structures} \label{sec:acceleration}
-The computational cost associated with ray tracing and path tracing algorithms has always been regarded as a "necessary evil" one faces when desiring highly realistic images. An often-cited fact is Whitted's observation that, for complex scenes, 95 percent of the time used by his algorithm is spent on intersection calculations \cite[p 349]{whitted1979improved}. To give an example, the image displayed in Figure \ref{fig:kajiya_figure} was rendered via path tracing on an IBM 3081 machine during 1221 minutes \cite[p 149]{kajiya1986rendering}. The image had a resolution of 512 by 512 pixels and was rendered with 40 paths per pixel.
+The computational cost associated with ray tracing and path tracing algorithms has always been regarded as a "necessary evil" one faces when desiring highly realistic images. An often-cited fact is Whitted's observation that, for complex scenes, 95 percent of the time used by his algorithm is spent on intersection calculations \cite[p 349]{whitted1979improved}.
 
-It was only a logical consequence that new ideas were introduced over time, aiming at accelerating the ray tracing process. Be it through the minimization of the number of rays cast into the scene, the development of faster intersection testing algorithms, or the minimization of ray-primitive intersection tests. \emph{Acceleration data structures} are intended to address the latter. By utilizing these structures, one essentially trades a decrease of performance time for increased storage space. The following subsections focus on two popular acceleration data structures commonly used: Bounding volume hierarchies and KD trees.
+It was only a logical consequence that new ideas were introduced over time, aiming at accelerating the ray tracing process. Be it through the minimization of the number of rays cast into the scene, the development of faster intersection testing algorithms, or the minimization of ray-primitive intersection tests. \emph{Acceleration data structures} are intended to address the latter. By utilizing these structures, one essentially trades a a performance increase for a larger memory footprint. The following subsections focus on two popular acceleration data structures commonly used: Bounding volume hierarchies and KD trees.
 
 \subsection{Bounding volume hierarchies}
 
-\emph{Bounding volume hierarchies (BVHs)} are hierarchical structures of \emph{bounding volumes}, aiming at the reduction of unnecessary intersection tests. Bounding volumes enclose geometries with an analytical shape, such as a sphere, a cylinder, or a box. As previously discussed in Section \ref{sec:quadrics}, testing for an intersection between a given ray and one such analytical shape is easy. If no intersection with such volume is found, it is logical that an intersection between the ray and the enclosed geometry is not possible. Therefore, the intersection calculation between the ray and the enclosed geometry can be safely disregarded. 
+\emph{Bounding volume hierarchies (BVHs)} are hierarchical structures of \emph{bounding volumes}, aiming at the reduction of unnecessary intersection tests. Bounding volumes enclose geometries with an analytical shape, such as a sphere, a cylinder, or a box. As previously discussed in Section \ref{sec:quadrics}, testing for an intersection between a given ray and an analytical shape is easy. If no intersection with such volume is found, it is logical that an intersection between the ray and the enclosed geometry is not possible. Therefore, the intersection calculation between the ray and the enclosed geometry can be safely disregarded. 
 
 \begin{figure}
 	\centering
@@ -342,6 +343,7 @@ A BVH that is build over $n$ primitives obtains $2n-1$ total nodes, $n$ leave no
 
 During ray tracing, the BVH is traversed, and a cast ray is tested for intersections between the bounding box associated with the current tree node. If an intersection is found, the traversal continues in the node's children, otherwise traversing the subtree rooted at that node is disregarded.
 
+A variety of different variants of BVHs exists. Their individual strengths and weaknesses depend on the target application (e.g., on whether it supports dynamic or static scenes) and the system architecture (e.g., on the CPU instruction set) \footnote{For more information on these various types of BVHs, we would like to re-direct the interested reader to the research article \citetitle{meister2021survey} \cite{meister2021survey}.}.
 
 \subsection{KD trees}
 
@@ -352,13 +354,16 @@ During ray tracing, the BVH is traversed, and a cast ray is tested for intersect
 	\label{fig:kdtree}
 \end{figure}
 
-\emph{K-dimensional trees} (or \emph{KD trees}), which were introduced by \cite{bentley1975multidimensional}, belong to the group of \emph{binary space partitioning trees (BSP trees)}. BSP trees recursively subdivide $k$ dimensional space with $k-1$ dimensional hyperplanes. One subdivision of space occurs when the number of geometric primitives contained in it is greater than a specified threshold. When one such subdivision takes place, space is divided into two smaller half-spaces. This procedure is repeated for each of the two half-spaces until the number of primitives in a subdivided area is smaller or equal to the threshold. The hyperplanes that partition space are stored in a tree structure. The root of the tree is associated with the hyperplane splitting the bounding volume of the entire scene. Its children to the left are the hyper-planes and geometric objects in one half-space, and the children to the right are the planes and objects located in the other half-space. The leaf nodes correspond to a list of geometries located in the area bounded by the hyper-planes associated with their parent nodes in the tree.
+\emph{K-dimensional trees} (or \emph{KD trees}), which were introduced by \cite{bentley1975multidimensional}, belong to the group of \emph{binary space partitioning trees (BSP trees)}.
+The crucial difference between this tree structure and the BVH is that the BVH uses bounding boxes to group geometric shapes, while BSP trees recursively subdivide $k$ dimensional space with $k-1$ dimensional hyperplanes to group shapes.
+
+One subdivision of space occurs when the number of geometric primitives contained in it is greater than a specified threshold. When one such subdivision takes place, space is divided into two smaller half-spaces. This procedure is repeated for each of the two half-spaces until the number of primitives in a subdivided area is smaller or equal to the threshold. The hyperplanes that partition space are stored in a tree structure. The root of the tree is associated with the hyperplane splitting the bounding volume of the entire scene. Its children to the left are the hyper-planes and geometric objects in one half-space, and the children to the right are the planes and objects located in the other half-space. The leaf nodes correspond to a list of geometries located in the area bounded by the hyper-planes associated with their parent nodes in the tree.
 
 KD trees are a specialized case where the split-planes are perpendicular to one of the coordinate axes. In this subsection, we will only consider the subdivision of three-dimensional space with KD trees. During the recursive splitting, the axis to which the current plane is perpendicular is alternated. The tree's root represents the plane subdividing the bounding box enclosing the entire scene.
 
 The traversal of the KD tree for calculating intersections between a ray and the scene geometry is almost similar to the traversal of bounding volume hierarchies. The crucial difference lies in the calculation of volumes bounded by split planes, as opposed to axis-aligned bounding boxes, before testing the contained geometry for intersections.
 
-When a given ray does not intersect the box containing the entire scene geometry, there is no need to traverse the KD tree. Otherwise, we test for intersections between the ray and the two volumes bounding the half-spaces, separated by the split plane, represented by the tree root. These two half-spaces are associated with the children to the left and the right of the root node. If the ray does not intersect one such half-space, bounded by the scene bounding box and the split plane, the corresponding subtree is not further traversed. Otherwise, the same procedure is recursively applied to the interior nodes until a leaf node is reached. In this case, the geometries in the list corresponding to the leaf node are tested for intersection.
+When a given ray does not intersect the box containing the entire scene geometry, there is no need to traverse the KD tree. Otherwise, we test for intersections between the ray and the two volumes bounding the half-spaces, separated by the split plane, represented by the tree root. These two half-spaces are associated with the children to the left and the right of the root node. If the ray does not intersect one such half-space, bounded by the scene bounding box and the split plane, the corresponding subtree is not further traversed. Otherwise, the same procedure is recursively applied to the child nodes until a leaf node is reached. In this case, the geometries in the list corresponding to the leaf node are tested for intersection.
 
 A variety of construction and traversal algorithms exists for KD trees, for example the algorithm described in \cite{wald2006building}.
 
@@ -367,7 +372,7 @@ A variety of construction and traversal algorithms exists for KD trees, for exam
 Despite the effect of various ray acceleration data structures and hardware optimizations, exploiting the full capabilities of modern CPUs, which exhibit different architectures and instruction sets and support different algorithms and data structures, remains challenging for ray tracing applications.
 
 Embree is a high performance rendering framework written in C99 which addresses this problem. It offers a collection of vectorized kernels optimized for communication with CPUs that support SSE, AVX, AVX2, AVX-512, and instruction sets. The provided kernels offer a variety of components, e.g., different types of BVHs, traversal algorithms, and intersection algorithms, Figure \ref{fig:embree} provides an overview.
-During a rendering process, Embree will decide on which components to use for building the acceleration structure and traversing it based on information provided by the user and on the target CPU architecture. The latter is performed by the "Ray Tracing Kernel Selection" layer of the hierarchy shown in Figure \ref{fig:embree}.
+For rendering, Embree will decide on which are the best-suited components to use for building the acceleration structure. It selects these components based on the information provided by the user and on the target CPU architecture. The latter is performed by the "Ray Tracing Kernel Selection" layer of the hierarchy shown in Figure \ref{fig:embree}.
 \\
 
 Interesting features of Embree are:

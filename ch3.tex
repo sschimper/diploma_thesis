@@ -418,28 +418,22 @@ A flag gets activated after a successful initialization of a CSG for Embree duri
 
 During the intersection calculation by the \texttt{embree\_intersect} callback function, the \texttt{getIntersectionList} function associated with the \texttt{\_combinedAttributes\_or\_csg\_node} object is called. Depending on this node being a \texttt{Combined Attributes} node or a topmost CSG node, the rendering procedure diverges: For a \texttt{Combined Attributes} node, the intersections are calculated directly on the shape, taking transformation information into account. For a topmost CSG node, the intersections with the underlying primitives are calculated by traversing the sub scene graph rooted at that node, as outlined in Section \ref{sec:art_raytracing}, only with the difference that with this approach, only a subgraph of the original scene graph is traversed.
 
+During the scene graph assembly for scenes with environment lighting, ART connects the infinite sphere with the rest of the geometries in the scene with a union operator. This is undesirable since our implementation would treat the entire geometries contained in the scene as one CSG. We can compensate for this by checking if a given topmost CSG node that is about to be initialized for Embree has an infinite sphere as a direct child. If so, we are not initializing this topmost CSG node for Embree.
+
 With this approach, scenes containing constructive solid geometries can be successfully rendered, and the performance of the ray tracing process increased noticeably compared to the previous approach. Furthermore, the artifacts that result from rendering a scene ART by traversing of the original scene graph, as described in Subsection \ref{sec:art_raytracing}, such as the visible noise, are not present in images rendered with this approach. We cannot give a definite answer on why these artifacts are disappearing when rendering scenes with this approach. However, we believe this resolution must be related to the only partial traversal of the original scene graph.
 
 \subsubsection{Limitations of this approach}
 
-A limitation of this approach is that \todo{tomorrow}
+An inconvenience of this approach is that the fact that Embree treats the entire CSG as a single geometry must be taken into account by a user when modeling a scene for ART. For example, Figure \ref{fig:cb} shows rendered images of the Cornell Box. For rendering the scene with Native ART, one could apply a union operator to the geometry of the box itself and the geometry describing the area light source (which is depicted as a box itself). Our approach, however, would interpret these two geometries as a single CSG and traverse the original scene graph to find intersections between them and a given ray. It would be better to describe the box of the Cornell Box and the area light as two disjoint geometrical entities.
 
 
-One issue was encountered when rendering a specific CSG scene: The Villa Rotonda scene, shown in Figure \ref{fig:rotonda_intro}. Figure \ref{fig:rotonda_embree} shows the final image, rendered by the described approach. The figure shows the villa with its roof missing. At this point, we have to admit that we were not able to resolve this issue \todo{rephrase?}. However, due to the fact that rendering the scene with native ART by traversal of the original scene graph had the same outcome (apart from the visible noise), and due to the fact that we did not encounter this issue with other scene files containing CSG, we assume that this is a bug of the target platform ART. \todo{rephrase}
-
-\todo{or infsphere}
-
-\todo{triangle csg}
-
-
-
-
+An issue was encountered when rendering a specific CSG scene: The Villa Rotonda scene, shown in Figure \ref{fig:rotonda_intro}. Figure \ref{fig:rotonda_embree} shows the final image, rendered by the described approach. The figure shows the villa with its roof missing (compare Figure \ref{fig:rotonda_intro}). We have to admit that we were not able to resolve this issue yet. However, rendering the scene with Native ART by traversal of the original scene graph results in the same artifact (besides the visible noise). Due to this and the fact that we did not encounter this issue with other scene files containing CSG (compare Chapter \ref{chap:results}), we assume that this is the issue is due to a bug occurring during the scene graph assembly for this scene in ART.
 
 \begin{figure}
 	\centering
-	\subfloat[Villa Rotonda scene rendered with Embree.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaEmbree.png}\label{fig:rotonda_embree}}
+	\subfloat[Villa Rotonda scene rendered with the implementation outlined in this subsection.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaEmbree.png}\label{fig:rotonda_embree}}
 	\hfil
-	\subfloat[Villa Rotonda scene rendered with native ART by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaOrgScenegraph.png}\label{fig:rotonda_orgscenegraph}}
+	\subfloat[Villa Rotonda scene rendered with Native ART by traversing the original scene graph.]{\includegraphics[width=.4\textwidth]{img/3 approach/villaRotondaOrgScenegraph.png}\label{fig:rotonda_orgscenegraph}}
 	\caption{Artifact in the Villa Rotonda scene: The villa is missing its roof.}
 	\label{fig:rotonda}
 \end{figure}
@@ -447,14 +441,31 @@ One issue was encountered when rendering a specific CSG scene: The Villa Rotonda
 
 \begin{figure}
 	\centering
-	\subfloat[Villa Rotonda scene rendered with native ART by traversing the interlan KD tree.]{\includegraphics[width=.4\textwidth]{img/3 approach/spheresEmbree.png}\label{fig:csg_mesh_intro_normal}}
+	\subfloat[Scene rendered with native ART by traversing the internal KD tree.]{\includegraphics[width=.4\textwidth]{img/3 approach/spheresEmbree.png}\label{fig:csg_mesh_intro_normal}}
 	\hfil
-	\subfloat[Villa Rotonda scene rendered with Embree.]{\includegraphics[width=.4\textwidth]{img/3 approach/EmbreeOrgScenegraph.png}\label{fig:csg_mesh_intro_embree}}
+	\subfloat[Artifact in the scene rendered with the approach outlined in this section.]{\includegraphics[width=.4\textwidth]{img/3 approach/EmbreeOrgScenegraph.png}\label{fig:csg_mesh_intro_embree}}
+	\caption{CSG composed of triangle meshes. The figures show a scene with two spheres described as triangle meshes. The right sphere is "subtracted" from the left sphere via the Boolean set operation \texttt{OR}. The scene can be regarded as the counterpart of the scene shown in Figure \ref{fig:csg_sub} for triangle mesh primitives.}
 	\label{fig:csg_mesh_intro}
 \end{figure}
 
+Furthermore, the rendering of CSG that is composed of at least one triangle mesh leads to artifacts. As mentioned, triangle meshes are associated in ART with individual KD trees that accelerate the intersection calculations solely between a ray the particular triangle mesh. When we initialize a triangle mesh for Embree, we omit the construction of individual mesh KD trees because they are not needed when ray tracing triangle meshes in general. However, when treating a CSG constructed from triangle meshes as a user-defined geometry and thus using ART's internal structures to calculate the intersections with the primitives, we depend on these individual KD trees for triangle meshes. Resurrecting these individual KD trees alone is not enough to resolve the artifact since the transmission from the original scene graph to the individual KD Tree at the Shape node representing the triangle mesh is not seamless.
 
-\subsection{Creation of KD trees for constructive solid geometries}
+
+\subsection{Creation of KD trees for CSG}
 \label{subsec:apprach3}
 
-\cite{zajicek2012}
+The artifact shown in the rendered image of the Villa Rotonda scene, which is visible in Figure \ref{fig:rotonda_embree}, as well as the artifacts that arise when rendering CSG that is composed of triangle meshes, as shown in Figure \ref{fig:csg_mesh_intro}, motivated us to develop further our approach outlined in the previous section. The initial idea for resolving these artifacts was to build ART's internal KD tree over the entire scene and, when a bounding box of a CSG is intersected by Embree, to continue the traversal to the CSG primitives in the subtree of the KD tree describing the spatial area in which the CSG is located.
+However, associating a Shape node in the scene graph to the area subdivided by the split planes of the KD trees, in which the shape is located, is not obvious since multiple geometries can be located in such an area.
+
+The approach outlined in this subsection, which can be reagrded as an extension for the approach described in the previous subsection, was inspired by the individual KD trees for the triangle meshes and the work of Petr Zaji\v{c}ek, documented in his master thesis \cite{zajicek2012}. In this thesis, Zaji\v{c}ek describes the application of KD trees to scenes containing CSG.
+
+For the scenes containing CSG, instead of constructing one KD tree that subdivides the bounding box of the entire scene, we construct multiple smaller KD trees for subdividing the bounding box of the CSG present in the scene.
+Therefore, we add a Boolean variable to the \texttt{GeometryData} struct shown in Listing \ref{lst:geometry_data_final}, indicating whether the associated geometry is a CSG or not. Before committing the \texttt{RTCScene} that will trigger the construction of Embree's internal BVH, we iterate through the linked list storing all \texttt{GeometryData} structs that are associated with the scene geometry. With the help of the \texttt{GeometryData} struct, we check whether the associated geometry is a CSG. If so, we calculate the bounding box that encloses the CSG and construct a KD tree that further subdivides the bounding volume. To calculate the bounding box and the KD tree, we use functions provided by ART. Furthermore, we add a reference to the root of the constructed KD tree to the \texttt{GeometryData} associated with the CSG.
+
+During ray tracing with Embree, we retrieve the \texttt{GeometryData} corresponding to the intersected shape and verify if that shape is a CSG or not. If not, the ray tracing procedure continues as outlined in Subsection \ref{subsec:instersect}. Otherwise, we traverse the associated KD tree beginning at the root node, calculating the intersections with the CSG primitives and storing the resulting intersection list in the intersection linked list.
+
+By traversing the individual KD trees to calculate intersections with CSG primitives, the issue regarding the Villa Rotonda scene described in the previous section is resolved \footnote{Figure \ref{fig:csg_rotonda} shows the scene rendered with the additional KD trees}. Furthermore, we are able to render CSG that is composed of triangle meshes.
+
+\subsubsection{Limitations of this approach}
+
+A disadvantage of this approach is that it depends on the internal KD trees associated with triangle meshes by ART. Their construction was originally omitted when initializing triangle meshes for Embree. However, by constructing those mesh KD trees for this approach, the decrease of the time needed to prepare the scene for ray tracing is compensated.
