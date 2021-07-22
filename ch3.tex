@@ -68,6 +68,12 @@ Although it would be convenient to initialize all shapes in ART as user defined 
 
 Into the first category will fall the analytically described shapes. Triangles and quadrangles will be regarded as non user defined geometry and represented by Embree's own primitive types \texttt{RTC\_GEOMETRY\_TYPE\_TRIANGLE} and \texttt{RTC\_GEOMETRY\_TYPE\_QUAD}. This division makes sense since the rendering of these primitive types with Embree is more efficient than the rendering user defined geometries. Furthermore, all the information needed to set up these primitive types is the vertices and indices associated with the shape. They can be easily transferred from ART to Embree. 
 
+\begin{figure} 
+	\centering
+	\includegraphics[width=.75\linewidth]{img/3 approach/shape_init_diagram.png}
+	\caption{Flowchart describing the workflow of the \texttt{initEmbreeGeometry} function.}
+	\label{fig:init_chart}
+\end{figure}
 
 The initialization of geometries for Embree takes place during the assembly of the scene graph from the information that has been parsed from the ARM scene file. To be precise, a particular shape is initialized for Embree when the Combined Attributes nodes and Shape nodes associated with it are created and inserted into the scene graph. After this insertion, an instance method of the \texttt{ArnEmbree} class, \texttt{initEmbreeGeometry}, is called. The shape object itself, together with the \texttt{Combined Attributes} object, and the transformation matrix, are passed as function arguments. 
 \\
@@ -220,6 +226,13 @@ Once an intersection with a bounding box enclosing a user-defined geometry is fo
 
 Once the geometries contained in a virtual scene are initialized for Embree and Embree's internal BVH has been created, the scene can be ray cast with the help of Embree. If Embree support is enabled by provision of the \texttt{-e} flag, an instance function of the \texttt{ArnRayCaster} class with the name \texttt{getIntersectionListWithEmbree} is called, which takes an empty \texttt{ArIntersectionList} struct as an argument.
 
+\begin{figure} 
+	\centering
+	\includegraphics[width=1\linewidth]{img/3 approach/getIntersectionListWithEmbree.png}
+	\caption{Flowchart the workflow of ray tracing with Embree in ART. The nodes with the three dots depict the internal procedures of ART.}
+	\label{fig:raytracing_chart}
+\end{figure}
+
 In the body of this function, an \texttt{RTCIntersectContext} is set up and a \texttt{RTCRayHit} struct is declared and updated according to the state of the \texttt{ArnRayCaster} object: The information with which the \texttt{RTCRayHit} stuct is being updated contains the orientation and direction of the ray that is stored as an instance variable of the \texttt{ArnRayCaster} object, and the ID associated to the ray. The \texttt{tfar} value of is initialized with Objective-C's \texttt{INFINITY} macro and the \texttt{geomID} field of the \texttt{RTCHit} struct is initialized with the macro \texttt{RTC\_INVALID\_GEOMETRY\_ID}. 
 
 Embree utilizes single-precision floating-point numbers for its internal calculations, whereas ART uses double-precision floating-point numbers. To compensate for visual artifacts in the final image, we do not initialize the \texttt{tnear} value of the \texttt{RTCRay} with zero. Instead, we give it a little offset to prevent calculating an intersection between a secondary ray and the same shape that was already hit. We found the value $1\cdot 10^{-3}$ to be reliable. A comparison of an image rendered with and without this offset is given by Figure \ref{fig:offset}.
@@ -241,9 +254,16 @@ Once the overall rendering job successfully completed, a "clean-up" is performed
 \subsection{Intersecting user-defined geometry}
 \label{subsec:instersect}
 
-In case a bounding box of a user-defined geometry is intersected with an \texttt{RTCRay}, the callback function \texttt{embree\_intersect\_geometry} is invoked by Embree. In its interior, the \texttt{Geometry Data} struct associated with the geometry in question is retrieved via the geometry user data pointer. 
+In case a bounding box of a user-defined geometry is intersected with an \texttt{RTCRay}, the callback function \texttt{embree\_intersect\_geometry} is invoked by Embree. In this function, the \texttt{Geometry Data} struct associated with the geometry in question is retrieved via the geometry user data pointer. 
 
-Subsequently, an empty \texttt{ArIntersectionList} struct is declared and the intersection calculation with the ray and the shape is performed via calling the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object, which takes a reference to the empty \texttt{ArIntersectionList}, as well a reference to the \texttt{ArnRayCaster} object as input.
+\begin{figure} 
+	\centering
+	\includegraphics[width=.8\linewidth]{img/3 approach/inetsect_flowchart.png}
+	\caption{Workflow of the custom \texttt{embree\_intersect\_geometry} callback function.}
+	\label{fig:intersecting_chart}
+\end{figure}
+
+Subsequently, an empty \texttt{ArIntersectionList} struct is declared and the intersection between ART's representation of the ray and the shape is calculated via calling the \texttt{getIntersectionList} function of the \texttt{Combined Attributes} object, which takes a reference to the empty \texttt{ArIntersectionList}, as well a reference to the \texttt{ArnRayCaster} object as input.
 This function will calculate the intersection points on the shape and update the \texttt{ArIntersectionList} struct accordingly. The reason why the \texttt{getIntersectionList} instance method of the \texttt{Combined Attributes} object is called, rather than the \texttt{getIntersectionList} instance method of the shape object, is that by doing so, the transformation information of the shape will be taken into account.
 
 If no intersection was found, we return immediately from the \texttt{embree\_intersect\_geometry} function. Otherwise, we will update the \texttt{tfar} value of the \texttt{RTCRay} with the hit distance and the geometry ID of the \texttt{RTCHit} struct with the geometry ID associated with the intersected shape.
