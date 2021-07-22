@@ -24,7 +24,7 @@ We tested the functionality of our implementation concerning CSG rendering with 
 	\item  Figure \ref{fig:csg_orennayar} shows the rendered image of a scene composed of a cylinder serving as the ground on which three so-called \emph{grooved spheres} are placed. The grooves on the sphere result from applying a \texttt{SUB} operator to a group of six tori and the sphere in question.
 	The purpose of this scene is to showcase ART's implementation of the Oren–Nayar reflectance model \cite{oren1994generalization} with different roughness grades.
 	
-	\item We have already encountered the \textbf{Villa Rotonda} scene in Subsection \ref{subsec:apprach1}. As mentioned there, the model of the Villa Rotonda is composed of two CSG with a total number of 1,255 primitives.
+	\item We have already encountered the Villa Rotonda scene in Subsection \ref{subsec:apprach1}. As mentioned there, the model of the Villa Rotonda is composed of two CSG with a total number of 1,255 primitives.
 		
 	\item The scene displayed in Figure \ref{fig:csg_torrancesparrow} is composed of twelve grooved spheres that are placed on three deformed cubes with different heights that together form a staircase. Furthermore, a cylinder serves as the ground. The initial purpose of this particular scene was the demonstration of the implementation of the Torrance–Sparrow reflectance model \cite{torrance1967theory} with varying roughness grades.
 	
@@ -73,7 +73,9 @@ We tested the functionality of our implementation concerning CSG rendering with 
 	\label{tab:csg}
 \end{table}
 
-As can be seen in Table \ref{tab:csg}, the \todo{do}
+The results we obtained from these tests show that rendering CSG geometry by traversing the original scene graph is competitive with Native ART. For the scene shown in Figure \ref{fig:csg_torrancesparrow}, the speedup resulting from the support of Embree is only marginal. However, the increased acceleration shown in the table for the scene shown in Figure \ref{fig:csg_orennayar} is indeed noteworthy. We want to emphasize that the overall acceleration shown in the table is not just thanks to Embree but also the fast traversal of the subgraphs of ART's interior scene graph representing the CSG in the scene.
+
+The results we obtained by traversing KD trees that are associated with CSG are fairly diverse. For the scenes shown in Figures \ref{fig:csg_orennayar}, \ref{fig:csg_torrancesparrow} and \ref{fig:csg_locomotive}, this approach is comparable to the approach of traversing the original scene graph. However, for scenes
 
 \subsubsection{Special case: Rendering CSG composed of triangle meshes}
 
@@ -127,7 +129,7 @@ This section provides results of tests conducted with this final implementation.
 \begin{itemize}
 	\setlength\itemsep{0.05em}
 	
-	\item The scene shown in Figure \ref{fig:chart} contains a model of the MacBeth ColorChecker, a color calibration target. This model is composed of one larger deformed cube serving as the frame and 24 cubes depicting the colored samples. The chart is placed on a cylinder.
+	\item The scene shown in Figure \ref{fig:chart} contains a model of the MacBeth ColorChecker, a color calibration tool. This model is composed of one larger deformed cube serving as the frame and 24 cubes depicting the colored samples. The chart is placed on a cylinder.
 	
 	\item Figure \ref{fig:gandalf} shows a typical Cornell Box scene with two additional image textures applied to the rear of the box and two a quadrangle on the right. The scene is composed of a total number of 20 non-user-defined geometries.
 	
@@ -151,8 +153,7 @@ This section provides results of tests conducted with this final implementation.
 	\\
 	\subfloat[Exoplanet scene]{\includegraphics[width=.7\textwidth]{img/4 results/normal/skydomeEmbreeFinal.png}\label{fig:skydome}}
 
-	
-	\caption{Scenes from the gallery of the ART repository.}
+	\caption{Scenes containing various types of shapes: CSG, user-defined geometry, and non-user-defined geometry.}
 	\label{fig:scenes}
 \end{figure}
 
@@ -164,13 +165,13 @@ This section provides results of tests conducted with this final implementation.
 			\toprule
 			Scene & \Verb!#!Geometries & Native ART & Embree & Speedup \\ 
 			\midrule
-			Figure \ref{fig:chart} & 26 & 196.34 sec & 213.15 sec & \textcolor{red}{-8.56 \%} \\
-			Figure \ref{fig:gandalf} & 20 & 454.60 sec & 229.73 sec & 49.47 \% \\
-			Figure \ref{fig:glow} & 13 & 401.27 sec & 225.29 sec & 43.86 \%  \\
-			Figure \ref{fig:skydome} & 38 & 761.25 sec & 621.96 sec & 18.30 \% \\
+			Figure \ref{fig:chart} & 26 & 382.70 sec & 361.80 sec & 5.46 \% \\
+			Figure \ref{fig:gandalf} & 20 & 387.72 sec & 227.74 sec & 41.26 \% \\
+			Figure \ref{fig:glow} & 13 & 397.46 sec & 389.72 sec & 1.95 \%  \\
+			Figure \ref{fig:skydome} & 38 & 674.91 sec & 634.52 sec & 5.98 \% \\
 			\bottomrule
 	\end{tabular}}
-	\caption{An example table. Table caption should clearly explain how to interpret the data in the table. Use some visual guide, such as boldface or color coding, to highlight the most important results (e.g., comparison winners).}
+	\caption{Comparison between Native ART and our hybrid implementation on scenes that contain various types of geometries. In the table, triangle meshes and CSG are considered one geometry.}
 	\label{tab:scenes}
 \end{table}
 
