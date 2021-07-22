@@ -1,18 +1,20 @@
 \chapter{Results and discussion}
 \label{chap:results}
 
-Our approach to integrating Embree into ART, as outlined in the previous chapter, was tested on a variety of scene files. This chapter provides an overview and analysis of the performance of our implementation. It is divided into three subsections. Subsection \ref{sec:results_csg} discusses the execution time of ART when rendering scenes CSG. A comparison is drawn between our two approaches for realizing CSG operations with Embree, the initialization of an entire CSG as a user-defined geometry and the traversal through the original scene graph or a dedicated KD tree. We will exclude the provision of results concerning the rendering of CSG through the collection of intersection points and their subsequent evaluation, outlined in Subsection \ref{subsec:apprach1}. This exclusion is due to the immense rendering time resulting from this approach, making it impractical.
+Our approach of integrating Embree into ART, as outlined in the previous chapter, was tested on a variety of scene files. This chapter provides an overview and analysis of the performance of our implementation. It is divided into three sections. Subsection \ref{sec:results_csg} discusses the execution time of ART when rendering scenes containing constructive solid geometries. A comparison is drawn between our two approaches for realizing CSG operations with Embree, the initialization of an entire CSG as a user-defined geometry and the traversal through the original scene graph or a dedicated KD tree. We will exclude the provision of results concerning the rendering of CSG through the collection of intersection points and their subsequent evaluation, outlined in Subsection \ref{subsec:apprach1}. This exclusion is due to the significantly decreased rendering performance resulting from this approach, and thus, making it impractical.
 
-Furthermore, we decided to test our implementation on virtual scenes, not necessarily containing CSG, to analyze the overall performance of rendering non-user-defined and user-defined geometries. Section \ref{sec:result_normal} provides the results on various scenes rendered by an hybrid implementation combining the approaches outlined in Subsections \ref{subsec:apprach2} and \ref{subsec:apprach3}. 
+Furthermore, we decided to test our implementation on virtual scenes, using mesh geometry, to analyze and compare the performance of rendering non-user-defined and user-defined geometries. 
 
-Finally, our implementation was tested on scenes, each containing triangle meshes of increasing triangle sizes. The outcome of these experiments is provided and evaluated in Section \ref{sec:result_meshes}.
+Section \ref{sec:result_normal} provides the results on various scenes rendered by an hybrid implementation combining the approaches outlined in Subsections \ref{subsec:apprach2} and \ref{subsec:apprach3}. 
 
-The following experiments were conducted on an Asus N551JX laptop, which exhibits a quad-core Intel Core i7–4720HQ processor with a frequency of 2.6 GHz and 8 GB of RAM. The images shown in this chapter were rendered in ART with Embree support at a resolution of 700x700, a path length of 20, and a sample size of 128. The image synthesis of these scenes was performed by using the eight available cores of the machine.
+In Section \ref{sec:result_meshes}, we test and evaluate our implementation on scene exclusively composed of triangles with varying amount of geometry.
+
+The following experiments were conducted on an Asus N551JX laptop with a quad-core Intel Core i7–4720HQ processor clocked at 2.6 GHz and 8 GB of RAM. The images shown in this chapter were rendered in ART with Embree support at a resolution of 700x700, a path length of 20, and 128 samples per pixel. The internal calculations regarding the image synthesis of these scenes were performed via multi-threading with eight threads.
 
 \section{Evaluation of our integration for scenes containing CSG}
 \label{sec:results_csg}
 
-We tested the functionality of our implementation concerning CSG rendering with Embree on six scenes, which were made publicly available by the developers of ART \footnote{Most of the scenes shown in this chapter can be found in the \texttt{Gallery} folder of the ART repository, which is submitted together with this thesis as an electronic attachment. Scenes or 3D models that are not taken from this folder will be cited.}. All the scenes mentioned in this section contain an infinite sphere, serving as a skydome for illuminating the other scene geometry. 
+We tested the functionality of our implementation concerning CSG rendering with Embree on six scenes, which were made publicly available by the developers of ART \footnote{Most of the scenes shown in this chapter can be found in the \texttt{Gallery} folder of the ART repository, which is submitted together with this thesis as an electronic attachment. Scenes or 3D models that are not taken from this folder will be cited.}. All the scenes mentioned in this section contain an infinite sphere, serving as a skydome to light the scene. 
 \\
 
 \noindent For this evaluation, our implementation was tested on the following scenes:
@@ -60,13 +62,13 @@ We tested the functionality of our implementation concerning CSG rendering with 
 			\toprule
 			Scene & \thead{\texttt{\#}Topmost \\ CSG \\ nodes} & Native ART & \thead{Org scene \\ graph} &  KD tree & \thead{Org scene \\ graph \\ speedup} & \thead{KD tree \\ speedup} \\ 
 			\midrule
-			Figure \ref{fig:csg_shell} & 1 & 2,611.75 sec & 2,437.81 sec & 4,151.01 sec & 6.66 \% & \textcolor{red}{-58.94 \%}  \\
-			Figure \ref{fig:csg_orennayar} & 3 & 791.71 sec & 522.97 sec & 528.77 sec & 33.94 \% & 33.21 \% \\
-			Figure \ref{fig:csg_rotonda} & 2 & 738.25 sec & 629.03 sec &  765.44 sec & 14.79 \%  & \textcolor{red}{-3.68 \%}  \\
+			Figure \ref{fig:csg_shell} & 1 & 2,611.75 sec & 2,437.81 sec & 4,151.01 sec & \textbf{6.66 \%} & \textbf{\textcolor{red}{-58.94 \%}}  \\
+			Figure \ref{fig:csg_orennayar} & 3 & 791.71 sec & 522.97 sec & 528.77 sec & \textbf{33.94 \%} & \textbf{33.21 \%} \\
+			Figure \ref{fig:csg_rotonda} & 2 & 738.25 sec & 629.03 sec &  765.44 sec & \textbf{14.79 \%}  & \textbf{\textcolor{red}{-3.68 \%}}  \\
 			\addlinespace % a nice non-intrusive separator of data groups (or final table sums)
-			Figure \ref{fig:csg_torrancesparrow} & 12 & 910.56 sec & 896.97 sec & 902.61 sec & 1.49 \%  & 0.87 \% \\
-			Figure \ref{fig:csg_plane} & 28 & 522.58 sec & 498.25 sec & 546.79 sec & 4.66 \% & \textcolor{red}{-4.63} \% \\
-			Figure \ref{fig:csg_locomotive} & 354 & 312.94 sec & 272.08 sec & 280.83 sec & 13.06 \%  & 10.26 \% \\
+			Figure \ref{fig:csg_torrancesparrow} & 12 & 910.56 sec & 896.97 sec & 902.61 sec & \textbf{1.49 \%}  & \textbf{0.87 \%} \\
+			Figure \ref{fig:csg_plane} & 28 & 522.58 sec & 498.25 sec & 546.79 sec & \textbf{4.66 \%} & \textbf{\textcolor{red}{-4.63} \%} \\
+			Figure \ref{fig:csg_locomotive} & 354 & 312.94 sec & 272.08 sec & 280.83 sec & \textbf{13.06 \%}  & \textbf{10.26 \%} \\
 			\bottomrule
 	\end{tabular}}
 	\caption{Comparison between the performances of Native ART and ART with Embree support. The performance of both methods of traversing the original scene graph and traversing the dedicated KD tree is compared to the performance of Native ART.}
@@ -75,7 +77,9 @@ We tested the functionality of our implementation concerning CSG rendering with 
 
 The results we obtained from these tests show that rendering CSG geometry by traversing the original scene graph is competitive with Native ART. For the scene shown in Figure \ref{fig:csg_torrancesparrow}, the speedup resulting from the support of Embree is only marginal. However, the increased acceleration shown in the table for the scene shown in Figure \ref{fig:csg_orennayar} is indeed noteworthy. We want to emphasize that the overall acceleration shown in the table is not just thanks to Embree but also the fast traversal of the subgraphs of ART's interior scene graph representing the CSG in the scene.
 
-The results we obtained by traversing KD trees that are associated with CSG are fairly diverse. For the scenes shown in Figures \ref{fig:csg_orennayar}, \ref{fig:csg_torrancesparrow} and \ref{fig:csg_locomotive}, this approach is comparable to the approach of traversing the original scene graph. However, for scenes
+The results we obtained by traversing KD trees that are associated with CSG are highly scene dependent. For the scenes shown in Figures \ref{fig:csg_orennayar}, \ref{fig:csg_torrancesparrow} and \ref{fig:csg_locomotive}, this approach is comparable to the approach of traversing the original scene graph. However, for scenes shown in Figures \ref{fig:csg_shell}, \ref{fig:csg_rotonda} and \ref{fig:csg_plane} the rendering time increased compared to Native ART. The decrease seen in the table for Figures \ref{fig:csg_rotonda} and \ref{fig:csg_plane} can arguably be regarded as competitive with Native ART. Nevertheless, the decrease of performance regarding the rendering of the scene shown in Figure \ref{fig:csg_shell} is significant. These three scenes have in common that they contain CSG being constructed from a large number of geometric primitives. Therefore, these CSG are associated with complex KD trees whose traversal impacts the performance. In contrast, the locomotive model shown in Figure \ref{fig:csg_locomotive}, which is constructed by a large number of primitives, too, is modeled by the assembly of multiple CSG instead of one single large one. This explains why we did not experience a decrease in performance regarding this scene.
+
+We conclude that our approach of traversing KD trees associated with CSG does work well with CSG composed of a manageable amount of geometric primitives but does not work well with more complex CSG.
 
 \subsubsection{Special case: Rendering CSG composed of triangle meshes}
 
@@ -95,8 +99,8 @@ The results we obtained by traversing KD trees that are associated with CSG are 
 			\toprule
 			Scene  & \thead{Native ART \\ Preparation} & \thead{Native ART \\ Ray \\ Tracing} & \thead{Embree \\ Preparation} & \thead{Embree \\ Ray Tracing} & \thead{Ray Tracing \\ Speedup} \\ 
 			\midrule
-			Figure \ref{fig:csg_mesh_spheres} & 0.09 sec & 237.25 sec & 0.09 sec & 284.86 sec & \textcolor{red}{-20.07 \%} \\
-			Figure \ref{fig:csg_mesh_bunny_buddha} & 4.58 sec & 376.20 sec & 61.82 sec & 709.77 sec  & \textcolor{red}{-88.67 \%} \\
+			Figure \ref{fig:csg_mesh_spheres} & 0.09 sec & 237.25 sec & 0.09 sec & 284.86 sec & \textbf{\textcolor{red}{-20.07 \%}} \\
+			Figure \ref{fig:csg_mesh_bunny_buddha} & 4.58 sec & 376.20 sec & 61.82 sec & 709.77 sec  & \textbf{\textcolor{red}{-88.67 \%}} \\
 			\bottomrule
 	\end{tabular}}
 	\caption{Comparison between the performances of Native ART and ART with Embree support. The time needed for preparing the ray tracing process by constructing the internal acceleration data structures and the time needed for the ray tracing process itself.}
@@ -114,30 +118,27 @@ We do not recommend using our approach to render CSG composed of triangle meshes
 \section{Hybrid implementation and evaluation}
 \label{sec:result_normal}
 
-After examining the results of our tests concerning the rendering of CSG described in the previous section, we decided to abandon our approach of calculating the intersection points by traversing a KD tree associated with the CSG in question. This is because the traversal of the original scene subgraph rooted at the topmost CSG node is faster. For now, we accept the drawback concerning the Villa Rotonda scene missing its roof as a known issue (as outlined in Subsection \ref{subsec:apprach2}), since we strongly believe that this issue is rather connected to the scene graph traversal than to the functionality concerning Embree. Finding an adequate solution to resolve this issue will be a part of our future work.
+After examining the results of our tests concerning the rendering of CSG described in the previous section, we decided to abandon our approach of calculating the intersection points by traversing KD trees associated with the CSG in the scene. For now, we accept the drawback concerning the Villa Rotonda scene missing its roof, as outlined in Subsection \ref{subsec:apprach2}, as a known issue.
 
-However, we cannot completely abandon the approach of building and traversing individual KD trees for CSG since scenes with CSG that are composed of at least one triangle mesh strictly depend on the KD trees.
+However, we cannot completely abandon the approach of building and traversing individual KD trees for CSG since scenes with CSG that are composed of at least one triangle mesh strictly depend on these. Therefore, in our final implementation, we use a hybrid technique merging our approaches described in Subsection \ref{subsec:apprach2} and Subsection \ref{subsec:apprach3}. During the preparation of the scene for ray tracing in ART, the scene graph is assembled. If, during the assembly, a topmost CSG node is encountered, we check if at least one of the leaves of its subtree is associated with a triangle mesh. If this is the case, a flag associated with the CSG in question is activated. Whenever such a flag is activated for a CSG, the internal KD tree for the triangle mesh primitive is built, and an individual KD tree is built for the CSG.
+When a ray intersects this particular CSG during the ray tracing procedure, the intersections will be calculated by the traversal of the associated KD tree.
 
-Therefore, our final implementation of the facilitation of CSG rendering with Embree consists of a hybrid combination between Approach 2 and Approach 3: Before the actual image synthesis procedure in ART, the scene graph is assembled. When, during this step, a topmost CSG node corresponding to a CSG that is constructed by at least one triangle mesh, a flag associated with the CSG is activated. Whenever such a flag is activated for a CSG in question, the internal KD tree for the triangle mesh primitive is built and the KD tree for the CSG according to Approach 3. If such a CSG, being constructed of at least one triangle mesh, is intersected by a ray during the ray tracing procedure, the intersections between ray and CSG are calculated by the traversal of the associated KD tree.
+The intersection calculations between rays and CSG that are not constructed of at least one triangle mesh are calculated by traversal of the scene subgraph rooted at the topmost CSG node corresponding to the particular CSG.
 
-The intersection calculations between rays and CSG that are not constructed of at least one triangle mesh, are calculated by traversal of the scene subgraph rooted at the topmost CSG node corresponding to the particular CSG, according to Approach 2.
-
-This section provides results of tests conducted with this final implementation.
+This section provides the results of tests conducted with this final implementation.
 \\
 
 \noindent In the following, we provide an overview of the scenes used for testing the overall performance of ART with Embree support:
 \begin{itemize}
 	\setlength\itemsep{0.05em}
 	
-	\item The scene shown in Figure \ref{fig:chart} contains a model of the MacBeth ColorChecker, a color calibration tool. This model is composed of one larger deformed cube serving as the frame and 24 cubes depicting the colored samples. The chart is placed on a cylinder.
+	\item The scene shown in Figure \ref{fig:chart} contains a model of the Macbeth ColorChecker, a color calibration tool. This model comprises one larger deformed cube serving as the frame and 24 cubes depicting the colored samples. The chart is placed on a cylinder.
 	
 	\item Figure \ref{fig:gandalf} shows a typical Cornell Box scene with two additional image textures applied to the rear of the box and two a quadrangle on the right. The scene is composed of a total number of 20 non-user-defined geometries.
 	
-	\item The scene shown in Figure \ref{fig:glow} \cite{wilkie2011physically}
+	\item The scene shown in Figure \ref{fig:glow} was created as part of the development of a model for describing the emission from glowing solid objects, described in  \cite{wilkie2011physically}. It consists of twelve spheres and a cylinder on which the spheres are placed.
 	
-	\item Figure \ref{fig:skydome} shows an image that was originally published in the research article \citetitle{wilkie2013predicting} \cite{wilkie2013predicting}.
-	
-	- 10 x 13 for grooved spheres, 1 mirror sphere, colorchecker, traingle mesh, cylinder
+	\item Figure \ref{fig:skydome} shows an image of a scene that was originally published in \cite{wilkie2013predicting}. The scene consists of CSG, user-defined geometries, and a triangle mesh. We will refer to this scene as \emph{Exoplanet scene} since it was used to showcase illumination on earth-like exoplanets.
 	
 	
 \end{itemize}
@@ -165,10 +166,10 @@ This section provides results of tests conducted with this final implementation.
 			\toprule
 			Scene & \Verb!#!Geometries & Native ART & Embree & Speedup \\ 
 			\midrule
-			Figure \ref{fig:chart} & 26 & 382.70 sec & 361.80 sec & 5.46 \% \\
-			Figure \ref{fig:gandalf} & 20 & 387.72 sec & 227.74 sec & 41.26 \% \\
-			Figure \ref{fig:glow} & 13 & 397.46 sec & 389.72 sec & 1.95 \%  \\
-			Figure \ref{fig:skydome} & 38 & 674.91 sec & 634.52 sec & 5.98 \% \\
+			Figure \ref{fig:chart} & 26 & 382.70 sec & 361.80 sec & \textbf{5.46 \%} \\
+			Figure \ref{fig:gandalf} & 20 & 387.72 sec & 227.74 sec & \textbf{41.26 \%} \\
+			Figure \ref{fig:glow} & 13 & 397.46 sec & 389.72 sec & \textbf{1.95 \%}  \\
+			Figure \ref{fig:skydome} & 38 & 674.91 sec & 634.52 sec & \textbf{5.98 \%} \\
 			\bottomrule
 	\end{tabular}}
 	\caption{Comparison between Native ART and our hybrid implementation on scenes that contain various types of geometries. In the table, triangle meshes and CSG are considered one geometry.}
@@ -179,18 +180,37 @@ This section provides results of tests conducted with this final implementation.
 
 \begin{figure}
 	\centering
-	\subfloat[Macbeth ColorChecker]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeDetail.png}\label{fig:gandalf_embree}}
+	\subfloat[Rendered image of the Cornell Box scene with the individual quadrangles being initialized with Embree's proprietary primitive types.]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeDetail.png}\label{fig:gandalf_embree}}
 	\hfill
-	\subfloat[Cornell box with texture mapping]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceEmbreeNormal.png}\label{fig:difference_embree}}
+	\subfloat[Difference image between the image shown in Figure \ref{fig:gandalf_embree} and the corresponding image rendered by Native ART.]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceEmbreeNormal.png}\label{fig:difference_embree}}
 	\\
-	\subfloat[Glowing spheres]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeUserDetail.png}\label{fig:gandalf_embree_user}}
+	\subfloat[Rendered image of the Cornell Box scene with the individual quadrangles being initialized as user-defined geometries.]{\includegraphics[width=.45\textwidth]{img/4 results/normal/imagemapEmbreeUserDetail.png}\label{fig:gandalf_embree_user}}
 	\hfill
-	\subfloat[Exoplanet scene]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceUserNormal.png}\label{fig:difference_embree_user}}
-	
-	
-	\caption{Scenes from the gallery of the ART repository.}
+	\subfloat[Difference image between the image shown in Figure \ref{fig:gandalf_embree_user} and the corresponding image rendered by Native ART.]{\includegraphics[width=.45\textwidth]{img/4 results/normal/differenceUserNormal.png}\label{fig:difference_embree_user}}
+		
+	\caption{Images of the Cornell Box scene rendered with different approaches.}
 	\label{fig:res_gandalf_issue}
 \end{figure}
+
+The results shown in Table \ref{tab:scenes} are similar to those presented in Section \ref{sec:results_csg}. The result obtained by rendering the scene shown in Figure \ref{fig:gandalf} stands out from the remaining results. The performance speedup is due to this scene being modeled entirely with non-user-defined geometries, which are initialized with Embree's proprietary primitive types. Rendering non-user-defined geometry with Embree is more efficient than rendering user-defined geometry.
+
+However, this increase in performance comes with a significant drawback. The rendered image exhibits visible noise at the edges between the ceiling of the box and the three walls. This artifact can be seen in Figure \ref{fig:gandalf_embree}. Although we cannot give a definite answer to what caused this artifact, we believe it is due to one of the two following reasons. Firstly, for ray tracing non-user-defined geometry, double-precision floating-point numbers are cast into single-precision floating-point numbers, resulting in inaccuracies. Secondly, the quadrangle depicting the light source and the ceiling of the Cornell Box are coplanar. It seems that for an incident angle, lower than a certain number of degrees, between the ray that is intersecting the light source and the light source itself, the contribution of light for that ray is disregarded.
+
+\begin{table}
+	\centering
+	{\footnotesize\sf
+		\begin{tabular}{lrrrr}
+			\toprule
+			Scene  & Native ART & Embree & Speedup \\ 
+			\midrule
+			Figure \ref{fig:gandalf} & 454.60 sec & 292.25 sec & \textbf{35.71 \%} \\
+			\bottomrule
+	\end{tabular}}
+	\caption{Comparison of the performance of Native ART and ART with Embree support with regard to the Cornell Box scene shown in Figure \ref{fig:gandalf}. The quadrangles, of which the scene is composed were initialized as user-defined geometries.}
+	\label{tab:gandalf}
+\end{table}
+
+One can work around this issue by initializing the quadrangles, of which the scene is composed, as user-defined geometries for Embree. A result of this approach can be seen in Figure \ref{fig:gandalf_embree_user}. We tested the rendering performance of this approach concerning this specific scene. The obtained result is shown in Table \ref{tab:gandalf}. The performance of rendering this scene, with its contained shapes initialized as user-defined geometries, is still increased compared to the performance of Native ART. However, the resulting speedup is lower than the one obtained when having the shapes initialized as non-user-defined geometry.
 
 
 \section{Evaluation of our implementation for scenes containing triangle meshes}
@@ -240,21 +260,21 @@ Each scene shown in Figure \ref{fig:mesh_scenes} is composed of a quadrangle ser
 			\toprule
 			Scene  & \thead{Native ART \\ Preparation} & \thead{Embree \\ Preparation}  & \thead{Native ART \\ Ray Tracing} & \thead{Embree \\ Ray Tracing} &  \thead{Ray Tracing \\ Speedup}\\ 
 			\midrule
-			Figure \ref{fig:mesh_teapot} & 0.29 sec & 0.04 sec & 353.83 sec & 304.26 sec &  14.01 \% \\
-			Figure \ref{fig:mesh_bunny}  & 4.28 sec & 0.25 sec & 379.02 sec & 305.00 sec &  19.53 \% \\
-			Figure \ref{fig:mesh_mike} & 18.40 sec & 1.85 sec &  302.52 sec & 254.03 sec &  16.03 \%  \\
+			Figure \ref{fig:mesh_teapot} & 0.29 sec & 0.04 sec & 353.83 sec & 304.26 sec &  \textbf{14.01 \%} \\
+			Figure \ref{fig:mesh_bunny}  & 4.28 sec & 0.25 sec & 379.02 sec & 305.00 sec &  \textbf{19.53 \%} \\
+			Figure \ref{fig:mesh_mike} & 18.40 sec & 1.85 sec &  302.52 sec & 254.03 sec &  \textbf{16.03 \%}  \\
 			\addlinespace % a nice non-intrusive separator of data groups (or final table sums)
-			Figure \ref{fig:mesh_buddha}  & 57.28 sec & 6.48 sec & 351.92 sec & 276.00 sec &  21.57 \% \\
+			Figure \ref{fig:mesh_buddha}  & 57.28 sec & 6.48 sec & 351.92 sec & 276.00 sec &  \textbf{ 21.57 \%} \\
 			Figure \ref{fig:mesh_dragon} & (no data)  & 64.43 sec & (no data) & 304.29 sec & (no data)  \\
 			Figure \ref{fig:mesh_lucy}  & (no data) & 302.19 sec & (no data) & 327.59 sec & (no data)  \\
 			\bottomrule
 	\end{tabular}}
-	\caption{An example table. Table caption should clearly explain how to interpret the data in the table. Use some visual guide, such as boldface or color coding, to highlight the most important results (e.g., comparison winners).}
+	\caption{Comparison between the performances of Native ART and ART with Embree support regarding the rendering of triangle meshes.}
 	\label{tab:mesh}
 \end{table}
 
-The results in Table \ref{tab:mesh} show a general increase of the performance of ART when supported by Embree. Another advantage of our implementation compared to Native ART is that the time needed to prepare the scene for ray tracing decreased since we omit the construction of KD trees for triangle meshes.
+The results in Table \ref{tab:mesh} show a general increase in the performance of ART when supported by Embree. Another advantage of our implementation is the drastic speedup when building the acceleration structure before rendering.
 
 However, we could not render the Asian Dragon and Lucy meshes with Native ART on our local machine. This is because these meshes are large, and so is ART's internal KD tree for grouping the individual triangles into spaces bound by split planes. For triangle meshes composed of a number of triangles higher than a certain threshold, the required memory needed for the construction of the mesh KD tree exceeds the available system memory, which, in our case, results in a termination of the program by the Linux kernel.
 
-At this point, we would like to emphasize that through our implementation, the rendering of such large triangle meshes is possible on machines comparable to the one we used for our tests.
+At this point, we would like to emphasize that our implementation allows for the rendering of much more complicated scenes than Native ART on the same hardware.
